@@ -1,0 +1,1638 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>澶╁懡杞浆 - 瑙掕壊閾埢</title>
+<style>
+  :root {
+    --bg-primary: #0f0d0a;
+    --bg-card: #1a1714;
+    --bg-card-hover: #231f19;
+    --bg-input: #161310;
+    --text-primary: #e8dcc8;
+    --text-secondary: #b5a78e;
+    --text-muted: #7d7264;
+    --gold: #c9a84c;
+    --gold-light: #e8d5a0;
+    --gold-dark: #8a7230;
+    --border: #3d3428;
+    --shadow-gold: 0 0 30px rgba(201,168,76,0.08);
+    --space-xs: clamp(4px, 1vw, 8px);
+    --space-sm: clamp(8px, 2vw, 12px);
+    --space-md: clamp(12px, 3vw, 16px);
+    --space-lg: clamp(16px, 4vw, 24px);
+    --space-xl: clamp(20px, 5vw, 32px);
+    --space-2xl: clamp(24px, 6vw, 40px);
+    --fs-xs: clamp(10px, 2vw, 11px);
+    --fs-sm: clamp(11px, 2.2vw, 12px);
+    --fs-base: clamp(12px, 2.5vw, 14px);
+    --fs-md: clamp(13px, 2.8vw, 15px);
+    --fs-lg: clamp(15px, 3.2vw, 18px);
+    --fs-xl: clamp(18px, 4vw, 22px);
+    --fs-2xl: clamp(22px, 5vw, 26px);
+    --fs-3xl: clamp(26px, 6vw, 32px);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg-primary); color: var(--text-primary);
+    font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; justify-content: center; line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .container { position: relative; width: 100%; max-width: 640px; min-height: 100vh; min-height: 100dvh; }
+
+  .page {
+    display: none;
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: var(--space-2xl) var(--space-lg);
+    padding-top: calc(var(--space-2xl) + var(--safe-top));
+    padding-bottom: calc(var(--space-2xl) + var(--safe-bottom) + 36px);
+    padding-left: calc(var(--space-lg) + var(--safe-left));
+    padding-right: calc(var(--space-lg) + var(--safe-right));
+    min-height: 100vh; min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .page.active { display: flex; }
+
+  .page-inner {
+    width: 100%; max-width: 520px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--space-lg); flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .taiji-symbol { animation: none !important; }
+  }
+
+  .taiji-symbol {
+    width: clamp(48px, 10vw, 64px); height: clamp(48px, 10vw, 64px);
+    opacity: 0.7; animation: taiji-spin 30s linear infinite; flex-shrink: 0;
+  }
+  @keyframes taiji-spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  .taiji-symbol.large { width: clamp(80px, 18vw, 120px); height: clamp(80px, 18vw, 120px); opacity: 0.5; animation-duration: 20s; }
+
+  .separator { width: clamp(160px, 50vw, 240px); height: 20px; opacity: 0.5; flex-shrink: 0; }
+
+  .page-title { font-size: var(--fs-2xl); color: var(--gold); letter-spacing: clamp(4px, 1.5vw, 8px); font-weight: 400; text-align: center; flex-shrink: 0; }
+  .page-guide { font-size: var(--fs-base); color: var(--text-secondary); line-height: 2; text-align: center; max-width: 420px; letter-spacing: clamp(0.5px, 0.2vw, 1px); flex-shrink: 0; }
+
+  .input-field {
+    width: 100%; max-width: 360px; padding: clamp(10px, 2.5vw, 14px) clamp(14px, 3vw, 20px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-lg); font-family: inherit;
+    text-align: center; letter-spacing: clamp(2px, 0.8vw, 4px); outline: none;
+    transition: border-color 0.3s; min-height: 44px; flex-shrink: 0;
+  }
+  .input-field:focus { border-color: var(--gold); box-shadow: var(--shadow-gold); }
+  .input-field::placeholder { color: var(--text-muted); letter-spacing: 2px; font-size: var(--fs-base); }
+
+  .card-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); gap: var(--space-md); width: 100%; }
+  .card {
+    padding: clamp(16px, 4vw, 24px) clamp(12px, 3vw, 16px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; text-align: center; transition: all 0.3s; user-select: none; min-height: 44px;
+  }
+  .card:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); transform: translateY(-2px); }
+  .card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); box-shadow: var(--shadow-gold); }
+  .card-title { font-size: var(--fs-xl); color: var(--gold); margin-bottom: var(--space-xs); letter-spacing: clamp(2px, 0.6vw, 4px); }
+  .card-desc { font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.8; }
+
+  .mini-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(60px, 14vw, 80px), 1fr)); gap: var(--space-sm); width: 100%; justify-items: center; }
+  .mini-card {
+    width: 100%; max-width: 80px; aspect-ratio: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; transition: all 0.3s; user-select: none; min-height: 44px;
+  }
+  .mini-card:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); }
+  .mini-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); box-shadow: var(--shadow-gold); }
+  .mini-card .mc-label { font-size: var(--fs-md); color: var(--text-primary); letter-spacing: 2px; }
+
+  .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(80px, 18vw, 100px), 1fr)); gap: var(--space-sm); width: 100%; justify-items: center; }
+  .art-card {
+    width: 100%; max-width: 110px; padding: clamp(10px, 2.5vw, 16px) clamp(6px, 1.5vw, 8px);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; transition: all 0.3s; user-select: none; min-height: 44px;
+  }
+  .art-card:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); }
+  .art-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+  .art-card .art-name { font-size: var(--fs-base); color: var(--text-primary); letter-spacing: 2px; }
+  .art-card .art-desc { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.6; text-align: center; }
+
+  .realm-group { width: 100%; margin-bottom: var(--space-sm); }
+  .realm-group-title { font-size: var(--fs-sm); color: var(--gold-dark); letter-spacing: clamp(1px, 0.5vw, 3px); margin-bottom: var(--space-xs); padding-left: 4px; }
+  .realm-options, .faction-grid { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+  .realm-btn, .faction-btn {
+    padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 14px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-secondary); font-size: var(--fs-sm); font-family: inherit;
+    cursor: pointer; transition: all 0.3s; letter-spacing: 1px; min-height: 36px; touch-action: manipulation;
+  }
+  .realm-btn:hover, .faction-btn:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); color: var(--text-primary); }
+  .realm-btn.selected, .faction-btn.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+  .realm-more-toggle {
+    padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px);
+    background: none; border: 1px dashed var(--border); border-radius: 4px;
+    color: var(--text-muted); font-size: var(--fs-sm); font-family: inherit;
+    cursor: pointer; letter-spacing: 2px; transition: all 0.3s; min-height: 36px; touch-action: manipulation;
+  }
+  .realm-more-toggle:hover { border-color: var(--gold-dark); color: var(--text-secondary); }
+  .realm-advanced { display: none; width: 100%; }
+  .realm-advanced.show { display: block; }
+
+  .custom-wrap { width: 100%; max-width: 400px; margin-top: var(--space-xs); display: flex; gap: var(--space-xs); align-items: center; justify-content: center; flex-wrap: wrap; }
+  .custom-label { font-size: var(--fs-sm); color: var(--text-muted); white-space: nowrap; }
+  .custom-input {
+    flex: 1; min-width: 0; padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-base); font-family: inherit;
+    outline: none; letter-spacing: 2px; transition: border-color 0.3s; min-height: 40px;
+  }
+  .custom-input:focus { border-color: var(--gold); }
+  .custom-select {
+    flex: 1; min-width: 0; padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-base); font-family: inherit;
+    outline: none; letter-spacing: 1px; transition: border-color 0.3s; min-height: 40px;
+    cursor: pointer; appearance: auto;
+  }
+  .custom-select:focus { border-color: var(--gold); }
+  .custom-select option { background: var(--bg-card); color: var(--text-primary); }
+  .num-input {
+    width: 70px; padding: clamp(6px, 1.5vw, 8px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-base); font-family: inherit;
+    outline: none; text-align: center; min-height: 40px;
+  }
+  .num-input:focus { border-color: var(--gold); }
+
+  .preview-text { font-size: var(--fs-lg); color: var(--gold-light); letter-spacing: clamp(1px, 0.5vw, 3px); text-align: center; min-height: 24px; transition: all 0.3s; flex-shrink: 0; word-break: break-all; }
+
+  .btn-row { display: flex; gap: var(--space-md); margin-top: var(--space-sm); flex-wrap: wrap; justify-content: center; flex-shrink: 0; }
+  .btn {
+    padding: clamp(10px, 2.5vw, 12px) clamp(24px, 6vw, 36px);
+    background: transparent; border: 1px solid var(--gold); border-radius: 4px;
+    color: var(--gold); font-size: var(--fs-md); font-family: inherit;
+    cursor: pointer; letter-spacing: clamp(2px, 0.6vw, 4px); transition: all 0.3s;
+    min-height: 44px; touch-action: manipulation; white-space: nowrap;
+  }
+  .btn:hover { background: rgba(201,168,76,0.1); box-shadow: var(--shadow-gold); }
+  .btn:active { background: rgba(201,168,76,0.15); }
+  .btn-primary { background: rgba(201,168,76,0.12); }
+  .btn-back { border-color: var(--border); color: var(--text-muted); }
+  .btn-back:hover { border-color: var(--text-secondary); color: var(--text-secondary); background: transparent; box-shadow: none; }
+  .btn-start { padding: clamp(12px, 3vw, 16px) clamp(36px, 8vw, 56px); font-size: var(--fs-lg); letter-spacing: clamp(4px, 1.2vw, 8px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-sm {
+    padding: 4px 10px; font-size: var(--fs-xs); min-height: 28px;
+    letter-spacing: 1px; border-radius: 3px;
+  }
+  .btn-danger { border-color: #8b4513; color: #c97a4c; }
+  .btn-danger:hover { background: rgba(139,69,19,0.15); }
+
+  .step-indicator {
+    position: fixed; bottom: calc(var(--space-md) + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+    display: flex; gap: clamp(4px, 1vw, 8px); z-index: 10;
+    padding: 4px 8px; border-radius: 12px; background: rgba(15,13,10,0.8);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .step-dot { width: clamp(5px, 1.2vw, 7px); height: clamp(5px, 1.2vw, 7px); border-radius: 50%; background: var(--border); transition: all 0.3s; }
+  .step-dot.active { background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.4); }
+  .step-dot.done { background: var(--gold-dark); }
+
+  .summary-table { width: 100%; border-collapse: collapse; }
+  .summary-table tr { border-bottom: 1px solid rgba(61,52,40,0.5); }
+  .summary-table td { padding: clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px); font-size: var(--fs-base); vertical-align: top; }
+  .summary-table td:first-child { color: var(--text-muted); letter-spacing: 2px; width: clamp(60px, 16vw, 100px); text-align: right; padding-right: clamp(8px, 2vw, 20px); white-space: nowrap; }
+  .summary-table td:last-child { color: var(--gold-light); letter-spacing: 1px; word-break: break-all; }
+
+  .scroll-area {
+    width: 100%; overflow-x: hidden; padding-right: 4px;
+    touch-action: pan-y;
+  }
+  @media (max-width: 768px) {
+    .scroll-area {
+      max-height: 40vh; overflow-y: auto;
+      -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+    }
+  }
+  @media (min-width: 769px) {
+    .scroll-area {
+      max-height: 45vh; max-height: 45dvh; overflow-y: auto;
+      -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .scroll-area::-webkit-scrollbar { width: 3px; }
+    .scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  }
+
+  .hint { font-size: var(--fs-xs); color: var(--text-muted); text-align: center; letter-spacing: 1px; flex-shrink: 0; }
+
+  .textarea-field {
+    width: 100%; max-width: 460px; min-height: 120px; padding: clamp(10px, 2.5vw, 14px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-base); font-family: inherit;
+    line-height: 1.8; letter-spacing: 1px; outline: none; resize: none;
+    transition: border-color 0.3s; flex-shrink: 0;
+  }
+  .textarea-field:focus { border-color: var(--gold); box-shadow: var(--shadow-gold); }
+  .textarea-field::placeholder { color: var(--text-muted); }
+
+  .tag-grid { display: flex; flex-wrap: wrap; gap: var(--space-xs); width: 100%; justify-content: center; }
+  .tag-btn {
+    padding: clamp(8px, 2vw, 10px) clamp(14px, 3vw, 18px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+    color: var(--text-secondary); font-size: var(--fs-sm); font-family: inherit;
+    cursor: pointer; transition: all 0.3s; letter-spacing: 1px; min-height: 36px; touch-action: manipulation;
+  }
+  .tag-btn:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); color: var(--text-primary); }
+  .tag-btn.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+  #region-container { width: 100%; min-height: 36px; }
+
+  /* 鈹€鈹€ 鏁呬簨鍩鸿皟鍗＄墖 鈹€鈹€ */
+  .tone-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: var(--space-md); width: 100%; }
+  .tone-card {
+    padding: clamp(14px, 3vw, 20px) clamp(10px, 2.5vw, 14px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; text-align: center; transition: all 0.3s; user-select: none;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .tone-card:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); transform: translateY(-2px); }
+  .tone-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); box-shadow: var(--shadow-gold); }
+  .tone-card .tone-icon { width: 32px; height: 32px; color: var(--gold); opacity: 0.8; }
+  .tone-card .tone-name { font-size: var(--fs-md); color: var(--gold); letter-spacing: 2px; }
+  .tone-card .tone-desc { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.6; }
+
+  .section-title { font-size: var(--fs-md); color: var(--gold-dark); letter-spacing: 2px; width: 100%; padding-left: 4px; margin-top: var(--space-sm); }
+
+  /* 鈹€鈹€ 鍔ㄦ€佽缂栬緫鍣?鈹€鈹€ */
+  .dyn-row {
+    width: 100%; display: flex; gap: var(--space-xs); align-items: center; flex-wrap: wrap;
+    padding: var(--space-xs) 0; border-bottom: 1px solid rgba(61,52,40,0.3);
+  }
+  .dyn-row .custom-input, .dyn-row .custom-select, .dyn-row .num-input { flex: none; }
+  .dyn-row .dyn-name { flex: 1; min-width: 80px; }
+  .dyn-row .dyn-select { width: 90px; }
+  .dyn-row .dyn-attr { flex: 1; min-width: 60px; }
+  .dyn-add-btn {
+    width: 100%; padding: 8px; margin-top: var(--space-xs);
+    background: none; border: 1px dashed var(--border); border-radius: 4px;
+    color: var(--text-muted); font-size: var(--fs-sm); font-family: inherit;
+    cursor: pointer; letter-spacing: 2px; transition: all 0.3s; min-height: 36px;
+  }
+  .dyn-add-btn:hover { border-color: var(--gold-dark); color: var(--text-secondary); }
+
+  /* 鈹€鈹€ 鐏电煶杈撳叆琛?鈹€鈹€ */
+  .spirit-stone-row {
+    width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-xs);
+  }
+  .spirit-stone-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .spirit-stone-item label { font-size: var(--fs-xs); color: var(--text-muted); letter-spacing: 1px; }
+  .spirit-stone-item input {
+    width: 100%; padding: 6px 4px; text-align: center;
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-base); font-family: inherit;
+    outline: none; min-height: 36px;
+  }
+  .spirit-stone-item input:focus { border-color: var(--gold); }
+
+  /* 鈹€鈹€ 蹇冮瓟寮曞鏂囨 鈹€鈹€ */
+  .demon-guide {
+    width: 100%; padding: var(--space-md);
+    background: rgba(139,69,19,0.06); border: 1px solid rgba(139,69,19,0.2); border-radius: 6px;
+    font-size: var(--fs-xs); color: var(--text-muted); line-height: 2;
+  }
+  .demon-guide strong { color: var(--gold-dark); }
+
+  @media (max-width: 360px) {
+    .card-row { grid-template-columns: 1fr 1fr; gap: var(--space-xs); }
+    .mini-card-grid { grid-template-columns: repeat(4, 1fr); }
+    .art-grid { grid-template-columns: repeat(3, 1fr); }
+    .tone-card-grid { grid-template-columns: 1fr 1fr; }
+    .custom-wrap { flex-direction: column; align-items: stretch; }
+    .custom-label { text-align: center; }
+    .btn { padding: 10px 20px; }
+    .btn-start { padding: 12px 32px; }
+    .spirit-stone-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-height: 480px) and (orientation: landscape) {
+    .page { justify-content: flex-start; padding-top: var(--space-md); padding-bottom: calc(var(--space-md) + 36px); }
+    .page-inner { margin: 0; gap: var(--space-sm); }
+    .taiji-symbol { display: none; }
+    .taiji-symbol.large { display: block; width: 48px; height: 48px; }
+    .separator { display: none; }
+    .page-guide { line-height: 1.6; }
+  }
+  @media (min-width: 768px) {
+    .mini-card-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+    .art-grid { grid-template-columns: repeat(5, 1fr); }
+    .tone-card-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (min-width: 1024px) { .container { max-width: 680px; } .scroll-area { max-height: 50vh; max-height: 50dvh; } }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+
+  <!-- PAGE 0: 澶╁懡杞浆 -->
+  <div class="page active" id="page-0">
+    <div class="page-inner">
+      <svg class="taiji-symbol large" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="48" fill="none" stroke="var(--gold)" stroke-width="0.8" opacity="0.4"/>
+        <circle cx="50" cy="50" r="44" fill="none" stroke="var(--gold)" stroke-width="0.3" opacity="0.2"/>
+        <path d="M50 6 A44 44 0 0 1 50 94 A22 22 0 0 0 50 50 A22 22 0 0 1 50 6" fill="var(--gold)" opacity="0.15"/>
+        <path d="M50 94 A44 44 0 0 1 50 6 A22 22 0 0 1 50 50 A22 22 0 0 0 50 94" fill="var(--gold)" opacity="0.06"/>
+        <circle cx="50" cy="28" r="4" fill="var(--bg-primary)" stroke="var(--gold)" stroke-width="0.5" opacity="0.5"/>
+        <circle cx="50" cy="72" r="4" fill="var(--gold)" opacity="0.2"/>
+      </svg>
+      <h1 class="page-title" style="font-size:var(--fs-3xl); letter-spacing:clamp(6px, 2vw, 12px);">澶╁懡杞浆</h1>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="40" y1="10" x2="175" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><circle cx="200" cy="10" r="2.5" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.5"/><line x1="225" y1="10" x2="360" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/></svg>
+      <p class="page-guide">娣锋矊鏈紑涔嬫椂锛屼竾鐗╃殕瀵傘€?br>蹇芥湁涓€缂曠伒鍏夎嚜铏氭棤涓癁鐢燂紝<br>绌块€忎節澶╁崄鍦帮紝钀戒簬姹濅箣榄傞瓌銆?br><br>姝ゅ埢璧凤紝灏樼紭宸叉柇锛屼粰閫斿垵鍚€?br>涓旈殢杩欑紩澶╁厜锛屽彥寮€閫氬線鍙︿竴鏂瑰ぉ鍦扮殑闂ㄦ墘銆?/p>
+      <div class="btn-row" style="margin-top:var(--space-lg);"><button class="btn btn-primary btn-start" onclick="goToPage(1)">韪忓叆浠欓€?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 1: 閬撳彿 鈽呭繀濉?-->
+  <div class="page" id="page-1">
+    <div class="page-inner">
+      <svg class="taiji-symbol" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="none" stroke="var(--gold)" stroke-width="0.8" opacity="0.3"/><path d="M50 6 A44 44 0 0 1 50 94 A22 22 0 0 0 50 50 A22 22 0 0 1 50 6" fill="var(--gold)" opacity="0.1"/><circle cx="50" cy="28" r="3" fill="var(--bg-primary)" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><circle cx="50" cy="72" r="3" fill="var(--gold)" opacity="0.15"/></svg>
+      <h2 class="page-title">閬撳彿閾埢</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">鍚嶈€咃紝澶╁湴涔嬪嵃璁帮紝鍥犳灉涔嬭捣濮嬨€?br>鑷粖鏃ヨ捣锛屼笁鐣屽叚閬撶殕浠ユ鍚嶈瘑姹濄€?br>涓€瀛楀畾涔惧潳锛屼竴鍙烽€氱鏄庛€?/p>
+      <input class="input-field" id="input-name" type="text" placeholder="閾埢姹濅箣閬撳彿" maxlength="20" autocomplete="off">
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(0)">杩斿洖</button><button class="btn btn-primary" onclick="saveName()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: 闃撮槼 鈽呭繀濉?-->
+  <div class="page" id="page-2">
+    <div class="page-inner">
+      <h2 class="page-title">闃撮槼瀹氱浉</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">澶╁湴鍒嗛槾闃筹紝涓囩墿鏈夊叾搴忋€?br>涔句负澶┿€佸潳涓哄湴锛岄槼鍒氶槾鏌旓紝鍚勬湁鍏堕亾銆?/p>
+      <div class="card-row">
+        <div class="card" onclick="selectGender(this,'鐢?)"><div class="card-title">涔?/div><div class="card-desc">闃冲垰涔嬩綋<br>浠ュぉ涓洪亾</div></div>
+        <div class="card" onclick="selectGender(this,'濂?)"><div class="card-title">鍧?/div><div class="card-desc">闃存煍涔嬩綋<br>浠ュ湴涓洪亾</div></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(1)">杩斿洖</button><button class="btn btn-primary" onclick="saveGender()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 3: 骞村瞾 鈽呭繀濉?-->
+  <div class="page" id="page-3">
+    <div class="page-inner">
+      <h2 class="page-title">绾㈠皹骞村崕</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">浠欓€旀极婕紝濮嬩簬鍑″皹銆?br>閭ｄ簺骞存湀铏界煭锛屽嵈閾稿氨浜嗛亾蹇冧箣鍩恒€?/p>
+      <input class="input-field" id="input-age" type="number" min="1" max="100000" value="18" autocomplete="off" oninput="updateAgeHint(parseInt(this.value)||0)">
+      <p class="hint" id="age-hint">寮卞啝涔嬪勾锛屾鍊间慨琛屽叆闂ㄤ箣榫?/p>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(2)">杩斿洖</button><button class="btn btn-primary" onclick="saveAge()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: 鐏垫牴 鈼嬮€夊～ -->
+  <div class="page" id="page-4">
+    <div class="page-inner">
+      <h2 class="page-title">鐏垫牴鏄惧寲</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">鐏垫牴鑰咃紝鍏堝ぉ涔嬪熀涔熴€?br>涓囩墿鐨嗗彲鍖栦负鐏垫牴锛屽ぉ鍦颁笉鎷樹竴鏍笺€?br>涓嶉€夊垯鐢卞ぉ鍛藉喅瀹氥€?/p>
+      <div class="realm-group"><div class="realm-group-title">鍝佺骇</div><div class="realm-options" id="root-grade-options">
+        <button class="realm-btn" onclick="selectRootGrade(this,'澶?)">澶?/button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'鍦?)">鍦?/button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'鐜?)">鐜?/button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'榛?)">榛?/button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'鏉?)">鏉?/button>
+      </div></div>
+      <div class="realm-group"><div class="realm-group-title">灞炴€?(鍙€夊椤癸紝鎴栫洿鎺ヨ緭鍏ヨ嚜瀹氫箟鐏垫牴)</div><div class="mini-card-grid" id="root-element-grid">
+        <div class="mini-card" onclick="toggleElement(this,'閲?)"><span class="mc-label">閲?/span></div>
+        <div class="mini-card" onclick="toggleElement(this,'鏈?)"><span class="mc-label">鏈?/span></div>
+        <div class="mini-card" onclick="toggleElement(this,'姘?)"><span class="mc-label">姘?/span></div>
+        <div class="mini-card" onclick="toggleElement(this,'鐏?)"><span class="mc-label">鐏?/span></div>
+        <div class="mini-card" onclick="toggleElement(this,'鍦?)"><span class="mc-label">鍦?/span></div>
+        <div class="mini-card" style="border-style:dashed;" onclick="toggleElement(this,'闆?)"><span class="mc-label">闆?/span></div>
+        <div class="mini-card" style="border-style:dashed;" onclick="toggleElement(this,'鍐?)"><span class="mc-label">鍐?/span></div>
+        <div class="mini-card" style="border-style:dashed;" onclick="toggleElement(this,'椋?)"><span class="mc-label">椋?/span></div>
+      </div></div>
+      <div class="custom-wrap"><span class="custom-label">鑷畾涔夌伒鏍?</span><input class="custom-input" id="root-custom" type="text" placeholder="濡? 澶╁搧鏄熻景鐏垫牴" autocomplete="off" oninput="onCustomRoot()"></div>
+      <div class="preview-text" id="root-preview"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(3)">杩斿洖</button><button class="btn btn-primary" onclick="saveRoot()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 5: 浣撹川 鈼嬮€夊～锛堜粎鍐欎笘鐣屼功锛?-->
+  <div class="page" id="page-5">
+    <div class="page-inner">
+      <h2 class="page-title">澶╄祴浣撹川</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">涓栭棿涓囦腑鏃犱竴鑰咃紝鍋跺緱澶╄祴寮傜涔嬩綋銆?br>浣撹川涔冨厛澶╅€犲寲鎵€璧愶紝鍙亣鑰屼笉鍙眰銆?br>澶у鏁颁慨澹苟鏃犵壒娈婁綋璐紝鐣欑┖鍗冲彲銆?/p>
+      <p class="hint">閫夊～锛屼粎鍐欏叆涓栫晫涔︿緵AI鍙傝€冿紝涓嶅瓨鍏ュ彉閲?/p>
+      <div class="custom-wrap"><span class="custom-label">浣撹川鍚嶇О:</span><input class="custom-input" id="input-constitution-name" type="text" placeholder="濡? 鍐版櫠鐜変綋銆佸ぉ鐢熷墤浣撱€佸厛澶╅亾浣?.." autocomplete="off"></div>
+      <div class="realm-group"><div class="realm-group-title">浣撹川浠嬬粛 (鎻忚堪浣撹川鐨勬晥鏋滃拰鐗规€?</div>
+        <textarea class="textarea-field" id="input-constitution-desc" style="min-height:100px;" placeholder="濡? 澶╃敓浣撳唴钑村惈鏋佸瘨涔嬪姏锛屼慨鐐煎啺绯诲姛娉曚簨鍗婂姛鍊嶏紝浣嗗鐏郴鏀诲嚮鏍煎鑴嗗急...&#10;&#10;璇︾粏鎻忚堪浣撹川鐨勬晥鏋滐紝AI灏嗘嵁姝よ繘琛岀浉鍏冲墽鎯呮紨缁庛€?></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(4)">杩斿洖</button><button class="btn btn-primary" onclick="saveConstitution()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 6: 鐧捐壓 鈼嬮€夊～ -->
+  <div class="page" id="page-6">
+    <div class="page-inner">
+      <h2 class="page-title">鐧捐壓鎷╅亾</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">淇湡涔嬮亾锛岀櫨鑹轰簤杈夈€?br>姹濆績涔嬫墍鍚戯紝褰撴嫨浣曢亾锛?br>閫夋嫨鍚庡皢鑷姩鑾峰緱鍏ラ棬澧冪晫銆?/p>
+      <p class="hint">鍙€夊椤癸紝浜﹀彲鏆備笉閫夋嫨</p>
+      <div class="art-grid" id="art-grid">
+        <div class="art-card" onclick="toggleArt(this,'鍓戜慨')"><span class="art-name">鍓戜慨</span><span class="art-desc">浠ュ墤鍏ラ亾<br>涓囨硶鐨嗘柀</span></div>
+        <div class="art-card" onclick="toggleArt(this,'鐐间腹')"><span class="art-name">鐐间腹</span><span class="art-desc">鐐夌伀绾潚<br>鍖栬厫涓哄</span></div>
+        <div class="art-card" onclick="toggleArt(this,'鐐煎櫒')"><span class="art-name">鐐煎櫒</span><span class="art-desc">閿ょ偧娉曞疂<br>閾稿櫒閫氱</span></div>
+        <div class="art-card" onclick="toggleArt(this,'闃垫硶')"><span class="art-name">闃垫硶</span><span class="art-desc">甯冮樀鍥版晫<br>涓囪薄褰掕櫄</span></div>
+        <div class="art-card" onclick="toggleArt(this,'绗︾畵')"><span class="art-name">绗︾畵</span><span class="art-desc">绗︾畵閫氱伒<br>鏁曚护澶╁湴</span></div>
+        <div class="art-card" onclick="toggleArt(this,'椹吔')"><span class="art-name">椹吔</span><span class="art-desc">椹伒浣垮吔<br>涓囧吔鏈濆畻</span></div>
+        <div class="art-card" onclick="toggleArt(this,'鍖绘湳')"><span class="art-name">鍖绘湳</span><span class="art-desc">鎮６娴庝笘<br>鍖婚亾閫氱</span></div>
+        <div class="art-card" onclick="toggleArt(this,'鍌€鍎℃湳')"><span class="art-name">鍌€鍎℃湳</span><span class="art-desc">浠ユ湳閫犵伒<br>鍌€鍎￠€氱</span></div>
+        <div class="art-card" onclick="toggleArt(this,'绉嶆閲囪嵂')"><span class="art-name">绉嶆閲囪嵂</span><span class="art-desc">鑽夋湪閫氱伒<br>鐢熸満閫犲寲</span></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(5)">杩斿洖</button><button class="btn btn-primary" onclick="saveArts()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 7: 淇负 鈼嬮€夊～ -->
+  <div class="page" id="page-7">
+    <div class="page-inner">
+      <h2 class="page-title">淇负鍒濆畾</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">鍑′汉鏈涗粰璺澶╁爲锛岀偧姘斿＋鏂圭煡澶╁湴涔嬪箍銆?br>姹濅粖绔嬩簬浠欓€斾綍澶勶紵</p>
+      <div class="scroll-area" id="realm-scroll">
+        <div class="realm-group"><div class="realm-group-title">鍑″皹</div><div class="realm-options"><button class="realm-btn selected" onclick="selectRealm(this,'鍑′汉')">鍑′汉</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">鐐兼皵</div><div class="realm-options" id="realm-lianqi"></div></div>
+        <div class="realm-group"><div class="realm-group-title">绛戝熀</div><div class="realm-options" id="realm-zhuji"></div></div>
+        <div class="realm-group"><div class="realm-group-title">閲戜腹</div><div class="realm-options" id="realm-jindan"></div></div>
+        <div style="text-align:center;margin:var(--space-sm) 0;"><button class="realm-more-toggle" onclick="document.getElementById('realm-advanced').classList.toggle('show')">鏇撮珮澧冪晫...</button></div>
+        <div class="realm-advanced" id="realm-advanced">
+          <div class="realm-group"><div class="realm-group-title">鍏冨┐</div><div class="realm-options" id="realm-yuanying"></div></div>
+          <div class="realm-group"><div class="realm-group-title">鍖栫</div><div class="realm-options" id="realm-huashen"></div></div>
+          <div class="realm-group"><div class="realm-group-title">鐐艰櫄</div><div class="realm-options" id="realm-lianxu"></div></div>
+          <div class="realm-group"><div class="realm-group-title">鍚堜綋</div><div class="realm-options" id="realm-heti"></div></div>
+          <div class="realm-group"><div class="realm-group-title">澶т箻</div><div class="realm-options" id="realm-dacheng"></div></div>
+          <div class="realm-group"><div class="realm-group-title">娓″姭</div><div class="realm-options" id="realm-dujie"></div></div>
+          <div class="realm-group"><div class="realm-group-title">鐪熶粰澧?/div><div class="realm-options" id="realm-zhenxian"></div></div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(6)">杩斿洖</button><button class="btn btn-primary" onclick="saveRealm()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 8: 閬撴硶浼犳壙 鈼嬮€夊～ 鈥?缁撴瀯鍖栬緭鍏?-->
+  <div class="page" id="page-8">
+    <div class="page-inner">
+      <h2 class="page-title">閬撴硶浼犳壙</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">淇涔嬭矾锛屽姛娉曚负鍩恒€?br>姹濆彲浜庢璁惧畾宸蹭範寰椾箣鍔熸硶涓庢湳娉曪紝<br>浜﹀彲鐣欑櫧锛岀敱澶╁懡瀹夋帓浼犳壙銆?/p>
+      <p class="hint">閫夊～锛岀暀绌哄垯鐢卞ぉ鍛藉畨鎺掑垵濮嬪姛娉?/p>
+      <div class="realm-group"><div class="realm-group-title">涓讳慨鍔熸硶</div>
+        <div class="custom-wrap"><span class="custom-label">鍔熸硶鍚?</span><input class="custom-input" id="input-gongfa-name" type="text" placeholder="濡? 澶櫄鍓戣瘈銆佷節杞巹鍔?.." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">鍝佺骇:</span>
+          <select class="custom-select" id="input-gongfa-grade">
+            <option value="">鏈€夋嫨</option>
+            <option value="鍑＄骇">鍑＄骇</option>
+            <option value="榛勭骇涓嬪搧">榛勭骇涓嬪搧</option><option value="榛勭骇涓搧">榛勭骇涓搧</option><option value="榛勭骇涓婂搧">榛勭骇涓婂搧</option><option value="榛勭骇鏋佸搧">榛勭骇鏋佸搧</option>
+            <option value="鐜勭骇涓嬪搧">鐜勭骇涓嬪搧</option><option value="鐜勭骇涓搧">鐜勭骇涓搧</option><option value="鐜勭骇涓婂搧">鐜勭骇涓婂搧</option><option value="鐜勭骇鏋佸搧">鐜勭骇鏋佸搧</option>
+            <option value="鍦扮骇涓嬪搧">鍦扮骇涓嬪搧</option><option value="鍦扮骇涓搧">鍦扮骇涓搧</option><option value="鍦扮骇涓婂搧">鍦扮骇涓婂搧</option><option value="鍦扮骇鏋佸搧">鍦扮骇鏋佸搧</option>
+            <option value="澶╃骇涓嬪搧">澶╃骇涓嬪搧</option><option value="澶╃骇涓搧">澶╃骇涓搧</option><option value="澶╃骇涓婂搧">澶╃骇涓婂搧</option><option value="澶╃骇鏋佸搧">澶╃骇鏋佸搧</option>
+            <option value="鍦ｇ骇">鍦ｇ骇</option>
+            <option value="浠欑骇">浠欑骇</option>
+          </select>
+        </div>
+        <div class="custom-wrap">
+          <span class="custom-label">灞傛暟:</span>
+          <span class="custom-label" style="color:var(--text-secondary)">宸蹭慨</span>
+          <input class="num-input" id="input-gongfa-cur-layer" type="number" min="0" value="0" placeholder="0">
+          <span class="custom-label" style="color:var(--text-secondary)">/</span>
+          <span class="custom-label" style="color:var(--text-secondary)">鍏?/span>
+          <input class="num-input" id="input-gongfa-total-layer" type="number" min="0" value="0" placeholder="0">
+          <span class="custom-label" style="color:var(--text-secondary)">灞?/span>
+        </div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">宸蹭範鏈硶</div>
+        <p class="hint">姣忚涓€涓湳娉曪紝閫夋嫨鐔熺粌搴︾瓑绾?/p>
+        <div id="spell-list"></div>
+        <button class="dyn-add-btn" onclick="addSpellRow()">+ 娣诲姞鏈硶</button>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(7)">杩斿洖</button><button class="btn btn-primary" onclick="saveGongfa()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 9: 娉曞疂 鈼嬮€夊～ 鈥?缁撴瀯鍖栬緭鍏?-->
+  <div class="page" id="page-9">
+    <div class="page-inner">
+      <h2 class="page-title">娉曞疂绁偧</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">娉曞櫒閫氱伒锛屽疂鍣ㄦ姢閬撱€?br>姹濆彲浜庢鎻忚堪闅忚韩娉曞疂锛?br>浜﹀彲鐣欑櫧锛岀敱澶╁懡瀹夋帓鍣ㄧ墿銆?/p>
+      <p class="hint">閫夊～锛岀暀绌哄垯鐢卞ぉ鍛藉畨鎺掑垵濮嬫硶瀹?/p>
+      <div class="realm-group"><div class="realm-group-title">鏈懡娉曞疂锛堣澶囨鍣ㄦ爮锛?/div>
+        <div class="custom-wrap"><span class="custom-label">娉曞疂鍚?</span><input class="custom-input" id="input-weapon-name" type="text" placeholder="濡? 闈掗攱鍓戙€佺巹鍐扮浘..." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">鍝侀樁:</span><input class="custom-input" id="input-weapon-grade" type="text" placeholder="濡? 鐏靛櫒銆佹硶瀹濄€佸疂鍣?.." autocomplete="off"></div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">鍏朵粬娉曞疂 (鍙笉濉?</div>
+        <textarea class="textarea-field" id="input-extra-weapons" style="min-height:80px;" placeholder="濡? 闃插尽娉曞疂銆岀巹榫熺浘銆嶏紙鐏靛櫒锛夈€佸偍鐗╄...&#10;鐣欑┖鍒欑敱澶╁懡瀹夋帓"></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(8)">杩斿洖</button><button class="btn btn-primary" onclick="saveWeapon()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 10: 鐏靛吔 鈼嬮€夊～ 鈥?缁撴瀯鍖栬緭鍏?-->
+  <div class="page" id="page-10">
+    <div class="page-inner">
+      <h2 class="page-title">鐏靛吔濂戠害</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">涓囧吔鏈夌伒锛屼笌淇＋缂旂粨濂戠害鑰咃紝鍙负浼翠荆銆?br>鐏靛吔闅忎富浜轰慨琛岋紝浜︽湁鍖栧舰涔嬫棩銆?/p>
+      <p class="hint">閫夊～锛屽ぇ澶氭暟淇＋鍒濇湡骞舵棤鐏靛疇</p>
+      <div class="realm-group"><div class="realm-group-title">鐏靛疇淇℃伅</div>
+        <div class="custom-wrap"><span class="custom-label">鐏靛疇鍚?</span><input class="custom-input" id="input-pet-name" type="text" placeholder="濡? 灏忕櫧銆佺巹鐏?.." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">鍝佺:</span><input class="custom-input" id="input-pet-species" type="text" placeholder="濡? 鐧借檸骞煎唇銆侀潚楦俱€佺伀鐙?.." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">闃剁骇:</span>
+          <select class="custom-select" id="input-pet-rank">
+            <option value="">鏈€夋嫨</option>
+            <option value="涓€闃?>涓€闃?/option><option value="浜岄樁">浜岄樁</option><option value="涓夐樁">涓夐樁</option>
+            <option value="鍥涢樁">鍥涢樁</option><option value="浜旈樁">浜旈樁</option><option value="鍏樁">鍏樁</option>
+            <option value="鐏电帇">鐏电帇</option><option value="鐏电殗">鐏电殗</option><option value="鐏靛笣">鐏靛笣</option>
+          </select>
+        </div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">鐏靛疇鎻忚堪 (鍙笉濉?</div>
+        <textarea class="textarea-field" id="input-pet-desc" style="min-height:80px;" placeholder="濡? 骞煎勾鐧借檸锛岄€氫綋闆櫧锛岄闂翠竴閬撻噾绾?..&#10;鐣欑┖鍒欑敱澶╁懡瀹夋帓"></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(9)">杩斿洖</button><button class="btn btn-primary" onclick="savePet()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 11: 寮傜伀 鈼嬮€夊～ 鈥?鏀寔澶氳 -->
+  <div class="page" id="page-11">
+    <div class="page-inner">
+      <h2 class="page-title">澶╁湴寮傜伀</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">澶╁湴寮傜伀锛岄€犲寲涔嬬簿銆?br>寮傜伀鍝佺骇浠庝竴鍝侊紙鏈€寮猴級鍒颁節鍝侊紝<br>鐐间腹銆佺偧鍣ㄧ殕璧栧紓鐏箣鍔涖€?br>鎷ユ湁寮傜伀鑰呬竾涓棤涓€锛岀暀绌哄嵆鍙€?/p>
+      <p class="hint">閫夊～锛屽彲娣诲姞澶氫釜寮傜伀</p>
+      <div class="realm-group"><div class="realm-group-title">寮傜伀鍒楄〃</div>
+        <div id="fire-list"></div>
+        <button class="dyn-add-btn" onclick="addFireRow()">+ 娣诲姞寮傜伀</button>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(10)">杩斿洖</button><button class="btn btn-primary" onclick="saveFire()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 12: 鍔垮姏 鈼嬮€夊～ -->
+  <div class="page" id="page-12">
+    <div class="page-inner">
+      <h2 class="page-title">瀹楅棬褰掑睘</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">澶╀笅瀹楅棬鏋楃珛锛屽悇鎬€閬撶粺浼犳壙銆?br>姹濆綋褰掍簬浣曟柟锛?/p>
+      <div class="scroll-area" id="faction-scroll">
+        <div class="realm-group"><div class="realm-group-title">鐙</div><div class="faction-grid"><button class="faction-btn selected" onclick="selectFaction(this,'鏁ｄ慨')">鏁ｄ慨</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">鍏ぇ浠欏畻 路 涓婁笁瀹?/div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'鍓戝畻')">鍓戝畻</button><button class="faction-btn" onclick="selectFaction(this,'涓瑰畻')">涓瑰畻</button><button class="faction-btn" onclick="selectFaction(this,'鐜勫ぉ瀹?)">鐜勫ぉ瀹?/button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">鍏ぇ浠欏畻 路 涓嬩笁瀹?/div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'澶櫄瀹?)">澶櫄瀹?/button><button class="faction-btn" onclick="selectFaction(this,'鍚堟瀹?)">鍚堟瀹?/button><button class="faction-btn" onclick="selectFaction(this,'铔婇瓟瀹?)">铔婇瓟瀹?/button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">姝ｉ亾鍦ｅ湴</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'澶╁墤鍦ｅ湴')">澶╁墤鍦ｅ湴</button><button class="faction-btn" onclick="selectFaction(this,'鐜夋竻閬撳')">鐜夋竻閬撳</button><button class="faction-btn" onclick="selectFaction(this,'鑽璋?)">鑽璋?/button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">姝ｉ亾寮哄畻</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'鍑涢湝鍓戦棬')">鍑涢湝鍓戦棬</button><button class="faction-btn" onclick="selectFaction(this,'鐧捐崏搴?)">鐧捐崏搴?/button><button class="faction-btn" onclick="selectFaction(this,'涓囨硶瀹?)">涓囨硶瀹?/button><button class="faction-btn" onclick="selectFaction(this,'涓囧吔灞卞簞')">涓囧吔灞卞簞</button><button class="faction-btn" onclick="selectFaction(this,'璧ら槼璋?)">璧ら槼璋?/button><button class="faction-btn" onclick="selectFaction(this,'鐏甸渼瀹?)">鐏甸渼瀹?/button><button class="faction-btn" onclick="selectFaction(this,'闈掍簯瀹?)">闈掍簯瀹?/button><button class="faction-btn" onclick="selectFaction(this,'澶╀粰闂?)">澶╀粰闂?/button><button class="faction-btn" onclick="selectFaction(this,'澶╂満闃?)">澶╂満闃?/button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">浜︽浜﹂偑</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'榄呰姳瀹?)">榄呰姳瀹?/button><button class="faction-btn" onclick="selectFaction(this,'鏋佷箰瀹?)">鏋佷箰瀹?/button><button class="faction-btn" onclick="selectFaction(this,'澶╁懡绁炴暀')">澶╁懡绁炴暀</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">榄旈亾鍔垮姏</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'骞藉啣榄斿畻')">骞藉啣榄斿畻</button><button class="faction-btn" onclick="selectFaction(this,'涓囩鏁?)">涓囩鏁?/button><button class="faction-btn" onclick="selectFaction(this,'鍣績娈?)">鍣績娈?/button><button class="faction-btn" onclick="selectFaction(this,'涓囨瘨绁炴暀')">涓囨瘨绁炴暀</button><button class="faction-btn" onclick="selectFaction(this,'鍣崚鏁?)">鍣崚鏁?/button><button class="faction-btn" onclick="selectFaction(this,'骞借闂?)">骞借闂?/button><button class="faction-btn" onclick="selectFaction(this,'褰掑榄旀笂')">褰掑榄旀笂</button><button class="faction-btn" onclick="selectFaction(this,'涓囬瓟绐?)">涓囬瓟绐?/button><button class="faction-btn" onclick="selectFaction(this,'澶╅瓟甯濋兘')">澶╅瓟甯濋兘</button><button class="faction-btn" onclick="selectFaction(this,'鐜勬笂鍩?)">鐜勬笂鍩?/button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">澶ч瓟鍥?/div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'澶ч瓟鍥?)">澶ч瓟鍥?/button></div></div>
+        <div class="realm-group"><div class="realm-group-title">涓珛/鍟嗕細</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'涓囧疂鍟嗕細')">涓囧疂鍟嗕細</button><button class="faction-btn" onclick="selectFaction(this,'涓囨硶妤?)">涓囨硶妤?/button><button class="faction-btn" onclick="selectFaction(this,'涓囧疂妤?)">涓囧疂妤?/button><button class="faction-btn" onclick="selectFaction(this,'绾㈠皹閰掑')">绾㈠皹閰掑</button><button class="faction-btn" onclick="selectFaction(this,'澧ㄥ鏈哄叧鍩?)">澧ㄥ鏈哄叧鍩?/button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">鐜嬫湞/鍥藉害</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'澶ч泹鐨囨湞')">澶ч泹鐨囨湞</button><button class="faction-btn" onclick="selectFaction(this,'鑻嶆緶鍥?)">鑻嶆緶鍥?/button></div></div>
+        <div class="realm-group"><div class="realm-group-title">浣涢棬/宸亾</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'灏忛浄闊冲')">灏忛浄闊冲</button><button class="faction-btn" onclick="selectFaction(this,'宸鏁?)">宸鏁?/button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">濡栨棌</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'闈掍笜鍥?)">闈掍笜鍥?/button><button class="faction-btn" onclick="selectFaction(this,'杩︽ゼ缃楀ぉ')">杩︽ゼ缃楀ぉ</button><button class="faction-btn" onclick="selectFaction(this,'涓囧鍥?)">涓囧鍥?/button><button class="faction-btn" onclick="selectFaction(this,'涓囪泭鍣緳绐?)">涓囪泭鍣緳绐?/button></div></div>
+        <div class="realm-group"><div class="realm-group-title">榫欐棌</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'涓滄捣榫欏')">涓滄捣榫欏</button><button class="faction-btn" onclick="selectFaction(this,'鍗楁捣榫欏')">鍗楁捣榫欏</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">寮傚煙</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'涓滅€?)">涓滅€?/button><button class="faction-btn" onclick="selectFaction(this,'鐢熷懡涔嬫．')">鐢熷懡涔嬫．</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">鐗规畩鍔垮姏</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'鐜茬彂缁ｉ榿')">鐜茬彂缁ｉ榿</button><button class="faction-btn" onclick="selectFaction(this,'骞惰拏瀹?)">骞惰拏瀹?/button><button class="faction-btn" onclick="selectFaction(this,'褰掔瀹?)">褰掔瀹?/button><button class="faction-btn" onclick="selectFaction(this,'缁')">缁</button><button class="faction-btn" onclick="selectFaction(this,'鍖楀師鐜嬪')">鍖楀師鐜嬪</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">涓珛瀹楅棬</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'铦跺寲瀹?)">铦跺寲瀹?/button></div></div>
+      </div>
+      <div class="custom-wrap"><span class="custom-label">鑷畾涔?</span><input class="custom-input" id="faction-custom" type="text" placeholder="杈撳叆鍔垮姏鍚嶇О" autocomplete="off" oninput="onCustomFaction()"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(11)">杩斿洖</button><button class="btn btn-primary" onclick="saveFaction()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 13: 閬撻€?鈼嬮€夊～ 鈥?鏂板椤甸潰 -->
+  <div class="page" id="page-13">
+    <div class="page-inner">
+      <h2 class="page-title">閬撻€旀妷鎷?/h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">姝ｉ偑涔嬪垎锛屼竴蹇典箣闂淬€?br>閬撻€旈潪瀹氭暟锛屽彲闅忎慨琛岃€岃浆鍙樸€?br>涓嶉€夊垯鐢盇I鏍规嵁琛屼簨鍒ゅ畾銆?/p>
+      <div class="realm-group"><div class="realm-group-title">閫夋嫨閬撻€?/div><div class="faction-grid" id="dao-grid">
+        <button class="faction-btn" onclick="selectDao(this,'姝ｉ亾')">姝ｉ亾</button>
+        <button class="faction-btn" onclick="selectDao(this,'閭亾')">閭亾</button>
+        <button class="faction-btn" onclick="selectDao(this,'榄旈亾')">榄旈亾</button>
+        <button class="faction-btn" onclick="selectDao(this,'涓珛')">涓珛</button>
+        <button class="faction-btn" onclick="selectDao(this,'娣蜂贡涓珛')">娣蜂贡涓珛</button>
+      </div></div>
+      <p class="hint">涓嶉€夋嫨鍒欑暀绌猴紝鐢盇I鏍规嵁浣犵殑琛屼负鍒ゅ畾閬撻€?/p>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(12)">杩斿洖</button><button class="btn btn-primary" onclick="saveDao()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 14: 澶╁湴鏂逛綅 鈼嬮€夊～ -->
+  <div class="page" id="page-14">
+    <div class="page-inner">
+      <h2 class="page-title">澶╁湴鏂逛綅</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">澶╁湴杈介様锛屼節鍩熷垎閲庛€?br>姹濅箣閬撻€斿浜庝綍鏂规按鍦燂紵</p>
+      <div class="realm-group"><div class="realm-group-title">鎵€鍦ㄥぇ鍩?/div><div class="faction-grid" id="domain-grid">
+        <button class="faction-btn selected" onclick="selectDomain(this,'涓ぎ绁炲窞')">涓ぎ绁炲窞</button>
+        <button class="faction-btn" onclick="selectDomain(this,'涓滆崚濡栧煙')">涓滆崚濡栧煙</button>
+        <button class="faction-btn" onclick="selectDomain(this,'鍖楀師榄斿湡')">鍖楀師榄斿湡</button>
+        <button class="faction-btn" onclick="selectDomain(this,'鍗楃枂宸湴')">鍗楃枂宸湴</button>
+        <button class="faction-btn" onclick="selectDomain(this,'瑗挎紶浣涘浗')">瑗挎紶浣涘浗</button>
+        <button class="faction-btn" onclick="selectDomain(this,'鍥涙捣')">鍥涙捣</button>
+        <button class="faction-btn" onclick="selectDomain(this,'闃存浌鍦板簻')">闃存浌鍦板簻</button>
+        <button class="faction-btn" onclick="selectDomain(this,'涓滅€?)">涓滅€?/button>
+        <button class="faction-btn" onclick="selectDomain(this,'澶ч瓟鍥?)">澶ч瓟鍥?/button>
+      </div></div>
+      <div class="realm-group"><div class="realm-group-title">鎵€鍦ㄥ尯鍩?(鍙笉濉?</div>
+        <div id="region-container" class="faction-grid"></div>
+        <div class="custom-wrap" style="margin-top:var(--space-xs);"><span class="custom-label">鑷畾涔?</span><input class="custom-input" id="region-custom" type="text" placeholder="杈撳叆鍖哄煙鍚? autocomplete="off" oninput="onCustomRegion()"></div>
+      </div>
+      <div class="custom-wrap"><span class="custom-label">鍏蜂綋鍦烘櫙:</span><input class="custom-input" id="input-scene" type="text" placeholder="濡? 娲楀墤姹犮€佺孩灏橀厭瀹?(鍙笉濉?" autocomplete="off"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(13)">杩斿洖</button><button class="btn btn-primary" onclick="saveLocation()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 15: 韬績涔嬫€?鈼嬮€夊～ 鈥?鐏电煶4妗?鍌ㄧ墿鎴?鍑′織璐у竵 -->
+  <div class="page" id="page-15">
+    <div class="page-inner">
+      <h2 class="page-title">韬績涔嬫€?/h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">浠欓€斿鍧庡澐锛岄亾蹇冨瓨涓囪薄銆?br>姹濊笍鍏ユ鐣屼箣鏃讹紝韬浣曠澧冨喌锛?/p>
+      <div class="realm-group"><div class="realm-group-title">韬綋鐘舵€?/div><div class="faction-grid" id="body-state-grid">
+        <button class="faction-btn selected" onclick="selectBodyState(this,'姝ｅ父')">姝ｅ父</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'鍙椾激')">鍙椾激</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'閲嶄激')">閲嶄激</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'涓瘨')">涓瘨</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'淇偧涓?)">淇偧涓?/button>
+        <button class="faction-btn" onclick="selectBodyState(this,'闂叧')">闂叧</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'鎴樻枟涓?)">鎴樻枟涓?/button>
+        <button class="faction-btn" onclick="selectBodyState(this,'琚洶')">琚洶</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'鐤椾激')">鐤椾激</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'璧惰矾')">璧惰矾</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'鏄忚糠')">鏄忚糠</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'琚皝鍗?)">琚皝鍗?/button>
+      </div></div>
+      <div class="realm-group"><div class="realm-group-title">鐏电煶</div>
+        <div class="spirit-stone-row">
+          <div class="spirit-stone-item"><label>涓嬪搧</label><input type="number" id="input-stone-low" min="0" value="0"></div>
+          <div class="spirit-stone-item"><label>涓搧</label><input type="number" id="input-stone-mid" min="0" value="0"></div>
+          <div class="spirit-stone-item"><label>涓婂搧</label><input type="number" id="input-stone-high" min="0" value="0"></div>
+          <div class="spirit-stone-item"><label>鏋佸搧</label><input type="number" id="input-stone-top" min="0" value="0"></div>
+        </div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">鍌ㄧ墿鎴?(鍙笉濉?</div>
+        <textarea class="textarea-field" id="input-storage" style="min-height:80px;" placeholder="姣忎釜鐗╁搧甯鍒嗙被]鍓嶇紑锛岀敤|鍒嗛殧锛屽:&#10;[涓硅嵂]鑱氭皵涓姑?|[涓硅嵂]绛戝熀涓姑?|[鑽潗]鍗冨勾鐏佃姖脳2&#10;鐣欑┖鍒欏垵濮嬩负绌?></textarea>
+      </div>
+      <div class="custom-wrap"><span class="custom-label">鍑′織璐у竵:</span><input class="custom-input" id="input-mundane-money" type="text" placeholder="濡? 榛勯噾脳100涓?(鍙笉濉?" autocomplete="off"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(14)">杩斿洖</button><button class="btn btn-primary" onclick="saveStatus()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 16: 蹇冮瓟 鈼嬮€夊～ 鈥?璇︾粏寮曞 -->
+  <div class="page" id="page-16">
+    <div class="page-inner">
+      <h2 class="page-title">蹇冮瓟鏆楀奖</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <div class="demon-guide">
+        <strong>蹇冮瓟绯荤粺璇存槑</strong><br>
+        蹇冮瓟婧愪簬淇＋鍐呭績鐨?strong>鎵у康銆侀仐鎲炬垨鍒涗激</strong>锛屾槸淇璺笂鐨勯噸瑕佸瓨鍦ㄣ€?br><br>
+        <strong>鈼?蹇冮瓟鎬佸害</strong>锛堟晫瀵?璇曟帰/涓珛/鍚堜綔/鐖辨亱/鑷ｆ湇锛?br>
+        鎬佸害鍙互鏄叾涓换浣曚竴绉嶏紝骞堕殢浣犵殑閫夋嫨鍜岃涓洪殢鏃跺彉鍖栥€傛瑙嗚嚜韬急鐐瑰彲鏀瑰杽鍏崇郴锛屽己琛屽帇鍒跺垯绉疮鎬ㄦ仺銆?br><br>
+        <strong>鈼?涓夋潯璺嚎</strong><br>
+        路 <strong>鍖栬В蹇冮瓟</strong> 鈥?鐩撮潰鎵у康鏍规簮锛岄亾蹇冭秼浜庡渾婊?br>
+        路 <strong>涓庡績榄斿叡鐢?/strong> 鈥?鑾峰緱棰濆鍔涢噺锛屼絾闇€浠樺嚭浠ｄ环<br>
+        路 <strong>琚績榄斿悶鍣?/strong> 鈥?璧板悜榄斿寲锛屽姏閲忔毚娑ㄤ絾澶卞幓鑷垜<br><br>
+        <strong>鈼?蹇冮瓟浼氬湪绐佺牬澧冪晫銆佹浮鍔椂骞叉壈淇</strong><br><br>
+        涓嶅～鍐欏垯鍒濆鏃犲績榄旓紝鍚庣画鍓ф儏涓彲鑳藉洜缁忓巻鑰岃嚜鐒朵骇鐢熴€?      </div>
+      <div class="realm-group"><div class="realm-group-title">蹇冮瓟鍚?/div>
+        <div class="custom-wrap"><span class="custom-label">鍚嶅彿:</span><input class="custom-input" id="input-demon-name" type="text" placeholder="濡? 鍡滆涔嬪奖銆佸線鐢熸墽蹇?.." autocomplete="off"></div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">蹇冮瓟鎵у康</div>
+        <div class="custom-wrap"><span class="custom-label">鎵у康:</span><input class="custom-input" id="input-demon-obsession" type="text" placeholder="濡? 瀵圭伃闂ㄤ粐浜虹殑鎵у康銆佸閫濆幓涔嬩汉鐨勪笉鑸?.." autocomplete="off"></div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">蹇冮瓟鍒濆鎬佸害</div><div class="faction-grid" id="demon-attitude-grid">
+        <button class="faction-btn" onclick="selectDemonAttitude(this,'鏁屽')">鏁屽</button>
+        <button class="faction-btn" onclick="selectDemonAttitude(this,'璇曟帰')">璇曟帰</button>
+        <button class="faction-btn" onclick="selectDemonAttitude(this,'涓珛')">涓珛</button>
+        <button class="faction-btn" onclick="selectDemonAttitude(this,'鍚堜綔')">鍚堜綔</button>
+        <button class="faction-btn" onclick="selectDemonAttitude(this,'鐖辨亱')">鐖辨亱</button>
+        <button class="faction-btn" onclick="selectDemonAttitude(this,'鑷ｆ湇')">鑷ｆ湇</button>
+      </div></div>
+      <p class="hint">涓嶅～鍐欏績榄斿悕鍒欏垵濮嬫棤蹇冮瓟</p>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(15)">杩斿洖</button><button class="btn btn-primary" onclick="saveDemon()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 17: 涓撶簿涔嬪 鈼嬫潯浠舵樉绀?-->
+  <div class="page" id="page-17">
+    <div class="page-inner">
+      <h2 class="page-title">涓撶簿涔嬪</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">鏈笟鏈変笓绮撅紝閬撴湁楂樹笅涔嬪垎銆?br>姹濅箣涓撶簿淇锛屽凡鑷充綍绛夊鐣岋紵</p>
+      <p class="hint">閫夊～锛屼害鍙暀绌虹敱澶╁懡瑁佸畾</p>
+      <div class="realm-group" id="sword-realm-group" style="display:none;">
+        <div class="realm-group-title">鍓戝績澧冪晫 (鍓戜慨涓撳睘)</div>
+        <div class="faction-grid">
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鍏ュ墤')">鍏ュ墤</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鍓戞剰')">鍓戞剰</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鍓戝娍')">鍓戝娍</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鍓戝績')">鍓戝績</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鍓戝績閫氭槑')">鍓戝績閫氭槑</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鏃犳垜')">鏃犳垜</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鏃犲墤')">鏃犲墤</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'鏃犳垜鏃犲墤')">鏃犳垜鏃犲墤</button>
+        </div>
+      </div>
+      <div class="realm-group" id="alchemy-realm-group" style="display:none;">
+        <div class="realm-group-title">涓归亾澧冪晫 (涓逛慨涓撳睘)</div>
+        <div class="faction-grid">
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'鐐肩簿鍖栨皵')">鐐肩簿鍖栨皵</button>
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'鐐兼皵鍖栫')">鐐兼皵鍖栫</button>
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'鐐肩杩樿櫄')">鐐肩杩樿櫄</button>
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'鐐艰櫄鍚堥亾')">鐐艰櫄鍚堥亾</button>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goBackFromSpecialRealm()">杩斿洖</button><button class="btn btn-primary" onclick="saveSpecialRealm()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 18: 鍛介€旀妷鎷?鈼嬮€夊～ -->
+  <div class="page" id="page-18">
+    <div class="page-inner">
+      <h2 class="page-title">鍛介€旀妷鎷?/h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">澶╅亾鏃犲父锛屼竾鑸懡閫旂殕鍦ㄤ竴蹇典箣闂淬€?br>姹濇湡鏈涜繖娈典粰閫斾互浣曠鏂瑰紡灞曞紑锛?br>姝ら€夊皢褰卞搷鏁翠釜涓栫晫瀵规睗鐨勬€佸害銆?/p>
+      <div class="section-title">鏍稿績鐜╂硶 (鍙€変竴椤?</div>
+      <div class="tone-card-grid" id="tone-core-grid"></div>
+      <div class="section-title">闄勫姞椋庢牸 (鍙閫?</div>
+      <div class="tag-grid" id="tone-style-grid"></div>
+      <div class="section-title">鑷畾涔夋弿杩?(閫夊～)</div>
+      <textarea class="textarea-field" id="input-tone-custom" style="min-height:80px;" placeholder="鍦ㄦ鎻忚堪浣犳湡鏈涚殑鏁呬簨椋庢牸锛堝彲閫夛級锛?#10;渚嬪锛氭垜甯屾湜鏁呬簨浠ュ笀寰掑叧绯讳负鏍稿績灞曞紑&#10;渚嬪锛氱函绮圭殑淇偧鍗囩骇锛屽噺灏戞劅鎯呯嚎"></textarea>
+      <div class="btn-row"><button class="btn btn-back" onclick="goBackFromTone()">杩斿洖</button><button class="btn btn-primary" onclick="saveTone()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 19: 鍓嶅皹寰€浜?鈼嬮€夊～ -->
+  <div class="page" id="page-19">
+    <div class="page-inner">
+      <h2 class="page-title">鍓嶅皹寰€浜?/h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">姣忎竴浣嶈笍鍏ヤ粰閫旇€咃紝鐨嗘湁涓€娈典笉鍙（鐏殑鍓嶅皹銆?br>鎴栬鏄伃闂ㄤ箣浠囷紝鎴栬鏄伓寰楀缂樸€?br>姝ゅ鍙功鍐欐睗涔嬫潵鍘嗭紝浜﹀彲鐣欑櫧锛岀敱澶╁懡瀹夋帓銆?/p>
+      <textarea class="textarea-field" id="input-background" style="min-height:160px;" placeholder="鍦ㄦ涔﹀啓姹濅箣鑳屾櫙鏁呬簨銆佺壒娈婄粡鍘嗐€佺洰鏍?..&#10;&#10;浜﹀彲涓嶅～锛岀敱澶╁懡瀹夋帓鍓嶅皹寰€浜嬨€?></textarea>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(18)">杩斿洖</button><button class="btn btn-primary" onclick="saveBackground()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 20: 鍒濆叆澶╁湴 鈽呭繀濉?鈥?鍙湁鑷畾涔夊紑鍦虹櫧textarea -->
+  <div class="page" id="page-20">
+    <div class="page-inner">
+      <h2 class="page-title">鍒濆叆澶╁湴</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">浠欓€斾竾鍗冩潯锛岃捣濮嬪悇涓嶅悓銆?br>鎻忚堪姹濊笍鍏ユ鐣岀殑绗竴骞曞満鏅€?/p>
+      <textarea class="textarea-field" id="input-opening-custom" style="min-height:180px;" placeholder="鍦ㄦ涔﹀啓浣犵殑寮€鍦虹櫧...&#10;&#10;鎻忚堪浣犵殑瑙掕壊褰撳墠澶勫銆佹墍瑙佹墍闂汇€佸唴蹇冩劅鍙椼€?#10;杩欐鏂囧瓧灏嗘垚涓烘晠浜嬬殑璧风偣銆?></textarea>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(19)">杩斿洖</button><button class="btn btn-primary" onclick="saveOpening()">涓嬩竴姝?/button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 21: 澶╁懡鏄ず 鈥?鎬昏纭 -->
+  <div class="page" id="page-21">
+    <div class="page-inner">
+      <h2 class="page-title">澶╁懡鏄ず</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">鍛芥暟宸插畾锛屽ぉ鏈烘槶鐒躲€?br>鍥為瀹¤锛岀‘璁ゆ棤璇悗锛屼究韪忓叆杩欐柟澶╁湴銆?/p>
+      <div class="scroll-area">
+        <table class="summary-table" id="summary-table"></table>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goToPage(20)">杩斿洖</button>
+        <button class="btn btn-primary btn-start" id="btn-confirm" onclick="onConfirm()">韪忓叆澶╁湴</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-indicator" id="step-indicator"></div>
+</div>
+
+<script>
+  // ========== 瑙掕壊鍒涘缓鍚戝 v3 ==========
+  console.log("========== 瑙掕壊鍒涘缓鍚戝 v3 ==========");
+
+  var userData = {
+    name:'', gender:'', age:18,
+    rootGrade:'', rootElements:[], rootString:'', rootCustom:'',
+    constitutionName:'', constitutionDesc:'',
+    arts:[], realm:'鍑′汉', faction:'鏁ｄ慨', dao:'',
+    gongfaName:'', gongfaGrade:'', gongfaCurLayer:0, gongfaTotalLayer:0,
+    spells: [], // [{name,level}]
+    weaponName:'', weaponGrade:'', extraWeapons:'',
+    petName:'', petSpecies:'', petRank:'', petDesc:'',
+    fires: [], // [{name,rank,attr}]
+    domain:'涓ぎ绁炲窞', region:'', regionCustom:'', scene:'',
+    bodyState:'姝ｅ父',
+    stoneLow:0, stoneMid:0, stoneHigh:0, stoneTop:0,
+    storage:'', mundaneMoney:'',
+    demonName:'', demonObsession:'', demonAttitude:'',
+    swordRealm:'', alchemyRealm:'',
+    toneCore:'', toneStyles:[], toneCustom:'',
+    background:'',
+    openingCustom:''
+  };
+
+  var currentPage = 0;
+  var TOTAL_PAGES = 22; // page-0 鍒?page-21
+  var pageSequence = [];
+
+  // 鈹€鈹€ SVG鍥炬爣鐢熸垚 鈹€鈹€
+  function svgIconLg(path, vb) {
+    return '<svg class="tone-icon" viewBox="' + (vb||'0 0 24 24') + '" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
+  }
+
+  // 鈹€鈹€ 鏍稿績鐜╂硶鍩鸿皟鏁版嵁 鈹€鈹€
+  var toneCoreData = [
+    { id:'鍗囩骇娴?, name:'鍗囩骇娴?, desc:'浠ヤ慨鐐肩獊鐮翠负鏍稿績锛岀ǔ姝ュ彉寮?, icon:'<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>' },
+    { id:'鎵尓鍚冭€佽檸', name:'鎵尓鍚冭€佽檸', desc:'浣庤皟瑁呭急锛屽叧閿椂涓€楦ｆ儕浜?, icon:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>' },
+    { id:'澶╁懡涔嬪瓙', name:'澶╁懡涔嬪瓙', desc:'濂囬亣杩炶繛锛屾皵杩愰€嗗ぉ', icon:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
+    { id:'閫嗗ぉ鏀瑰懡', name:'閫嗗ぉ鏀瑰懡', desc:'浠庣粷澧冧腑宕涜捣锛屼互寮辫儨寮?, icon:'<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/>' },
+    { id:'绉嶇敯鍏绘垚', name:'绉嶇敯鍏绘垚', desc:'缁忚惀鍙戝睍涓轰富锛屾垬鏂椾负杈?, icon:'<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
+    { id:'浜夐湼澶╀笅', name:'浜夐湼澶╀笅', desc:'浠ュ娍鍔涗簤鏂椾负鏍稿績', icon:'<path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M3.5 10c.83 0 1.5-.67 1.5-1.5v-5C5 2.67 4.33 2 3.5 2S2 2.67 2 3.5v5c0 .83.67 1.5 1.5 1.5z"/><path d="M9.5 10c.83 0 1.5-.67 1.5-1.5v-5c0-.83-.67-1.5-1.5-1.5S8 2.67 8 3.5v5c0 .83.67 1.5 1.5 1.5z"/><path d="M2 13.5V12a2 2 0 012-2h16a2 2 0 012 2v1.5"/><path d="M2 13.5a6.5 6.5 0 0010 5.5 6.5 6.5 0 0010-5.5"/>' }
+  ];
+
+  // 鈹€鈹€ 闄勫姞椋庢牸鏍囩 鈹€鈹€
+  var toneStyleData = [
+    { id:'绾埍', name:'绾埍' }, { id:'铏愭亱', name:'铏愭亱' }, { id:'璇¤安', name:'璇¤安' },
+    { id:'杞绘澗', name:'杞绘澗' }, { id:'榛戞殫', name:'榛戞殫' }, { id:'纭牳', name:'纭牳' },
+    { id:'鐑', name:'鐑' }, { id:'鍞編', name:'鍞編' }, { id:'鎺㈢储', name:'鎺㈢储' },
+    { id:'缇ゅ儚', name:'缇ゅ儚' }
+  ];
+
+  var regionData = {
+    '涓ぎ绁炲窞': ['涓囧墤灞辫剦','鍓戦福鍩?,'涓归湠鐏靛師','鐧捐崏闆?,'鏄熻景灞辫剦','澶╂満鍩?,'鎮┖灞?,'澶╁伐鍧?,'涓囦粸瀵掑北','涓存笂鍩?,'闀挎槬鍘?,'甯告槬鍩?,'椤诲讥灞辫剦','涓囪薄鍩?,'鐏甸渼灞?,'闈掍簯灞辫剦','澶╀粰宀?,'瑗垮煙鑽夊師','鐧惧吔鍩?,'鐐庣嫳灞?,'鐔旈噾鍩?,'澶╁惎鍩?,'鑻嶆緶鍩?,'娴侀噾鍩?,'娲涙按鍩?,'澧ㄥ鏈哄叧鍩?,'鐜勬笂鍩?,'澶╄剨灞辫剦','璧ら瓏娌?,'鏋佷箰骞诲煄','鐜夋竻宄?,'澶╁墤宄?,'骞惰拏婀?,'绔ョ湡璋?],
+    '涓滆崚濡栧煙': ['涓囧鍦ｅ煄','闈掍笜鍥?,'杩︽ゼ缃楀ぉ','鍗佷竾澶у北','鐧惧吔璋?,'鏃犲敖鏋楁捣','闆锋辰','浜戞ⅵ澶ф辰','钀芥棩宄¤胺','缁北','鍟搁宀?,'榛戞澗鏋?],
+    '鍖楀師榄斿湡': ['澶╅瓟甯濋兘','姘稿鍩?,'鐒氶瓟鐒﹀湡','绂侀敘瑕佸','琛€鐙辨繁鍘?,'娉ｈ灞辫剦','瀵傜伃娴?,'榛戝啺娓?,'褰掑榄旀笂','涓囨硶妤?],
+    '鍗楃枂宸湴': ['宸灞?,'鍗冭櫕甯傞泦','杩烽浘闆ㄦ灄','鐧炬瘨娌兼辰','鑽宄?,'鐜茬彂缁ｉ榿','鐢熷懡涔嬫．','铔婄璋?,'鏋佷箰瀹?,'鐐庣嫳灞?,'涓囪泭鍣緳绐?,'榛庢瘝姹?],
+    '瑗挎紶浣涘浗': ['鐏靛北','娓呮硥闀?,'娴佹矙涔嬫捣','鏈堢墮娉?,'绾㈢爞鍩?,'鏈涘ぉ缁挎床','榛戠煶娣辨笂','涓囬瓟绐?,'涓囧疂妤?,'骞藉啣榄旀','鑻﹁娌欐捣'],
+    '鍥涙捣': ['涓滄簾娴?,'纰ф尝鍩?,'钃幈浠欏矝','瑗挎瀬娴?,'鍗楃娴?,'鐝婄憵瀹?,'鐏嫳缇ゅ矝','鍖楀啣娴?,'骞借惤娴?,'榫欏'],
+    '闃存浌鍦板簻': ['榛勬硥璺?,'蹇樺窛娌?,'鏈涗埂鍙?,'闃庣綏娈?,'鏋夋鍩?,'鍏亾杞洖鐩?,'楝煎競'],
+    '涓滅€?: ['甯稿骞曞簻','浼婂娍澶хぞ'],
+    '澶ч瓟鍥?: ['榄囩殗瀹','鍥涚帇灏佸湴','榄旀皯闆嗗競','鐐肩嫳绔炴妧鍦?,'鏆楀奖妫灄']
+  };
+
+  // 鈹€鈹€ 澧冪晫鈫掑鍏冩槧灏?鈹€鈹€
+  var REALM_LIFESPAN = {
+    '鍑′汉':100,
+    '鐐兼皵':150,'鐐兼皵鏈?:150,
+    '绛戝熀':300,'绛戝熀鏈?:300,
+    '閲戜腹':800,'閲戜腹鏈?:800,
+    '鍏冨┐':2000,'鍏冨┐鏈?:2000,
+    '鍖栫':5000,'鍖栫鏈?:5000,
+    '鐐艰櫄':15000,'鐐艰櫄鏈?:15000,
+    '鍚堜綋':40000,'鍚堜綋鏈?:40000,
+    '澶т箻':100000,'澶т箻鏈?:100000,
+    '娓″姭':100000,'娓″姭鏈?:100000,
+    '鐪熶粰澧?:30000
+  };
+
+  function parseChineseNum(s) {
+    var m = {'涓€':1,'浜?:2,'涓?:3,'鍥?:4,'浜?:5,'鍏?:6,'涓?:7,'鍏?:8,'涔?:9,'鍗?:10};
+    return m[s] || parseInt(s) || 1;
+  }
+
+  function parseRealm(realmStr) {
+    if (!realmStr || realmStr === '鍑′汉') return { major:'鍑′汉', minor:'', lifespanMax:100 };
+    var lq = realmStr.match(/^鐐兼皵(?:鏈??(.+)灞?/);
+    if (lq) return { major:'鐐兼皵', minor:realmStr, lifespanMax:150 };
+    var st = realmStr.match(/^(绛戝熀|閲戜腹|鍏冨┐|鍖栫|鐐艰櫄|鍚堜綋|澶т箻|娓″姭)(?:鏈??(鍓嶆湡|涓湡|鍚庢湡|澶у渾婊?$/);
+    if (st) return { major:st[1], minor:realmStr, lifespanMax:REALM_LIFESPAN[st[1]] };
+    var zx = realmStr.match(/^鐪熶粰澧?.+)閲嶅ぉ/);
+    if (zx) {
+      var lvl = parseChineseNum(zx[1]);
+      return { major:'鐪熶粰澧?, minor:realmStr, lifespanMax:lvl*30000 };
+    }
+    var realmKeys = ['鐐兼皵','绛戝熀','閲戜腹','鍏冨┐','鍖栫','鐐艰櫄','鍚堜綋','澶т箻','娓″姭'];
+    for (var i = 0; i < realmKeys.length; i++) {
+      if (realmStr.indexOf(realmKeys[i]) === 0) {
+        return { major:realmKeys[i], minor:realmStr, lifespanMax:REALM_LIFESPAN[realmKeys[i]] };
+      }
+    }
+    return { major:'鍑′汉', minor:realmStr || '鍑′汉', lifespanMax:100 };
+  }
+
+  // 鈹€鈹€ 鏈硶鍔ㄦ€佽 鈹€鈹€
+  function addSpellRow(name, level) {
+    var list = document.getElementById('spell-list');
+    var row = document.createElement('div');
+    row.className = 'dyn-row';
+    row.innerHTML = '<input class="custom-input dyn-name" type="text" placeholder="鏈硶鍚? value="' + (name||'') + '" autocomplete="off">' +
+      '<select class="custom-select dyn-select"><option value="鍏ラ棬"' + (level==='鍏ラ棬'?' selected':'') + '>鍏ラ棬</option><option value="灏忔垚"' + (level==='灏忔垚'?' selected':'') + '>灏忔垚</option><option value="澶ф垚"' + (level==='澶ф垚'?' selected':'') + '>澶ф垚</option><option value="鍦嗘弧"' + (level==='鍦嗘弧'?' selected':'') + '>鍦嗘弧</option></select>' +
+      '<button class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">脳</button>';
+    list.appendChild(row);
+  }
+
+  function collectSpells() {
+    var rows = document.querySelectorAll('#spell-list .dyn-row');
+    var spells = [];
+    for (var i = 0; i < rows.length; i++) {
+      var name = rows[i].querySelector('.dyn-name').value.trim();
+      var level = rows[i].querySelector('.dyn-select').value;
+      if (name) spells.push({ name: name, level: level });
+    }
+    return spells;
+  }
+
+  // 鈹€鈹€ 寮傜伀鍔ㄦ€佽 鈹€鈹€
+  function addFireRow(name, rank, attr) {
+    var list = document.getElementById('fire-list');
+    var row = document.createElement('div');
+    row.className = 'dyn-row';
+    row.innerHTML = '<input class="custom-input dyn-name" type="text" placeholder="寮傜伀鍚? value="' + (name||'') + '" autocomplete="off">' +
+      '<select class="custom-select dyn-select">' +
+      '<option value="">鍝佺骇</option>' +
+      '<option value="涔濆搧"' + (rank==='涔濆搧'?' selected':'') + '>涔濆搧</option>' +
+      '<option value="鍏搧"' + (rank==='鍏搧'?' selected':'') + '>鍏搧</option>' +
+      '<option value="涓冨搧"' + (rank==='涓冨搧'?' selected':'') + '>涓冨搧</option>' +
+      '<option value="鍏搧"' + (rank==='鍏搧'?' selected':'') + '>鍏搧</option>' +
+      '<option value="浜斿搧"' + (rank==='浜斿搧'?' selected':'') + '>浜斿搧</option>' +
+      '<option value="鍥涘搧"' + (rank==='鍥涘搧'?' selected':'') + '>鍥涘搧</option>' +
+      '<option value="涓夊搧"' + (rank==='涓夊搧'?' selected':'') + '>涓夊搧</option>' +
+      '<option value="浜屽搧"' + (rank==='浜屽搧'?' selected':'') + '>浜屽搧</option>' +
+      '<option value="涓€鍝?' + (rank==='涓€鍝??' selected':'') + '>涓€鍝?/option>' +
+      '<option value="鐗规畩"' + (rank==='鐗规畩'?' selected':'') + '>鐗规畩</option>' +
+      '</select>' +
+      '<input class="custom-input dyn-attr" type="text" placeholder="灞炴€? value="' + (attr||'') + '" autocomplete="off">' +
+      '<button class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">脳</button>';
+    list.appendChild(row);
+  }
+
+  function collectFires() {
+    var rows = document.querySelectorAll('#fire-list .dyn-row');
+    var fires = [];
+    for (var i = 0; i < rows.length; i++) {
+      var name = rows[i].querySelector('.dyn-name').value.trim();
+      var rank = rows[i].querySelector('.dyn-select').value;
+      var attr = rows[i].querySelector('.dyn-attr').value.trim();
+      if (name) fires.push({ name: name, rank: rank, attr: attr });
+    }
+    return fires;
+  }
+
+  // 鈹€鈹€ 鏋勫缓鏁呬簨鍩鸿皟鍗＄墖 鈹€鈹€
+  function buildToneCards() {
+    var g = document.getElementById('tone-core-grid');
+    g.innerHTML = '';
+    toneCoreData.forEach(function(t) {
+      var d = document.createElement('div');
+      d.className = 'tone-card';
+      d.innerHTML = svgIconLg(t.icon) + '<span class="tone-name">' + t.name + '</span><span class="tone-desc">' + t.desc + '</span>';
+      d.onclick = function() {
+        var all = document.querySelectorAll('#tone-core-grid .tone-card');
+        for (var i = 0; i < all.length; i++) all[i].classList.remove('selected');
+        d.classList.add('selected');
+        userData.toneCore = t.id;
+      };
+      g.appendChild(d);
+    });
+
+    var sg = document.getElementById('tone-style-grid');
+    sg.innerHTML = '';
+    toneStyleData.forEach(function(t) {
+      var b = document.createElement('button');
+      b.className = 'tag-btn';
+      b.textContent = t.name;
+      b.onclick = function() {
+        var idx = userData.toneStyles.indexOf(t.id);
+        if (idx >= 0) { userData.toneStyles.splice(idx, 1); b.classList.remove('selected'); }
+        else { userData.toneStyles.push(t.id); b.classList.add('selected'); }
+      };
+      sg.appendChild(b);
+    });
+  }
+
+  // 鈹€鈹€ 椤甸潰瀵艰埅杈呭姪 鈹€鈹€
+  function buildRegionButtons(domain) {
+    var c = document.getElementById('region-container');
+    c.innerHTML = '';
+    var regions = regionData[domain] || [];
+    for (var i = 0; i < regions.length; i++) {
+      var b = document.createElement('button');
+      b.className = 'faction-btn';
+      b.textContent = regions[i];
+      (function(r) { b.setAttribute('onclick', "selectRegion(this,'" + r + "')"); })(regions[i]);
+      c.appendChild(b);
+    }
+  }
+
+  function selectDomain(el, v) {
+    var btns = document.querySelectorAll('#domain-grid .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.domain = v; userData.region = ''; userData.regionCustom = '';
+    document.getElementById('region-custom').value = '';
+    buildRegionButtons(v);
+  }
+  function selectRegion(el, v) {
+    var btns = document.querySelectorAll('#region-container .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.region = v; userData.regionCustom = '';
+    document.getElementById('region-custom').value = '';
+  }
+  function onCustomRegion() {
+    var v = document.getElementById('region-custom').value.trim();
+    if (v) {
+      var btns = document.querySelectorAll('#region-container .faction-btn');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+      userData.region = ''; userData.regionCustom = v;
+    }
+  }
+
+  // 鈹€鈹€ 鍚勯〉闈ave鍑芥暟 鈹€鈹€
+  function saveName() { var v=document.getElementById('input-name').value.trim(); if(!v){shakeEl('input-name');return;} userData.name=v; goToPage(2); }
+  function selectGender(el,v) { var c=document.querySelectorAll('#page-2 .card'); for(var i=0;i<c.length;i++)c[i].classList.remove('selected'); el.classList.add('selected'); userData.gender=v; }
+  function saveGender() { if(!userData.gender)return; goToPage(3); }
+  function saveAge() { var v=parseInt(document.getElementById('input-age').value); if(!v||v<1){shakeEl('input-age');return;} userData.age=Math.max(1,Math.min(100000,v)); goToPage(4); }
+  function updateAgeHint(a) {
+    var h=document.getElementById('age-hint');
+    if(a<=0)h.textContent=''; else if(a<15)h.textContent='灏戝勾涔嬭函锛岄亾蹇冩湭瀹氾紝鍓嶈矾婕极';
+    else if(a<20)h.textContent='寮卞啝涔嬪勾锛屾鍊间慨琛屽叆闂ㄤ箣榫?; else if(a<30)h.textContent='鑰岀珛涔嬪墠锛屾牴鍩哄皻鍙閫?;
+    else if(a<50)h.textContent='鍗婄敓宸茶繃锛岃嫢闈炴満缂橈紝鎭愰毦鍏ラ亾'; else if(a<100)h.textContent='鑺辩敳涔嬪勾锛岀孩灏橀槄灏斤紝閬撳績鎴栨洿鍧?;
+    else if(a<500)h.textContent='鐧惧瞾涔嬭函锛屽凡闈炲嚒浜哄鏁?; else if(a<1000)h.textContent='鏁扮櫨杞藉瞾鏈堬紝褰撳凡鍘嗙粡鏁版铚曞彉';
+    else h.textContent='鍗冨勾涔嬩笂锛屽凡鏄粰浜轰箣榫?;
+  }
+  function selectRootGrade(el,v) { var b=document.querySelectorAll('#root-grade-options .realm-btn'); for(var i=0;i<b.length;i++)b[i].classList.remove('selected'); el.classList.add('selected'); userData.rootGrade=v; document.getElementById('root-custom').value=''; userData.rootCustom=''; updateRootPreview(); }
+  function toggleElement(el,v) { var idx=userData.rootElements.indexOf(v); if(idx>=0){userData.rootElements.splice(idx,1);el.classList.remove('selected');}else{userData.rootElements.push(v);el.classList.add('selected');} document.getElementById('root-custom').value=''; userData.rootCustom=''; updateRootPreview(); }
+  function onCustomRoot() { userData.rootCustom=document.getElementById('root-custom').value.trim(); var b1=document.querySelectorAll('#root-grade-options .realm-btn'); for(var i=0;i<b1.length;i++)b1[i].classList.remove('selected'); var b2=document.querySelectorAll('#root-element-grid .mini-card'); for(var j=0;j<b2.length;j++)b2[j].classList.remove('selected'); userData.rootGrade=''; userData.rootElements=[]; updateRootPreview(); }
+  function updateRootPreview() { var p=document.getElementById('root-preview'); if(userData.rootCustom){var parsed=parseCustomRoot(userData.rootCustom);p.textContent=parsed!==userData.rootCustom?parsed+'  \u2190 宸茶浆鎹?:userData.rootCustom;return;} if(!userData.rootGrade||userData.rootElements.length===0){p.textContent='';return;} p.textContent=genRootStr(userData.rootGrade,userData.rootElements); }
+  function genRootStr(g,els) { var gn=g+'鐏垫牴',basic=['閲?,'鏈?,'姘?,'鐏?,'鍦?],cnt=els.length; var cn={1:'鍗?,2:'鍙?,3:'涓?,4:'鍥?,5:'浜?}; if(cnt===5){var ab=true;for(var i=0;i<els.length;i++){if(basic.indexOf(els[i])<0){ab=false;break;}}if(ab)return gn+'路浜旇淇卞叏';} if(cnt===1){return basic.indexOf(els[0])>=0?gn+'路鍗?+els[0]:gn+'路绾?+els[0];} return gn+'路'+els.join('')+(cn[cnt]||''); }
+  function parseCustomRoot(input) {
+    if(!input)return''; var s=input.trim(); if(/^[澶╁湴鐜勯粍鏉俔鐏垫牴路/.test(s))return s;
+    var gradeMap={'澶╁搧':'澶?,'澶╃骇':'澶?,'澶╅樁':'澶?,'澶?:'澶?,'鍦板搧':'鍦?,'鍦扮骇':'鍦?,'鍦伴樁':'鍦?,'鍦?:'鍦?,'鐜勫搧':'鐜?,'鐜勭骇':'鐜?,'鐜勯樁':'鐜?,'鐜?:'鐜?,'榛勫搧':'榛?,'榛勭骇':'榛?,'榛勯樁':'榛?,'榛?:'榛?,'鏉傚搧':'鏉?,'鏉傜骇':'鏉?,'鏉傞樁':'鏉?,'鏉?:'鏉?};
+    var basicElements=['閲?,'鏈?,'姘?,'鐏?,'鍦?]; var mutantElements=['闆?,'鍐?,'椋?,'鏆?,'鍏?,'绌洪棿','鏃堕棿','鏄熻景','闃?,'闃?,'琛€','姣?,'榄?,'娣锋矊','澶瀬'];
+    var allElements=basicElements.concat(mutantElements); var countToWord={1:'鍗?,2:'鍙?,3:'涓?,4:'鍥?,5:'浜?};
+    var grade='',elements=[],remaining=s;
+    var gradeKeys=Object.keys(gradeMap).sort(function(a,b){return b.length-a.length;});
+    for(var i=0;i<gradeKeys.length;i++){var gk=gradeKeys[i];if(remaining.indexOf(gk)>=0){grade=gradeMap[gk];remaining=remaining.replace(gk,'');break;}}
+    remaining=remaining.replace(/鐏垫牴/g,'').trim();
+    if(remaining.indexOf('浜旇淇卞叏')>=0||remaining==='浜旇'){if(!grade)grade='鏉?;return grade+'鐏垫牴路浜旇淇卞叏';}
+    var pureMatch=remaining.match(/绾?.+)/); if(pureMatch){if(!grade)grade='澶?;return grade+'鐏垫牴路绾?+pureMatch[1].trim();}
+    var countWords={'鍗?:1,'鍙?:2,'涓?:3,'鍥?:4,'浜?:5,'绾?:1};var ck=Object.keys(countWords);for(var c=0;c<ck.length;c++)remaining=remaining.replace(new RegExp(ck[c],'g'),'');
+    remaining=remaining.trim();
+    for(var e=0;e<allElements.length;e++){if(remaining.indexOf(allElements[e])>=0){elements.push(allElements[e]);remaining=remaining.replace(allElements[e],'');}}
+    if(elements.length>0){if(!grade){if(elements.length===1)grade='澶?;else if(elements.length===2)grade='鍦?;else if(elements.length===3)grade='鐜?;else if(elements.length===4)grade='榛?;else grade='鏉?;}
+    if(elements.length===5){var ab2=true;for(var ab3=0;ab3<elements.length;ab3++){if(basicElements.indexOf(elements[ab3])<0){ab2=false;break;}}if(ab2)return grade+'鐏垫牴路浜旇淇卞叏';}
+    if(elements.length===1){return grade+'鐏垫牴路'+(basicElements.indexOf(elements[0])>=0?'鍗?:'绾?)+elements[0];}
+    return grade+'鐏垫牴路'+elements.join('')+(countToWord[elements.length]||'');}
+    if(grade){remaining=remaining.trim();if(remaining)return grade+'鐏垫牴路'+remaining;return grade+'鐏垫牴';}
+    return s;
+  }
+  function saveRoot() { if(userData.rootCustom){userData.rootString=parseCustomRoot(userData.rootCustom);}else if(userData.rootGrade&&userData.rootElements.length>0){userData.rootString=genRootStr(userData.rootGrade,userData.rootElements);}else{userData.rootString='';} goToPage(5); }
+  function saveConstitution() { userData.constitutionName = document.getElementById('input-constitution-name').value.trim(); userData.constitutionDesc = document.getElementById('input-constitution-desc').value.trim(); goToPage(6); }
+  function toggleArt(el,v) { var idx=userData.arts.indexOf(v); if(idx>=0){userData.arts.splice(idx,1);el.classList.remove('selected');}else{userData.arts.push(v);el.classList.add('selected');} }
+  function saveArts() { goToPage(7); }
+  function selectRealm(el,v) { var b=document.querySelectorAll('.realm-btn'); for(var i=0;i<b.length;i++)b[i].classList.remove('selected'); el.classList.add('selected'); userData.realm=v; }
+  function saveRealm() { if(!userData.realm)return; goToPage(8); }
+  function saveGongfa() {
+    userData.gongfaName=document.getElementById('input-gongfa-name').value.trim();
+    userData.gongfaGrade=document.getElementById('input-gongfa-grade').value;
+    userData.gongfaCurLayer=parseInt(document.getElementById('input-gongfa-cur-layer').value)||0;
+    userData.gongfaTotalLayer=parseInt(document.getElementById('input-gongfa-total-layer').value)||0;
+    userData.spells=collectSpells();
+    goToPage(9);
+  }
+  function saveWeapon() { userData.weaponName=document.getElementById('input-weapon-name').value.trim(); userData.weaponGrade=document.getElementById('input-weapon-grade').value.trim(); userData.extraWeapons=document.getElementById('input-extra-weapons').value.trim(); goToPage(10); }
+  function savePet() { userData.petName=document.getElementById('input-pet-name').value.trim(); userData.petSpecies=document.getElementById('input-pet-species').value.trim(); userData.petRank=document.getElementById('input-pet-rank').value; userData.petDesc=document.getElementById('input-pet-desc').value.trim(); goToPage(11); }
+  function saveFire() { userData.fires=collectFires(); goToPage(12); }
+  function selectFaction(el,v) { var b=document.querySelectorAll('#faction-scroll .faction-btn'); for(var i=0;i<b.length;i++)b[i].classList.remove('selected'); el.classList.add('selected'); userData.faction=v; document.getElementById('faction-custom').value=''; }
+  function onCustomFaction() { var v=document.getElementById('faction-custom').value.trim(); if(v){var b=document.querySelectorAll('#faction-scroll .faction-btn');for(var i=0;i<b.length;i++)b[i].classList.remove('selected');userData.faction=v;} }
+  function saveFaction() { var c=document.getElementById('faction-custom').value.trim(); if(c)userData.faction=c; if(!userData.faction)return; goToPage(13); }
+  function selectDao(el,v) {
+    var btns=document.querySelectorAll('#dao-grid .faction-btn');
+    for(var i=0;i<btns.length;i++)btns[i].classList.remove('selected');
+    if(userData.dao===v){userData.dao='';} // 鍐嶆鐐瑰嚮鍙栨秷
+    else{el.classList.add('selected');userData.dao=v;}
+  }
+  function saveDao() { goToPage(14); }
+  function saveLocation() {
+    var c = document.getElementById('region-custom').value.trim();
+    if (c) userData.regionCustom = c;
+    userData.scene = document.getElementById('input-scene').value.trim();
+    goToPage(15);
+  }
+  function selectBodyState(el, v) {
+    var btns = document.querySelectorAll('#body-state-grid .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected'); userData.bodyState = v;
+  }
+  function saveStatus() {
+    userData.stoneLow = Math.max(0, parseInt(document.getElementById('input-stone-low').value)||0);
+    userData.stoneMid = Math.max(0, parseInt(document.getElementById('input-stone-mid').value)||0);
+    userData.stoneHigh = Math.max(0, parseInt(document.getElementById('input-stone-high').value)||0);
+    userData.stoneTop = Math.max(0, parseInt(document.getElementById('input-stone-top').value)||0);
+    userData.storage = document.getElementById('input-storage').value.trim();
+    userData.mundaneMoney = document.getElementById('input-mundane-money').value.trim();
+    goToPage(16);
+  }
+  function selectDemonAttitude(el, v) {
+    var btns = document.querySelectorAll('#demon-attitude-grid .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    if(userData.demonAttitude===v){userData.demonAttitude='';} // 鍐嶆鐐瑰嚮鍙栨秷
+    else{el.classList.add('selected'); userData.demonAttitude=v;}
+  }
+  function saveDemon() {
+    userData.demonName = document.getElementById('input-demon-name').value.trim();
+    userData.demonObsession = document.getElementById('input-demon-obsession').value.trim();
+    if (needSpecialRealmPage()) { setupSpecialRealmPage(); goToPage(17); }
+    else goToPage(18);
+  }
+  function needSpecialRealmPage() { return userData.arts.indexOf('鍓戜慨') >= 0 || userData.arts.indexOf('鐐间腹') >= 0; }
+  function setupSpecialRealmPage() {
+    document.getElementById('sword-realm-group').style.display = userData.arts.indexOf('鍓戜慨') >= 0 ? 'block' : 'none';
+    document.getElementById('alchemy-realm-group').style.display = userData.arts.indexOf('鐐间腹') >= 0 ? 'block' : 'none';
+  }
+  function selectSwordRealm(el, v) { var b=document.querySelectorAll('#sword-realm-group .faction-btn'); for(var i=0;i<b.length;i++)b[i].classList.remove('selected'); el.classList.add('selected'); userData.swordRealm=v; }
+  function selectAlchemyRealm(el, v) { var b=document.querySelectorAll('#alchemy-realm-group .faction-btn'); for(var i=0;i<b.length;i++)b[i].classList.remove('selected'); el.classList.add('selected'); userData.alchemyRealm=v; }
+  function saveSpecialRealm() { goToPage(18); }
+  function goBackFromSpecialRealm() { goToPage(16); }
+  function goBackFromTone() { if (needSpecialRealmPage()) goToPage(17); else goToPage(16); }
+  function saveTone() {
+    userData.toneCustom = document.getElementById('input-tone-custom').value.trim();
+    goToPage(19);
+  }
+  function saveBackground() { userData.background = document.getElementById('input-background').value.trim(); goToPage(20); }
+  function saveOpening() {
+    var v = document.getElementById('input-opening-custom').value.trim();
+    if(!v){shakeEl('input-opening-custom');return;}
+    userData.openingCustom=v;
+    goToPage(21);
+  }
+
+  // 鈹€鈹€ 椤甸潰搴忓垪涓庢楠ゆ寚绀哄櫒 鈹€鈹€
+  function rebuildPageSequence() {
+    pageSequence = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+    if (needSpecialRealmPage()) pageSequence.push(17);
+    pageSequence.push(18,19,20,21);
+  }
+
+  function buildStepIndicator() {
+    var c = document.getElementById('step-indicator'); c.innerHTML = '';
+    for (var i = 0; i < TOTAL_PAGES; i++) {
+      var d = document.createElement('div');
+      d.className = 'step-dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('data-page', i); c.appendChild(d);
+    }
+  }
+
+  function updateStepIndicator() {
+    rebuildPageSequence();
+    var dots = document.querySelectorAll('.step-dot');
+    for (var i = 0; i < dots.length; i++) {
+      var pg = parseInt(dots[i].getAttribute('data-page'));
+      dots[i].style.display = pageSequence.indexOf(pg) >= 0 ? '' : 'none';
+      dots[i].className = 'step-dot';
+      if (pg === currentPage) dots[i].className += ' active';
+      else if (pageSequence.indexOf(pg) < pageSequence.indexOf(currentPage)) dots[i].className += ' done';
+    }
+  }
+
+  function buildRealmButtons() {
+    var stages = ['鍓嶆湡','涓湡','鍚庢湡','澶у渾婊?];
+    var nums = '涓€浜屼笁鍥涗簲鍏竷鍏節鍗?;
+    var groups = { 'realm-lianqi':[],'realm-zhuji':[],'realm-jindan':[],'realm-yuanying':[],'realm-huashen':[],'realm-lianxu':[],'realm-heti':[],'realm-dacheng':[],'realm-dujie':[],'realm-zhenxian':[] };
+    for (var i=0;i<10;i++) groups['realm-lianqi'].push('鐐兼皵'+nums[i]+'灞?);
+    for (var s=0;s<stages.length;s++) {
+      groups['realm-zhuji'].push('绛戝熀'+stages[s]); groups['realm-jindan'].push('閲戜腹'+stages[s]);
+      groups['realm-yuanying'].push('鍏冨┐'+stages[s]); groups['realm-huashen'].push('鍖栫'+stages[s]);
+      groups['realm-lianxu'].push('鐐艰櫄'+stages[s]); groups['realm-heti'].push('鍚堜綋'+stages[s]);
+      groups['realm-dacheng'].push('澶т箻'+stages[s]); groups['realm-dujie'].push('娓″姭'+stages[s]);
+    }
+    for (var j=0;j<10;j++) groups['realm-zhenxian'].push('鐪熶粰澧?+nums[j]+'閲嶅ぉ');
+    groups['realm-zhenxian'].push('鐪熶粰澧冨崄閲嶅ぉ澶у渾婊?);
+    var keys = ['realm-lianqi','realm-zhuji','realm-jindan','realm-yuanying','realm-huashen','realm-lianxu','realm-heti','realm-dacheng','realm-dujie','realm-zhenxian'];
+    for (var k=0;k<keys.length;k++) {
+      var id=keys[k], realms=groups[id], c=document.getElementById(id);
+      if (!c) continue;
+      for (var r=0;r<realms.length;r++) {
+        var b=document.createElement('button'); b.className='realm-btn'; b.textContent=realms[r];
+        (function(realm) { b.setAttribute('onclick', "selectRealm(this,'"+realm+"')"); })(realms[r]);
+        c.appendChild(b);
+      }
+    }
+  }
+
+  function goToPage(n) {
+    if (n<0||n>=TOTAL_PAGES) return;
+    var pages=document.querySelectorAll('.page');
+    for (var i=0;i<pages.length;i++) pages[i].classList.remove('active');
+    currentPage=n;
+    var page=document.getElementById('page-'+n);
+    if (page) page.classList.add('active');
+    window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0;
+    updateStepIndicator();
+    if (n===21) buildSummary();
+  }
+
+  // 鈹€鈹€ 鎬昏 鈹€鈹€
+  function buildSummary() {
+    var t=document.getElementById('summary-table');
+    var loc=userData.domain+(userData.regionCustom||userData.region?' 路 '+(userData.regionCustom||userData.region):'')+(userData.scene?' 路 '+userData.scene:'');
+    var rows=[['閬撳彿',userData.name],['鏈浉',userData.gender==='鐢??'涔?(鐢?':'鍧?(濂?'],['骞村瞾',userData.age+' 宀?],['鐏垫牴',userData.rootString||'锛堢敱澶╁懡鍐冲畾锛?]];
+    if(userData.constitutionName){var cStr=userData.constitutionName;if(userData.constitutionDesc)cStr+=' 鈥?'+userData.constitutionDesc.substring(0,30)+(userData.constitutionDesc.length>30?'...':'');rows.push(['浣撹川',cStr]);}
+    rows.push(['鐧捐壓',userData.arts.length>0?userData.arts.join('銆?):'鏆傛棤']);
+    rows.push(['淇负',userData.realm]);
+    if(userData.gongfaName){var gfStr=userData.gongfaName;if(userData.gongfaGrade)gfStr+=' ('+userData.gongfaGrade+')';if(userData.gongfaTotalLayer>0)gfStr+=' '+userData.gongfaCurLayer+'/'+userData.gongfaTotalLayer+'灞?;rows.push(['鍔熸硶',gfStr]);}
+    if(userData.spells.length>0){var spellStr=userData.spells.map(function(s){return s.name+'('+s.level+')';}).join('銆?);rows.push(['鏈硶',spellStr.length>40?spellStr.substring(0,40)+'...':spellStr]);}
+    if(userData.weaponName)rows.push(['娉曞疂',userData.weaponName+(userData.weaponGrade?' ('+userData.weaponGrade+')':'')]);
+    if(userData.extraWeapons)rows.push(['鍏朵粬',userData.extraWeapons.length>40?userData.extraWeapons.substring(0,40)+'...':userData.extraWeapons]);
+    if(userData.petName){var ps=userData.petName;if(userData.petSpecies)ps+=' ('+userData.petSpecies+')';if(userData.petRank)ps+=' ['+userData.petRank+']';rows.push(['鐏靛疇',ps]);}
+    if(userData.fires.length>0){var fireStr=userData.fires.map(function(f){var s=f.name;if(f.rank)s+='('+f.rank+')';if(f.attr)s+='['+f.attr+']';return s;}).join('銆?);rows.push(['寮傜伀',fireStr]);}
+    rows.push(['鍔垮姏',userData.faction]);
+    if(userData.dao)rows.push(['閬撻€?,userData.dao]);
+    rows.push(['鏂逛綅',loc]);rows.push(['韬€?,userData.bodyState]);
+    var stoneStr='';if(userData.stoneLow)stoneStr+='涓嬪搧脳'+userData.stoneLow+' ';if(userData.stoneMid)stoneStr+='涓搧脳'+userData.stoneMid+' ';if(userData.stoneHigh)stoneStr+='涓婂搧脳'+userData.stoneHigh+' ';if(userData.stoneTop)stoneStr+='鏋佸搧脳'+userData.stoneTop;if(stoneStr.trim())rows.push(['鐏电煶',stoneStr.trim()]);
+    if(userData.storage)rows.push(['鍌ㄧ墿',userData.storage.length>40?userData.storage.substring(0,40)+'...':userData.storage]);
+    if(userData.mundaneMoney)rows.push(['璐у竵',userData.mundaneMoney]);
+    if(userData.demonName)rows.push(['蹇冮瓟',userData.demonName+(userData.demonObsession?' 鈥?'+userData.demonObsession:'')+(userData.demonAttitude?' ['+userData.demonAttitude+']':'')]);
+    if(userData.swordRealm)rows.push(['鍓戝績',userData.swordRealm]);
+    if(userData.alchemyRealm)rows.push(['涓归亾',userData.alchemyRealm]);
+    if(userData.toneCore)rows.push(['鍩鸿皟',userData.toneCore+(userData.toneStyles.length>0?' + '+userData.toneStyles.join('銆?):'')]);
+    if(userData.toneCustom)rows.push(['椋庢牸',userData.toneCustom.length>40?userData.toneCustom.substring(0,40)+'...':userData.toneCustom]);
+    if(userData.background)rows.push(['鍓嶅皹',userData.background.length>60?userData.background.substring(0,60)+'...':userData.background]);
+    if(userData.openingCustom)rows.push(['寮€鍦?,userData.openingCustom.length>60?userData.openingCustom.substring(0,60)+'...':userData.openingCustom]);
+    var html='';for(var i=0;i<rows.length;i++)html+='<tr><td>'+rows[i][0]+'</td><td>'+rows[i][1]+'</td></tr>';
+    t.innerHTML=html;
+  }
+
+  // 鈹€鈹€ 鏍煎紡鍖栫敤鎴蜂俊鎭笘鐣屼功鏉＄洰鍐呭 鈹€鈹€
+  function formatUserInfo() {
+    var lines=['<鐢ㄦ埛瑙掕壊淇℃伅>'];
+    lines.push('閬撳彿: '+userData.name);
+    lines.push('鎬у埆: '+(userData.gender==='鐢??'鐢?涔?':'濂?鍧?'));
+    lines.push('骞村瞾: '+userData.age);
+    lines.push('鐏垫牴: '+(userData.rootString||'鏈煡'));
+    if(userData.constitutionName){lines.push('浣撹川: '+userData.constitutionName);if(userData.constitutionDesc)lines.push('浣撹川鏁堟灉: '+userData.constitutionDesc);}
+    lines.push('淇鐧捐壓: '+(userData.arts.length>0?userData.arts.join('銆?):'鏆傛棤'));
+    lines.push('淇负澧冪晫: '+userData.realm);
+    lines.push('鎵€灞炲娍鍔? '+userData.faction);
+    if(userData.dao)lines.push('閬撻€? '+userData.dao);
+    var loc=userData.domain+(userData.regionCustom||userData.region?' - '+(userData.regionCustom||userData.region):'')+(userData.scene?' - '+userData.scene:'');
+    lines.push('褰撳墠浣嶇疆: '+loc);
+    lines.push('韬綋鐘舵€? '+userData.bodyState);
+    if(userData.gongfaName){var gfStr='涓讳慨鍔熸硶: '+userData.gongfaName;if(userData.gongfaGrade)gfStr+=' ('+userData.gongfaGrade+')';if(userData.gongfaTotalLayer>0)gfStr+=' 宸蹭慨'+userData.gongfaCurLayer+'/'+userData.gongfaTotalLayer+'灞?;lines.push(gfStr);}
+    if(userData.spells.length>0)lines.push('宸蹭範鏈硶: '+userData.spells.map(function(s){return s.name+'('+s.level+')';}).join('銆?));
+    if(userData.weaponName)lines.push('鏈懡娉曞疂: '+userData.weaponName+(userData.weaponGrade?' ('+userData.weaponGrade+')':''));
+    if(userData.extraWeapons)lines.push('鍏朵粬娉曞疂: '+userData.extraWeapons);
+    if(userData.petName){var pi=userData.petName;if(userData.petSpecies)pi+='锛屽搧绉? '+userData.petSpecies;if(userData.petRank)pi+='锛岄樁绾? '+userData.petRank;if(userData.petDesc)pi+='锛屾弿杩? '+userData.petDesc;lines.push('鐏靛疇: '+pi);}
+    if(userData.fires.length>0)lines.push('寮傜伀: '+userData.fires.map(function(f){var s=f.name;if(f.rank)s+='('+f.rank+')';if(f.attr)s+='['+f.attr+']';return s;}).join('銆?));
+    if(userData.swordRealm)lines.push('鍓戝績澧冪晫: '+userData.swordRealm);
+    if(userData.alchemyRealm)lines.push('涓归亾澧冪晫: '+userData.alchemyRealm);
+    if(userData.demonName){lines.push('蹇冮瓟: '+userData.demonName);if(userData.demonObsession)lines.push('蹇冮瓟鎵у康: '+userData.demonObsession);if(userData.demonAttitude)lines.push('蹇冮瓟鎬佸害: '+userData.demonAttitude);}
+    if(userData.background)lines.push('鑳屾櫙鏁呬簨: '+userData.background);
+    lines.push('</鐢ㄦ埛瑙掕壊淇℃伅>');
+    return lines.join('\n');
+  }
+
+  // 鈹€鈹€ 鏍煎紡鍖栨晠浜嬪熀璋冧笘鐣屼功鏉＄洰鍐呭 鈹€鈹€
+  function formatStoryTone() {
+    if (!userData.toneCore && userData.toneStyles.length === 0 && !userData.toneCustom) return '';
+    var toneStrategies = {
+      '鍗囩骇娴?: '鍥寸粫鐢ㄦ埛褰撳墠澧冪晫灞曞紑锛孨PC澧冪晫涓嶈秴杩囩敤鎴?涓ぇ澧冪晫锛涗晶閲嶄慨鐐煎閬囥€佸姛娉曟劅鎮熴€佺獊鐮村鏈猴紱鎴樻枟瀵规墜搴斿湪鐢ㄦ埛澧冪晫涓婁笅1涓ぇ澧冪晫鍐?,
+      '鎵尓鍚冭€佽檸': '棰戠箒瀹夋帓鐪嬭交/鎸戣鐢ㄦ埛鐨凬PC锛涚敤鎴峰嚭鎵嬫椂鍒堕€犲法澶у弽杞紱鏃佽鑰呴渿鎯婂弽搴旇鍒颁綅锛汵PC鍒濆鎬佸害澶氫负杞昏攽鎴栨棤瑙?,
+      '澶╁懡涔嬪瓙': '楂樺瘑搴﹀畨鎺掓満缂橈細娈嬬牬鍔熸硶銆佷笂鍙や紶鎵裤€佸伓閬囧己鑰呮敹寰掞紱浣嗕篃鏈夊搴旂殑鍔毦浣滀负浠ｄ环锛涙皵杩愰€嗗ぉ浣嗕笉绐佸厐',
+      '閫嗗ぉ鏀瑰懡': '鍒濆澶勫鑹伴毦锛岄€氳繃鍔姏鍜屾満缂橀€嗚浆鍛借繍锛涙瘡娆＄獊鐮撮兘瑕佷粯鍑哄法澶т唬浠凤紱浠ュ急鑳滃己鐨勫満闈㈣鍚堢悊',
+      '绉嶇敯鍏绘垚': '渚ч噸鐧捐壓鐜╂硶锛堢偧涓?绉嶆/鐐煎櫒/閽撻奔锛夈€佸畻闂ㄥ缓璁俱€佹敹闆嗚祫婧愩€丯PC浜や簰锛涙垬鏂椾笉鏄富绾匡紱鏃ュ父缁忚惀鍗犱富瑕佺瘒骞?,
+      '浜夐湼澶╀笅': '瀹楅棬鏀挎不銆佸娍鍔涘崥寮堛€佹垬鍦烘寚鎸ャ€佺粨鐩熻儗鍙涖€佸ぇ瑙勬ā鎴樹簤锛涗釜浜哄疄鍔涢噸瑕佷絾涓嶆槸鍞竴鍥犵礌锛涢渶瑕佽€冭檻澶у眬'
+    };
+    var lines = ['<鏁呬簨鍩鸿皟>'];
+    if (userData.toneCore) lines.push('鏍稿績鐜╂硶: ' + userData.toneCore);
+    if (userData.toneStyles.length > 0) lines.push('椋庢牸鏍囩: ' + userData.toneStyles.join('銆?));
+    if (userData.toneCustom) lines.push('鐜╁鏈熸湜: ' + userData.toneCustom);
+    lines.push('');
+    lines.push('鍙欎簨鎸囦护:');
+    if (userData.toneCore && toneStrategies[userData.toneCore]) lines.push('- ' + toneStrategies[userData.toneCore]);
+    var styleRules = {
+      '绾埍':'鎰熸儏绾夸笓涓€娣卞埢锛屼笉瀹夋帓绗笁鑰咃紝NPC鎰熸儏鑷劧娓愯繘',
+      '铏愭亱':'鎰熸儏绾胯穼瀹曡捣浼忥紝璇細鍒嗙鐢熸鑰冮獙锛屾渶缁堝彇鍐充簬鐢ㄦ埛閫夋嫨',
+      '璇¤安':'澶ч噺浼忕瑪鍙嶈浆闃磋皨锛屾病鏈変汉鏄〃闈㈢湅璧锋潵鐨勬牱瀛?,
+      '杞绘澗':'鏃ュ父鍚戞悶绗戜簰鍔ㄥ锛屼弗鑲冨墽鎯呭皯锛屾暣浣撴皼鍥存剦蹇?,
+      '榛戞殫':'涓栫晫娈嬮叿寮辫倝寮洪锛屽ソ浜烘病濂芥姤锛岄亾寰风伆鑹插湴甯?,
+      '纭牳':'涓ユ牸閬靛畧涓栫晫瑙傦紝澧冪晫鍘嬪埗缁濆锛岃祫婧愭湁闄愮簿鎵撶粏绠?,
+      '鐑':'鍙嬫儏淇″康涓嶅眻鎰忓織锛屾闈㈣繋鎺ユ寫鎴樼粷涓嶉€€缂?,
+      '鍞編':'娉ㄩ噸鎰忓鎻忓啓锛屽北姘寸敾鑸殑淇粰涓栫晫锛岃瘲鎰忓寲鍙欎簨',
+      '鎺㈢储':'澶ч噺鏈煡鍖哄煙绉樺閬楄抗锛屽己璋冩帰绱㈡湭鐭ョ殑涔愯叮',
+      '缇ゅ儚':'涓板瘜NPC鍒荤敾锛屾瘡涓鑹叉湁鑷繁鏁呬簨绾匡紝涓栫晫涓嶅洿缁曠敤鎴疯浆'
+    };
+    userData.toneStyles.forEach(function(style) {
+      if (styleRules[style]) lines.push('- ' + style + ': ' + styleRules[style]);
+    });
+    lines.push('');
+    lines.push('澧冪晫鍖归厤瑙勫垯:');
+    lines.push('- 褰撳墠澧冪晫(' + userData.realm + ')锛歂PC鍜屼簨浠跺洿缁曡澧冪晫灞曞紑');
+    lines.push('- 鎴樻枟瀵规墜澧冪晫涓嶈秴杩囩敤鎴?涓ぇ澧冪晫锛堥櫎闈炲墽鎯呴渶瑕佷笖鏈夊悎鐞嗚В閲婏級');
+    lines.push('- 楂樺鐣孨PC鍑虹幇搴斾繚鎸佺绉樻劅锛屼笉涓诲姩涓庝綆澧冪晫淇＋娣卞害浜ゆ祦');
+    lines.push('');
+    lines.push('缁濆绂佹:');
+    lines.push('- 浣庡鐣屾椂鐪熶粰澧僋PC鏃犳晠鍑虹幇浜掑姩');
+    lines.push('- 鏃犵悊鐢辫禒閫侀€嗗ぉ瀹濈墿');
+    lines.push('- 鐮村潖宸查€夋牳蹇冪帺娉曞熀璋冪殑鎯呰妭');
+    lines.push('</鏁呬簨鍩鸿皟>');
+    return lines.join('\n');
+  }
+
+  // 鈹€鈹€ 鐧捐壓鈫掑叆闂ㄥ鐣屾槧灏?鈹€鈹€
+  var ART_INIT_MAP = {
+    '鐐间腹': { field: '涓归亾澧冪晫', value: '鐐肩簿鍖栨皵' },
+    '鐐煎櫒': { field: '鐐煎櫒澧冪晫', value: '閿诲櫒鍏ラ棬' },
+    '闃垫硶': { field: '闃垫硶澧冪晫', value: '闃甸亾鍏ラ棬' },
+    '绗︾畵': { field: '绗︾畵澧冪晫', value: '绗﹂亾鍏ラ棬' },
+    '椹吔': { field: '椹吔澧冪晫', value: '椹吔鍏ラ棬' },
+    '鍖绘湳': { field: '鍖绘湳澧冪晫', value: '鍖婚亾鍏ラ棬' },
+    '鍌€鍎℃湳': { field: '鍌€鍎℃湳澧冪晫', value: '鍌€鍎″叆闂? },
+    '绉嶆閲囪嵂': { field: '绉嶆閲囪嵂澧冪晫', value: '鑽夎嵂鍏ラ棬' }
+  };
+
+  // 鈹€鈹€ onConfirm: 鍐欏叆MVU鍙橀噺 + 涓栫晫涔?+ 瑙﹀彂AI 鈹€鈹€
+  function onConfirm() {
+    console.log("onConfirm 琚皟鐢?);
+    var btn = document.getElementById('btn-confirm');
+    btn.disabled = true;
+    btn.textContent = '姝ｅ湪鍐欏叆...';
+
+    if (typeof getCharWorldbookNames === 'undefined') {
+      alert('褰撳墠鏈湪閰掗鐜涓繍琛岋紝鏃犳硶鎵ц鍐欏叆鎿嶄綔銆?);
+      btn.disabled = false; btn.textContent = '韪忓叆澶╁湴';
+      return;
+    }
+
+    var charWB = getCharWorldbookNames('current');
+    var wbName = charWB.primary;
+    if (!wbName) {
+      alert('褰撳墠瑙掕壊鍗℃湭缁戝畾涓讳笘鐣屼功锛岃鍏堢粦瀹氥€?);
+      btn.disabled = false; btn.textContent = '韪忓叆澶╁湴';
+      return;
+    }
+
+    // 鈹€鈹€ 1. 瑙ｆ瀽澧冪晫璁＄畻瀵垮厓 鈹€鈹€
+    var realmInfo = parseRealm(userData.realm);
+    var lifespan = realmInfo.lifespanMax;
+    var remainLife = Math.max(0, lifespan - userData.age);
+
+    // 鈹€鈹€ 2. 鏋勫缓涔犲緱鏈硶 Record<string, string> 鈹€鈹€
+    var spellRecord = {};
+    userData.spells.forEach(function(s) { if (s.name) spellRecord[s.name] = s.level; });
+
+    // 鈹€鈹€ 3. 鏋勫缓寮傜伀鍒楄〃瀛楃涓?鈹€鈹€
+    var fireListStr = userData.fires.map(function(f) {
+      var s = f.name;
+      if (f.rank) s += '(' + f.rank + ')';
+      if (f.attr) s += '[' + f.attr + ']';
+      return s;
+    }).join('|');
+
+    // 鈹€鈹€ 4. 鏋勫缓鍔熸硶搴?鈹€鈹€
+    var gongfaKu = '';
+    if (userData.gongfaName) {
+      gongfaKu = userData.gongfaName + '|' + (userData.gongfaGrade||'鏈煡') + '|' + userData.gongfaCurLayer + '/' + userData.gongfaTotalLayer;
+    }
+
+    // 鈹€鈹€ 5. 鏋勫缓瀹屾暣 stat_data锛堜弗鏍煎榻?schema.ts 90瀛楁锛?鈹€鈹€
+    var statData = {
+      // 鈺愨晲鈺?A绫伙細AI 鑷敱鏇存柊鐨勫彉閲?鈺愨晲鈺?      // 鈹€鈹€鈹€ 浣嶇疆淇℃伅 鈹€鈹€鈹€
+      澶у尯鍩? userData.domain,
+      瀛愬尯鍩? userData.regionCustom || userData.region || '',
+      鍏蜂綋鍦扮偣: userData.scene || '',
+      鍦ㄥ満瑙掕壊: '',
+      // 鈹€鈹€鈹€ 韬唤淇℃伅 鈹€鈹€鈹€
+      鐏垫牴: userData.rootString || '',
+      閬撻€? userData.dao || '',
+      鎵€灞炲娍鍔? userData.faction === '鏁ｄ慨' ? '' : userData.faction,
+      瀹楅棬鍦颁綅: userData.faction === '鏁ｄ慨' || userData.faction === '' ? '' : '澶栭棬寮熷瓙',
+      // 鈹€鈹€鈹€ 鏃堕棿绯荤粺 鈹€鈹€鈹€
+      闃撮槼鍘? '3杞?绾?82鍏兟?16骞?鏈?5鏃?,
+      鏃惰景: '鍗椂',
+      // 鈹€鈹€鈹€ 鍔熸硶绯荤粺 鈹€鈹€鈹€
+      涓讳慨鍔熸硶: userData.gongfaName || '',
+      鍔熸硶鍝佺骇: userData.gongfaGrade || '',
+      鍔熸硶鎬诲眰鏁? userData.gongfaTotalLayer || 0,
+      鍔熸硶宸蹭慨灞傛暟: userData.gongfaCurLayer || 0,
+      涔犲緱鏈硶: spellRecord,
+      // 鈹€鈹€鈹€ 鍓戝績路涓归亾路寮傜伀 鈹€鈹€鈹€
+      鍓戝績澧冪晫: userData.swordRealm || '',
+      涓归亾澧冪晫: userData.alchemyRealm || '',
+      寮傜伀鍒楄〃: fireListStr,
+      // 鈹€鈹€鈹€ 鍌ㄧ墿鎴捖风伒鐭陈疯揣甯?鈹€鈹€鈹€
+      鍌ㄧ墿鎴? userData.storage || '',
+      涓嬪搧鐏电煶: userData.stoneLow || 0,
+      涓搧鐏电煶: userData.stoneMid || 0,
+      涓婂搧鐏电煶: userData.stoneHigh || 0,
+      鏋佸搧鐏电煶: userData.stoneTop || 0,
+      鍑′織璐у竵: userData.mundaneMoney || '',
+      // 鈹€鈹€鈹€ 鏈澶囩墿鍝?鈹€鈹€鈹€
+      鏈澶嘷姝﹀櫒: userData.extraWeapons || '',
+      鏈澶嘷闃插叿: '',
+      鏈澶嘷楗板搧: '',
+      // 鈹€鈹€鈹€ 鍏崇郴鍒楄〃 鈹€鈹€鈹€
+      鍏崇郴鍒楄〃: {},
+      // 鈹€鈹€鈹€ 閽撻奔缁撴灉 鈹€鈹€鈹€
+      $閽撻奔_鎴愬姛娆℃暟: 0,
+      $閽撻奔_楸艰幏璁板綍: '',
+      $閽撻奔_鏈€楂樿褰? '',
+      // 鈹€鈹€鈹€ 鐧捐壓瀛︿範淇″彿 鈹€鈹€鈹€
+      涔犲緱鐧捐壓: '',
+      // 鈹€鈹€鈹€ 澧冪晫 鈹€鈹€鈹€
+      褰撳墠澧冪晫: realmInfo.minor,
+      // 鈹€鈹€鈹€ 鐧捐壓澧冪晫 鈹€鈹€鈹€
+      鐐煎櫒澧冪晫: '',
+      闃垫硶澧冪晫: '',
+      绗︾畵澧冪晫: '',
+      椹吔澧冪晫: '',
+      鍖绘湳澧冪晫: '',
+      鍌€鍎℃湳澧冪晫: '',
+      绉嶆閲囪嵂澧冪晫: '',
+      // 鈹€鈹€鈹€ 鐧捐壓瑁呭 鈹€鈹€鈹€
+      瑁呭_鍌€鍎? '',
+      $鍌€鍎＄姸鎬佸垪琛? '',
+      瑁呭_鐏靛吔: userData.petName ? userData.petName + (userData.petSpecies ? '(' + userData.petSpecies + ')' : '') + (userData.petRank ? '[' + userData.petRank + ']' : '') : '',
+      $鐏靛吔鐘舵€佸垪琛? userData.petName ? userData.petName + '|姝ｅ父|' + (userData.petRank || '涓€闃?) : '',
+      瑁呭_涓圭倝: '',
+      瑁呭_閿婚€犲彴: '',
+      瑁呭_涓€瀵稿湴: '',
+      $涓€瀵稿湴_绉嶆鍒楄〃: '',
+      瑁呭_绗︾瑪: '',
+      瑁呭_闃电洏: '',
+      $闃电洏_瀛樻斁闃垫硶: '',
+      瑁呭_鑽: '',
+      $鑽_宸ュ叿: '',
+      // 鈹€鈹€鈹€ 蹇冮瓟绯荤粺 鈹€鈹€鈹€
+      蹇冮瓟鍚? userData.demonName || '',
+      蹇冮瓟鎵у康: userData.demonObsession || '',
+      蹇冮瓟鎬佸害: userData.demonName ? (userData.demonAttitude || '') : '',
+      $蹇冮瓟璁板繂: '',
+
+      // 鈺愨晲鈺?B绫伙細鍓嶇/鑴氭湰鎺у埗鐨勫彧璇诲彉閲?鈺愨晲鈺?      // 鈹€鈹€鈹€ 淇偧绯荤粺 鈹€鈹€鈹€
+      _褰撳墠鐧捐壓: '',
+      _淇偧鐘舵€? '',
+      $淇偧杩涘害: 0,
+      蹇冮瓟鐘舵€? userData.demonName ? '瀛樺湪' : '鏃?,
+      // 鈹€鈹€鈹€ 瀵垮厓绯荤粺 鈹€鈹€鈹€
+      褰撳墠骞寸邯: userData.age,
+      褰撳墠瀵垮厓: lifespan,
+      _鍓╀綑瀵垮厓: remainLife,
+      _瀵垮厓鐘舵€? remainLife > lifespan * 0.2 ? '姝ｅ父' : '琛拌€佸垵鏈?,
+      _杞洖鐘舵€? '姝ｅ父',
+      // 鈹€鈹€鈹€ 瑁呭鏍?鈹€鈹€鈹€
+      _瑁呭_姝﹀櫒: userData.weaponName ? userData.weaponName + (userData.weaponGrade ? '(' + userData.weaponGrade + ')' : '') : '',
+      _瑁呭_闃插叿: '',
+      _瑁呭_楗板搧: '',
+      // 鈹€鈹€鈹€ 閽撻奔绯荤粺 鈹€鈹€鈹€
+      _閽撻奔_閽撻奔娆℃暟: 0,
+      瑁呭_楸肩: '',
+      瑁呭_娓旂綉: '',
+      瑁呭_閽撶: '',
+      // 鈹€鈹€鈹€ 鍔熸硶搴?鈹€鈹€鈹€
+      $鍔熸硶搴? gongfaKu,
+      // 鈹€鈹€鈹€ 鐧捐壓淇偧杩涘害 鈹€鈹€鈹€
+      $鐐间腹_鐔熺粌搴? 0, $鐐间腹_缁忛獙鍊? 0,
+      $鐐煎櫒_鐔熺粌搴? 0, $鐐煎櫒_缁忛獙鍊? 0,
+      $闃垫硶_鐔熺粌搴? 0, $闃垫硶_缁忛獙鍊? 0,
+      $绗︾畵_鐔熺粌搴? 0, $绗︾畵_缁忛獙鍊? 0,
+      $椹吔_鐔熺粌搴? 0, $椹吔_缁忛獙鍊? 0,
+      $鍖绘湳_鐔熺粌搴? 0, $鍖绘湳_缁忛獙鍊? 0,
+      $鍌€鍎℃湳_鐔熺粌搴? 0, $鍌€鍎℃湳_缁忛獙鍊? 0,
+      $绉嶆閲囪嵂_鐔熺粌搴? 0, $绉嶆閲囪嵂_缁忛獙鍊? 0
+    };
+
+    // 鈹€鈹€ 6. 鐧捐壓鑱斿姩锛氶€変簡鐧捐壓鈫掕嚜鍔ㄥ啓鍏ュ叆闂ㄥ鐣?鈹€鈹€
+    userData.arts.forEach(function(art) {
+      var mapping = ART_INIT_MAP[art];
+      if (mapping && !statData[mapping.field]) {
+        statData[mapping.field] = mapping.value;
+      }
+    });
+
+    // 鈹€鈹€ 濡傛灉閫変簡鐐间腹浣嗘病鎵嬪姩璁句腹閬撳鐣岋紝鑷姩璁句负鐐肩簿鍖栨皵 鈹€鈹€
+    if (userData.arts.indexOf('鐐间腹') >= 0 && !statData['涓归亾澧冪晫']) {
+      statData['涓归亾澧冪晫'] = '鐐肩簿鍖栨皵';
+    }
+
+    // 鈹€鈹€ 7. 鏋勫缓寮€鍦虹櫧鏂囨湰 鈹€鈹€
+    var openingText = userData.openingCustom || userData.name + '韪忓叆浜嗚繖鏂瑰ぉ鍦般€?;
+
+    // 鈹€鈹€ 鎵ц鍐欏叆锛氬紑鍦虹櫧鍙戦€佸埌绗?灞傦紝鍚屾椂鍐欏叆鍙橀噺鍒?灞傚拰鏈€鏂板眰 鈹€鈹€
+    var mvuPayload = { stat_data: statData };
+
+    createChatMessages([{
+      role: 'assistant',
+      message: openingText,
+      data: mvuPayload
+    }], { insert_before: 1, refresh: 'all' }).then(function() {
+      // 鈹€鈹€ 7b. 灏嗗彉閲忓悓鏃跺啓鍏ョ0灞?鈹€鈹€
+      console.log('[瑙掕壊鍒涘缓] 鍐欏叆绗?灞傚彉閲?);
+      return Mvu.replaceMvuData(mvuPayload, { type: 'message', message_id: 0 });
+    }).then(function() {
+      // 鈹€鈹€ 7c. 灏嗗彉閲忓啓鍏ユ渶鏂板眰锛坈reateChatMessages 鍙兘鏀瑰彉浜嗘渶鏂板眰鍙凤級 鈹€鈹€
+      var latestId = getLastMessageId();
+      if (latestId > 1) {
+        console.log('[瑙掕壊鍒涘缓] 鍐欏叆鏈€鏂板眰鍙橀噺, 妤煎眰:', latestId);
+        return Mvu.replaceMvuData(mvuPayload, { type: 'message', message_id: latestId });
+      }
+      return Promise.resolve();
+    }).then(function() {
+      // 鈹€鈹€ 8. 鍒涘缓鐢ㄦ埛淇℃伅涓栫晫涔︽潯鐩?鈹€鈹€
+      return deleteWorldbookEntries(wbName, function(e) { return e.name === '鐢ㄦ埛淇℃伅'; });
+    }).then(function() {
+      return createWorldbookEntries(wbName, [{
+        name: '鐢ㄦ埛淇℃伅',
+        enabled: true,
+        strategy: { type: 'constant', keys: [], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
+        position: { type: 'before_character_definition', role: 'system', depth: 0, order: 1 },
+        content: formatUserInfo(),
+        probability: 100,
+        recursion: { prevent_incoming: true, prevent_outgoing: true, delay_until: null },
+        effect: { sticky: null, cooldown: null, delay: null }
+      }]);
+    }).then(function() {
+      // 鈹€鈹€ 9. 鍒涘缓鏁呬簨鍩鸿皟涓栫晫涔︽潯鐩紙鏈夊唴瀹规椂鎵嶅垱寤猴級 鈹€鈹€
+      return deleteWorldbookEntries(wbName, function(e) { return e.name === '鏁呬簨鍩鸿皟'; });
+    }).then(function() {
+      var toneContent = formatStoryTone();
+      if (!toneContent) return Promise.resolve();
+      return createWorldbookEntries(wbName, [{
+        name: '鏁呬簨鍩鸿皟',
+        enabled: true,
+        strategy: { type: 'constant', keys: [], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
+        position: { type: 'at_depth', role: 'system', depth: 0, order: 1 },
+        content: toneContent,
+        probability: 100,
+        recursion: { prevent_incoming: true, prevent_outgoing: true, delay_until: null },
+        effect: { sticky: null, cooldown: null, delay: null }
+      }]);
+    }).then(function() {
+      // 鈹€鈹€ 10. 瑙掕壊鍒涘缓瀹屾垚锛岃Е鍙慉I鍥炲 鈹€鈹€
+      btn.disabled = false;
+      btn.textContent = '鉁?澶╁懡宸插畾';
+      btn.style.background = 'rgba(16,185,129,0.15)';
+      btn.style.borderColor = '#10b981';
+      btn.style.color = '#10b981';
+      console.log('[瑙掕壊鍒涘缓] 鎵€鏈夊啓鍏ュ畬鎴愶紝瑙﹀彂AI鍥炲');
+
+      setTimeout(function() {
+        if (typeof triggerSlash !== 'undefined') {
+          triggerSlash('/trigger');
+        }
+      }, 500);
+    }).catch(function(err) {
+      alert('鎿嶄綔澶辫触: ' + (err.message || String(err)));
+      console.error('[瑙掕壊鍒涘缓] onConfirm error:', err);
+      btn.disabled = false; btn.textContent = '韪忓叆澶╁湴';
+    });
+  }
+
+  function shakeEl(id) { var el=document.getElementById(id); el.style.borderColor='#8b4513'; el.style.transition='border-color 0.1s'; setTimeout(function(){el.style.borderColor='';},600); el.focus(); }
+
+  // 鈹€鈹€ 鍒濆鍖?鈹€鈹€
+  function init() {
+    console.log("init() v3");
+    buildRealmButtons();
+    buildRegionButtons('涓ぎ绁炲窞');
+    buildToneCards();
+    rebuildPageSequence();
+    buildStepIndicator();
+    updateStepIndicator();
+    console.log("鍒濆鍖栧畬鎴?);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState !== 'loading') init();
+</script>
+</body>
