@@ -1,0 +1,11 @@
+@@preprocessing
+<%
+/* ===== 阴阳历控制器 =====
+ * 蓝灯常驻，始终输出当前时间
+ */
+
+if (typeof yinYangDate === 'undefined') var yinYangDate = getvar('stat_data.阴阳历', { defaults: '3转7纪482元·816年9月15日' });
+if (typeof hour === 'undefined') var hour = getvar('stat_data.时辰', { defaults: '子时' });
+
+print('\n【时间】' + yinYangDate + ' ' + hour + '\n');
+%>

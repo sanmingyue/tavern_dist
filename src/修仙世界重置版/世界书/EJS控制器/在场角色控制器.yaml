@@ -1,0 +1,23 @@
+@@preprocessing
+<%/* 在场角色控制器
+ * 蓝灯常驻，优先判定
+ * 读取"在场角色"变量，按顿号分割角色名
+ * 对每个在场角色直接调用getwi激活其角色信息
+ * 无论主角身处何地，在场角色的信息始终被激活
+ * 会跳过已被扫描控制器激活的角色（避免重复）
+ */-%>
+<%
+if (typeof _scanActivated === 'undefined') var _scanActivated = [];
+if (typeof partyMembers === 'undefined') var partyMembers = getvar('stat_data.在场角色', { defaults: '' });
+if (partyMembers) {
+  var members = partyMembers.split('、');
+  for (var i = 0; i < members.length; i++) {
+    var name = members[i].trim();
+    if (name && _scanActivated.indexOf(name) === -1) {
+-%>
+<%- await getwi(name) %>
+<%
+    }
+  }
+}
+%>

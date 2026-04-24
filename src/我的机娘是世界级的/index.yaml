@@ -1,0 +1,449 @@
+# yaml-language-server: $schema=https://testingcf.jsdelivr.net/gh/StageDog/tavern_sync/dist/schema/character.zh.json
+# 这个配置文件仅作为使用同步脚本的提示. 同步脚本并不是必须使用, 但可以让你的角色卡完全做到自动更新, 具体请参考: https://stagedog.github.io/青空莉/工具经验/实时编写角色卡、世界书或预设/
+头像: null
+版本: ''
+作者: ''
+备注: ''
+
+第一条消息:
+  - 文件: 第一条消息/0
+
+角色描述: ''
+
+锚点:
+  - &分隔符
+    启用: false
+    激活策略:
+      类型: 向量化
+    插入位置:
+      类型: 角色定义之前
+      顺序: 14720
+    激活概率: 100
+    内容: ''
+
+世界书名称: 与角色卡名称相同
+条目:
+  - 文件夹: 世界观
+    条目:
+      - 名称: ===世界观开始===
+        <<: *分隔符
+
+      - 名称: 世界观设定
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 1
+        文件: 世界书/世界观设定
+
+      - 名称: 机娘设定
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 2
+        文件: 世界书/机娘设定
+
+      - 名称: 背景历史
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 3
+        文件: 世界书/背景历史
+
+      - 名称: 机娘人格准则
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 4
+        文件: 世界书/机娘人格准则
+
+      - 名称: 金融设定
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 5
+        文件: 世界书/金融设定
+
+      - 名称: 改件设定
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 6
+        文件: 世界书/改件设定
+
+      - 名称: 科技锁与叙事准则
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 7
+        文件: 世界书/科技锁与叙事准则
+
+      - 名称: 赛道生成规则
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 指定深度
+          角色: 系统
+          深度: 0
+          顺序: 8
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: true
+        文件: 世界书/赛道生成规则
+
+      - 名称: ===世界观结束===
+        <<: *分隔符
+
+  - 文件夹: 角色
+    条目:
+      - 名称: ===角色开始===
+        <<: *分隔符
+
+      - 名称: 兰月明
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 10
+        文件: 世界书/角色/兰月明
+
+      - 名称: 星月
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 11
+        文件: 世界书/角色/星月
+
+      - 名称: 氤
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 12
+        文件: 世界书/角色/氤
+
+      - 名称: 红雪
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 13
+        文件: 世界书/角色/红雪
+
+      - 名称: 阿芙佳朵
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 14
+        文件: 世界书/角色/阿芙佳朵
+
+      - 名称: 璃音
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 15
+        文件: 世界书/角色/璃音
+
+      - 名称: ===角色结束===
+        <<: *分隔符
+
+  - 文件夹: 变量
+    条目:
+      - 名称: ===变量开始===
+        <<: *分隔符
+
+      - 名称: '[initvar]变量初始化勿开'
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 14720
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: true
+        文件: 世界书/变量/initvar
+
+      - 名称: 变量列表
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 指定深度
+          角色: 系统
+          深度: 0
+          顺序: 14720
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: true
+        文件: 世界书/变量/变量列表
+
+      - 名称: '[mvu_update]变量更新规则'
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 指定深度
+          角色: 系统
+          深度: 0
+          顺序: 14720
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: false
+        文件: 世界书/变量/EJS_变量控制器
+
+      - 名称: '[mvu_update]变量更新规则_日常'
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 14720
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: true
+        文件: 世界书/变量/变量更新规则_日常
+
+      - 名称: '[mvu_update]变量更新规则_赛前准备'
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 14720
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: true
+        文件: 世界书/变量/变量更新规则_赛前准备
+
+      - 名称: '[mvu_update]变量更新规则_比赛中'
+        启用: false
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 角色定义之前
+          顺序: 14720
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: true
+        文件: 世界书/变量/变量更新规则_比赛中
+
+      - 名称: '[mvu_update]变量输出格式'
+        启用: true
+        激活策略:
+          类型: 蓝灯
+        插入位置:
+          类型: 指定深度
+          角色: 系统
+          深度: 0
+          顺序: 14720
+        递归:
+          不可被其他条目激活: true
+          不可激活其他条目: true
+        文件: 世界书/变量/变量输出格式
+
+      - 名称: ===变量结束===
+        <<: *分隔符
+
+扩展字段:
+  正则:
+    - 正则名称: '[不发送]去除变量更新'
+      id: 2d2018ae-c085-4916-af05-6830110a8293
+      启用: true
+      查找表达式: /<update(?:variable)?>(?:(?!.*<\/update(?:variable)?>).*$|.*<\/update(?:variable)?>)/gsi
+      替换为: ''
+      来源:
+        用户输入: true
+        AI输出: true
+      作用于:
+        仅格式显示: false
+        仅格式提示词: true
+      最大深度: 3
+
+    - 正则名称: '[折叠]变量更新中'
+      id: ea96523f-a1cc-4634-b9d2-f28531adca6c
+      启用: true
+      查找表达式: /<update(?:variable)?>(?!.*<\/update(?:variable)?>)\s*(.*)\s*$/gsi
+      替换为: |-
+
+        <details>
+        <summary>变量更新中{{random::.::..::...}}</summary>
+        $1
+        </details>
+      来源:
+        用户输入: true
+        AI输出: true
+      作用于:
+        仅格式显示: true
+        仅格式提示词: false
+
+    - 正则名称: '[折叠]完整变量更新'
+      id: 06dec31f-c0a9-456c-8b88-1f9176a73039
+      启用: true
+      查找表达式: /<update(?:variable)?>\s*(.*)\s*<\/update(?:variable)?>/gsi
+      替换为: |-
+
+        <details>
+        <summary>变量更新情况</summary>
+        $1
+        </details>
+      来源:
+        用户输入: true
+        AI输出: true
+      作用于:
+        仅格式显示: true
+        仅格式提示词: false
+
+    - 正则名称: '[折叠]赛道数据'
+      id: 3c7a1d5e-9f2b-4e8a-b317-2d4f6e8c9a01
+      启用: true
+      查找表达式: /<track_data>\s*([\s\S]*?)\s*<\/track_data>/gsi
+      替换为: |-
+
+        <details>
+        <summary>📍 赛道数据已生成</summary>
+        $1
+        </details>
+      来源:
+        用户输入: true
+        AI输出: true
+      作用于:
+        仅格式显示: true
+        仅格式提示词: false
+
+    - 正则名称: '[不发送]去除赛道数据'
+      id: 4d8b2e6f-a193-4c7b-8e25-3f5d7a9b0c12
+      启用: true
+      查找表达式: /<track_data>[\s\S]*?<\/track_data>/gsi
+      替换为: ''
+      来源:
+        用户输入: true
+        AI输出: true
+      作用于:
+        仅格式显示: false
+        仅格式提示词: true
+      最大深度: 3
+
+    - 正则名称: '[界面]状态栏'
+      id: b50d0bed-ff40-4a25-9ada-14feb4283324
+      启用: true
+      查找表达式: <StatusPlaceHolderImpl/>
+      替换为: |-
+        ```
+        <body>
+        <script>
+        $('body').load('https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/界面/状态栏/index.html')
+        </script>
+        </body>
+        ```
+      来源:
+        用户输入: false
+        AI输出: true
+      作用于:
+        仅格式显示: true
+        仅格式提示词: false
+
+    - 正则名称: '[界面]PC版'
+      id: e8f2a3b4-c5d6-4e7f-9012-3a4b5c6d7e8f
+      启用: true
+      查找表达式: /.+/s
+      替换为: |-
+        ```
+        <body>
+        <script>
+        $('body').load('https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/界面/PC版/index.html')
+        </script>
+        </body>
+        ```
+      来源:
+        用户输入: false
+        AI输出: true
+      作用于:
+        仅格式显示: true
+        仅格式提示词: false
+
+    - 正则名称: '[界面]手机版'
+      id: f9a3b4c5-d6e7-4f80-9123-4a5b6c7d8e9f
+      启用: false
+      查找表达式: /.+/s
+      替换为: |-
+        ```
+        <body>
+        <script>
+        $('body').load('https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/界面/手机版/index.html')
+        </script>
+        </body>
+        ```
+      来源:
+        用户输入: false
+        AI输出: true
+      作用于:
+        仅格式显示: true
+        仅格式提示词: false
+
+  酒馆助手:
+    脚本库:
+      - 名称: mvu
+        id: 22d70d1f-d0be-4061-911e-d0c57ab55053
+        启用: true
+        类型: 脚本
+        内容: |-
+          import 'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate/artifact/bundle.js';
+
+      - 名称: 变量结构
+        id: f65ab164-4268-4366-8228-16af904c2251
+        启用: true
+        类型: 脚本
+        内容: |-
+          import 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/脚本/变量结构/index.js';
+
+      - 名称: 状态栏
+        id: 7a3c91e2-8b4f-4d5a-9e1c-3f6d82a7b509
+        启用: true
+        类型: 脚本
+        内容: |-
+          import 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/脚本/状态栏/index.js';
+
+      - 名称: 共鸣技能
+        id: a4e8c2f1-5d3b-4a7e-9f12-6b8d93c5e701
+        启用: true
+        类型: 脚本
+        内容: |-
+          import 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/脚本/共鸣技能/index.js';
+
+      - 名称: 赛道捕获
+        id: b5c9d3e7-f1a4-4b6c-8d29-7e3f5a1c0d84
+        启用: true
+        类型: 脚本
+        内容: |-
+          import 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/脚本/赛道捕获/index.js';
+
+      - 名称: 隐藏楼层
+        id: c6d0e4f8-a2b5-4c7d-9e30-8f4a6b2d1e95
+        启用: true
+        类型: 脚本
+        内容: |-
+          import 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_helper_template/dist/角色卡名称/脚本/隐藏楼层/index.js';

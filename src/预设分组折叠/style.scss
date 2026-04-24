@@ -1,0 +1,130 @@
+/* ═══ 预设分组折叠样式 ═══ */
+
+.chaoxi-fold-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  border: 1px solid rgba(77, 201, 246, 0.12);
+  border-radius: 6px;
+  background: rgba(77, 201, 246, 0.04);
+}
+
+.chaoxi-fold-toolbar-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(77, 201, 246, 0.8);
+  margin-right: auto;
+}
+
+.chaoxi-fold-toolbar-btn {
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.chaoxi-fold-toolbar-btn:hover {
+  background: rgba(77, 201, 246, 0.12);
+  color: #4dc9f6;
+  border-color: rgba(77, 201, 246, 0.25);
+}
+
+/* ═══ 分组头 ═══ */
+.chaoxi-fold-header {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px !important;
+  margin: 2px 0;
+  border-radius: 6px;
+  background: rgba(77, 201, 246, 0.06);
+  border: 1px solid rgba(77, 201, 246, 0.12);
+  cursor: pointer;
+  transition: all 0.15s;
+  list-style: none;
+  user-select: none;
+}
+
+.chaoxi-fold-header:hover {
+  background: rgba(77, 201, 246, 0.1);
+  border-color: rgba(77, 201, 246, 0.2);
+}
+
+.chaoxi-fold-arrow {
+  font-size: 12px;
+  color: rgba(77, 201, 246, 0.7);
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.chaoxi-fold-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chaoxi-fold-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+/* ═══ 分组一键开关 ═══ */
+.chaoxi-fold-toggle-btn {
+  position: relative;
+  width: 32px;
+  height: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.chaoxi-fold-toggle-btn.on {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.chaoxi-fold-toggle-btn.partial {
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+.chaoxi-fold-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.2s;
+}
+
+.chaoxi-fold-toggle-btn.on .chaoxi-fold-toggle-knob {
+  left: 18px;
+  background: #34d399;
+  box-shadow: 0 0 4px rgba(52, 211, 153, 0.4);
+}
+
+.chaoxi-fold-toggle-btn.partial .chaoxi-fold-toggle-knob {
+  left: 10px;
+  background: #fbbf24;
+  box-shadow: 0 0 4px rgba(251, 191, 36, 0.3);
+}

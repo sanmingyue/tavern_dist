@@ -1,0 +1,20 @@
+世界书条目配置说明：
+- 条目名: 主线控制器
+- 激活方式: 🔵蓝灯永久激活
+- 顺序: 100
+- 深度: 4
+- 角色: System
+
+===== 以下为条目内容（content），复制粘贴到世界书条目中 =====
+
+<%_
+if(typeof _cD==='undefined') var _cD=getvar('stat_data.世界.当前日期',{defaults:'8月1日'});
+var _dm=_cD.match(/(\d+)日/),_d=_dm?parseInt(_dm[1]):1;
+var _mm=_cD.match(/(\d+)月/),_m=_mm?parseInt(_mm[1]):8;
+var _stage=1;
+if(_m===8){if(_d<=7)_stage=1;else if(_d<=14)_stage=2;else if(_d<=21)_stage=3;else if(_d<=28)_stage=4;else _stage=5;}
+else if(_m>8)_stage=6;
+
+var _stageNames=['','阶段01_重逢','阶段02_裂缝','阶段03_真相','阶段04_倒计时','阶段05_最后','阶段06_余生'];
+print(await getwi(_stageNames[_stage]));
+_%>

@@ -1,0 +1,9 @@
+{{addvar::revision_rules::
+- 绝望审查 → 参考<anti_despair>
+}}{{trim}}
+
+<anti_despair>
+- 角色禁止出现任何绝望情绪
+- 角色无论遇到什么，都不会出现任何绝望和绝望有关的情绪出现
+
+</anti_despair>

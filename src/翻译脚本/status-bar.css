@@ -1,0 +1,94 @@
+/* 状态栏样式 - 会通过 teleportStyle 复制到酒馆网页 */
+
+.translate-status-bar {
+  margin-top: 8px;
+  padding: 0;
+}
+
+.translate-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.translate-status-running {
+  color: #64b5f6;
+  background: rgba(100, 181, 246, 0.1);
+}
+
+.translate-status-running .fa-spinner {
+  font-size: 11px;
+}
+
+.translate-status-timer {
+  font-family: monospace;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.translate-status-success {
+  color: #81c784;
+  background: rgba(129, 199, 132, 0.1);
+}
+
+.translate-status-time {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.translate-status-tokens {
+  font-size: 11px;
+  opacity: 0.7;
+  border-left: 1px solid rgba(129, 199, 132, 0.3);
+  padding-left: 6px;
+  margin-left: 2px;
+}
+
+.translate-status-failed {
+  color: #e57373;
+  background: rgba(229, 115, 115, 0.1);
+}
+
+.translate-status-error {
+  font-size: 11px;
+  opacity: 0.8;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.translate-status-close {
+  background: none;
+  border: none;
+  color: #e57373;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.translate-status-close:hover {
+  opacity: 1;
+}
+
+.translate-status-skipped {
+  color: #ffb74d;
+  background: rgba(255, 183, 77, 0.1);
+}
+
+/* 翻译按钮样式 */
+.mes_translate_btn {
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+
+.mes_translate_btn:hover {
+  opacity: 1;
+}

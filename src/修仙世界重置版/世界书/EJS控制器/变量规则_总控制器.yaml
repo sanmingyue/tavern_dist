@@ -1,0 +1,72 @@
+@@preprocessing
+<%
+/* ===== 变量规则总控制器 =====
+ * 三层加载：知识(由其他控制器) + 变量规则 + 回复提示词
+ * 根据前端写入的 _ 前缀状态变量，精准加载对应模块
+ *
+ * 注意：getwi() 必须加 await，否则条目内容不会被加载！
+ */
+
+// ═══ 修炼系统 ═══
+if (typeof curState === 'undefined') var curState = getvar('stat_data._修炼状态', { defaults: '' });
+if (curState !== '') {
+  // 加载变量规则
+  print(await getwi('[mvu_update]修炼变量更新规则'));
+  // 加载对应的回复提示词
+  if (curState === '修炼中') {
+    print(await getwi('修炼中_回复提示词'));
+  }
+  if (curState === '突破中') {
+    print(await getwi('突破中_回复提示词'));
+  }
+  if (curState === '渡劫中') {
+    print(await getwi('渡劫中_回复提示词'));
+  }
+  if (curState === '引气入体') {
+    print(await getwi('引气入体_回复提示词'));
+  }
+}
+
+// ═══ 修真百艺 ═══
+if (typeof curArt === 'undefined') var curArt = getvar('stat_data._当前百艺', { defaults: '' });
+if (curArt !== '') {
+  // 加载变量规则 + 回复提示词（百艺知识由百艺知识控制器加载）
+  if (curArt === '炼丹') {
+    print(await getwi('[mvu_update]修真百艺_炼丹变量更新规则'));
+    print(await getwi('[mvu_update]修真百艺_丹道境界更新规则'));
+    print(await getwi('炼丹_回复提示词'));
+  }
+  if (curArt === '炼器') {
+    print(await getwi('[mvu_update]修真百艺_炼器变量更新规则'));
+    print(await getwi('炼器_回复提示词'));
+  }
+  if (curArt === '阵法') {
+    print(await getwi('[mvu_update]修真百艺_阵法变量更新规则'));
+    print(await getwi('阵法_回复提示词'));
+  }
+  if (curArt === '符箓') {
+    print(await getwi('[mvu_update]修真百艺_符箓变量更新规则'));
+    print(await getwi('符箓_回复提示词'));
+  }
+  if (curArt === '驭兽') {
+    print(await getwi('[mvu_update]修真百艺_驭兽变量更新规则'));
+    print(await getwi('驭兽_回复提示词'));
+  }
+  if (curArt === '医术') {
+    print(await getwi('[mvu_update]修真百艺_医术变量更新规则'));
+    print(await getwi('医术_回复提示词'));
+  }
+  if (curArt === '傀儡术') {
+    print(await getwi('[mvu_update]修真百艺_傀儡术变量更新规则'));
+    print(await getwi('傀儡术_回复提示词'));
+  }
+  if (curArt === '种植采药') {
+    print(await getwi('[mvu_update]修真百艺_种植采药变量更新规则'));
+    print(await getwi('种植采药_回复提示词'));
+  }
+  // ═══ 钓鱼（统一纳入百艺体系，回复提示词由钓鱼EJS控制器加载） ═══
+  if (curArt === '钓鱼') {
+    print(await getwi('[mvu_update]钓鱼变量更新规则'));
+  }
+}
+%>

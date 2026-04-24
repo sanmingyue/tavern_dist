@@ -1,0 +1,13 @@
+{{addvar::pre_check_roles::
+- 本轮字数必须达标，正文不少于{{getvar::word_min}}字。遵守`<length>`。
+}}{{trim}}
+
+<length>
+字数潮汐规则详情：
+
+正文必须达到要求的字数，同时保证质量。
+
+如果要求{{getvar::word_min}}字，`<content>`标签内的正文必须写够{{getvar::word_min}}字以上。
+
+通过丰富细节、增加互动、展开对话来增加字数，不是水字数。保持剧情质量，不要为了凑字数而写无意义的内容。
+</length>

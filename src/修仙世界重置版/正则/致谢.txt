@@ -1,0 +1,223 @@
+```
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>致谢</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    font-family: 'Georgia', 'Noto Serif SC', 'Source Han Serif SC', '宋体', serif;
+  }
+  .card {
+    width: 100%;
+    max-width: 520px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 60px rgba(180,120,160,0.15);
+    position: relative;
+  }
+  .bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('https://i.postimg.cc/V649xVYq/5-best-quality-absurdres-very-aesthetic-detailed-masterpiece-yoneyam-s-3629791854.webp') center center / cover no-repeat;
+    z-index: 0;
+  }
+  .overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(180deg,
+      rgba(20,10,25,0.55) 0%,
+      rgba(30,15,35,0.65) 30%,
+      rgba(25,12,30,0.7) 60%,
+      rgba(20,10,25,0.75) 100%
+    );
+    z-index: 1;
+  }
+  .content {
+    position: relative;
+    z-index: 2;
+    padding: 40px 32px 36px;
+    text-align: center;
+    color: #f0e6ef;
+  }
+  .deco-line {
+    width: 50px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(220,180,210,0.6), transparent);
+    margin: 0 auto 24px;
+  }
+  .title {
+    font-size: 1.15em;
+    letter-spacing: 0.15em;
+    color: #f5e0f0;
+    margin: 0 0 28px;
+    line-height: 1.8;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  }
+  .title .name { color: #f0c8e0; font-weight: 600; font-size: 1.05em; }
+  .sep {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; margin: 0 0 24px; opacity: 0.5;
+  }
+  .sep-line-l { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, #d4a0c0); }
+  .sep-line-r { width: 40px; height: 1px; background: linear-gradient(90deg, #d4a0c0, transparent); }
+  .sep-dot { font-size: 0.7em; color: #d4a0c0; }
+  .credits-title {
+    font-size: 0.85em; letter-spacing: 0.3em; color: #d4a0c0;
+    margin: 0 0 20px;
+    text-shadow: 0 0 12px rgba(200,140,180,0.3);
+  }
+  .credits {
+    font-size: 0.88em; line-height: 2.2; color: #e8d0e2;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  }
+  .credits .sub { opacity: 0.85; font-size: 0.82em; color: #c8b0c2; margin: 0 0 6px; }
+  .credits .thin-line { width: 30px; height: 1px; background: rgba(200,160,190,0.3); margin: 12px auto; }
+  .credits p { margin: 0; }
+  .credits .minor { opacity: 0.8; font-size: 0.85em; color: #c8b0c2; }
+  .credits .minor-s { opacity: 0.75; font-size: 0.82em; color: #baa5b5; margin-bottom: 4px; }
+  .bottom-sep {
+    margin-top: 28px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; opacity: 0.45;
+  }
+  .bottom-sep .l { width: 35px; height: 1px; background: linear-gradient(90deg, transparent, #d4a0c0); }
+  .bottom-sep .r { width: 35px; height: 1px; background: linear-gradient(90deg, #d4a0c0, transparent); }
+  .thanks {
+    font-size: 1em; letter-spacing: 0.25em; color: #f0d0e5;
+    margin: 16px 0 0; font-weight: 500;
+    text-shadow: 0 0 16px rgba(220,160,200,0.25), 0 1px 8px rgba(0,0,0,0.4);
+  }
+  .bottom-line {
+    width: 50px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(220,180,210,0.4), transparent);
+    margin: 20px auto 0;
+  }
+  .start-btn {
+    background: linear-gradient(135deg, rgba(200,140,180,0.25) 0%, rgba(180,120,160,0.35) 50%, rgba(200,140,180,0.25) 100%);
+    border: 1.5px solid rgba(220,170,200,0.4);
+    border-radius: 24px;
+    padding: 10px 36px;
+    color: #f5e0f0;
+    font-family: 'Georgia', 'Noto Serif SC', 'Source Han Serif SC', '宋体', serif;
+    font-size: 0.95em;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 16px rgba(180,120,160,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+    margin-top: 28px;
+  }
+  .start-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(220,160,200,0.35) 0%, rgba(200,140,180,0.45) 50%, rgba(220,160,200,0.35) 100%);
+    border-color: rgba(240,190,220,0.5);
+    box-shadow: 0 4px 24px rgba(200,140,180,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+    transform: translateY(-1px);
+    text-shadow: 0 0 12px rgba(240,200,220,0.4), 0 1px 6px rgba(0,0,0,0.4);
+  }
+  .start-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 12px rgba(180,120,160,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .start-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="bg"></div>
+  <div class="overlay"></div>
+  <div class="content">
+    <div class="deco-line"></div>
+    <p class="title">这里是<span class="name">三明月</span>，感谢你玩我的卡。</p>
+
+    <div class="sep">
+      <span class="sep-line-l"></span>
+      <span class="sep-dot">✦</span>
+      <span class="sep-line-r"></span>
+    </div>
+
+    <p class="credits-title">致 谢 名 单</p>
+
+    <div class="credits">
+      <p class="sub">过去、现在、未来玩我的卡的所有玩家</p>
+      <div class="thin-line"></div>
+      <p>青空莉</p>
+      <p>youzini</p>
+      <p>shiyue</p>
+      <p>安安和咖啡的公益站</p>
+      <p>MagicalAstrogy</p>
+      <div class="thin-line"></div>
+      <p class="minor">以及未提及的所有</p>
+      <p class="minor">在我写卡路上帮助过我的老师们</p>
+      <p class="minor-s">还有多到我写不完的朋友们</p>
+    </div>
+
+    <div class="bottom-sep">
+      <span class="l"></span>
+      <span class="sep-dot">✦</span>
+      <span class="r"></span>
+    </div>
+
+    <p class="thanks">谢谢你们</p>
+    <div class="bottom-line"></div>
+
+    <button class="start-btn" id="startBtn">✦ 开始游玩 ✦</button>
+  </div>
+</div>
+
+<script>
+const sendAIMessage = (text, replaceZeroLayer = false) => {
+  if (!text || text.trim().length === 0) return;
+  if (typeof createChatMessages === 'function') {
+    if (replaceZeroLayer) {
+      if (typeof deleteChatMessages === 'function') {
+        deleteChatMessages([0], { refresh: 'none' }).then(() => {
+          createChatMessages([{ role: 'assistant', message: text }], { insert_at: 0, refresh: 'all' });
+        }).catch(() => {
+          if (typeof setChatMessages === 'function') {
+            setChatMessages([{ message_id: 0, role: 'assistant', message: text }], { refresh: 'all' });
+          }
+        });
+      } else if (typeof setChatMessages === 'function') {
+        setChatMessages([{ message_id: 0, role: 'assistant', message: text }], { refresh: 'all' });
+      }
+    }
+  }
+};
+
+document.getElementById('startBtn').addEventListener('click', function() {
+  var btn = this;
+  var tag = String.fromCharCode(60) + 'sanmingyue' + String.fromCharCode(62);
+  var musicTag = String.fromCharCode(60) + 'music' + String.fromCharCode(62) + '983zho.ogg' + String.fromCharCode(60) + '/music' + String.fromCharCode(62);
+  var msg = tag + musicTag;
+  try {
+    sendAIMessage(msg, true);
+    btn.textContent = '\uD83C\uDF89 已开始！';
+    btn.disabled = true;
+  } catch(e) {
+    btn.textContent = '\u26A0 启动失败';
+    btn.style.borderColor = 'rgba(255,150,150,0.5)';
+    setTimeout(function() {
+      btn.textContent = '\u2726 开始游玩 \u2726';
+      btn.style.borderColor = '';
+    }, 2000);
+  }
+});
+</script>
+
+</body>
+</html>
+```

@@ -1,0 +1,7 @@
+{{setvar::word_min::1200}}{{setvar::word_max::1500}}{{trim}}
+
+{{//改动上面的数字，默认为1200-1500}}{{trim}}
+
+<word_count>
+**字数要求**：不计算HTML注释字数的情况下！`<content>`内正文每次响应字数不小于{{getvar::word_min}}，不大于{{getvar::word_max}}。
+</word_count>

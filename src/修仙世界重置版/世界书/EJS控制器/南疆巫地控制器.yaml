@@ -1,0 +1,132 @@
+@@preprocessing
+<%/* 南疆巫地控制器
+ * 根据位置变量动态激活南疆巫地相关世界书条目
+ * 会跳过已被扫描控制器激活的条目
+ */-%>
+<%
+if (typeof mainArea === 'undefined') var mainArea = getvar('stat_data.大区域', { defaults: '中央神州' });
+if (typeof subArea === 'undefined') var subArea = getvar('stat_data.子区域', { defaults: '' });
+if (typeof place === 'undefined') var place = getvar('stat_data.具体地点', { defaults: '' });
+if (typeof _scanActivated === 'undefined') var _scanActivated = [];
+function _notScanned(name) { return _scanActivated.indexOf(name) === -1; }
+-%>
+<% if (mainArea === '南疆巫地') { %>
+<%- await getwi('地图_南疆巫地') %>
+<%- await getwi('南疆散修与凡人') %>
+<% if (_notScanned('林药师')) { %><%- await getwi('林药师') %><% } %>
+<% if (_notScanned('蛇姬·青鸢')) { %><%- await getwi('蛇姬·青鸢') %><% } %>
+
+<% if (!subArea) { %>
+<%/* 大区域级: 加载所有原始总览条目 */%>
+<%- await getwi('南疆功法总览') %>
+<%- await getwi('南疆天材地宝') %>
+<%- await getwi('南疆谋生指南') %>
+<%- await getwi('南疆物价总览') %>
+<% } else { %>
+<%/* 子区域级: 加载通用/流通拆分条目 */%>
+<%- await getwi('南疆自然地理') %>
+<%- await getwi('南疆秘境禁地') %>
+<%- await getwi('南疆流通功法') %>
+<%- await getwi('南疆秘境残卷') %>
+<%- await getwi('南疆通用天材地宝') %>
+<%- await getwi('南疆通用谋生指南') %>
+<%- await getwi('南疆通用物价') %>
+
+<% if (subArea === '赤阳谷' && _notScanned('赤阳谷')) { %>
+<%- await getwi('赤阳谷') %>
+<%- await getwi('南疆赤阳谷功法') %>
+<%- await getwi('南疆赤阳谷天材地宝') %>
+<%- await getwi('南疆熔金城谋生') %>
+<%- await getwi('南疆熔金城物价') %>
+<% if (place) { %>
+<%- await getwi('呼延明焰') %>
+<%- await getwi('呼延战戈') %>
+<%- await getwi('烈凰儿') %>
+<%- await getwi('秦晚烟') %>
+<% } %>
+
+<% } else if (subArea === '蛊魔宗' && _notScanned('蛊魔宗')) { %>
+<%- await getwi('蛊魔宗') %>
+<%- await getwi('南疆蛊魔宗功法') %>
+<%- await getwi('南疆百毒沼泽天材地宝') %>
+<% if (place) { %>
+<%- await getwi('蛊皇') %>
+<%- await getwi('蛊婆') %>
+<% } %>
+
+<% } else if (subArea === '极乐宫' && _notScanned('极乐宫')) { %>
+<%- await getwi('极乐宫') %>
+<%- await getwi('南疆极乐宫功法') %>
+<% if (place) { %>
+<%- await getwi('苏媚儿(极乐宫)') %>
+<%- await getwi('小蛮') %>
+<%- await getwi('夜千泷') %>
+<% } %>
+
+<% } else if (subArea === '玲珑绣阁' && _notScanned('玲珑绣阁')) { %>
+<%- await getwi('玲珑绣阁') %>
+<%- await getwi('南疆玲珑绣阁功法') %>
+<%- await getwi('南疆玲珑绣阁天材地宝') %>
+<% if (place) { %>
+<%- await getwi('林微月') %>
+<%- await getwi('秋水寒') %>
+<%- await getwi('云纤纤') %>
+<% } %>
+
+<% } else if (subArea === '生命之森' && _notScanned('生命之森')) { %>
+<%- await getwi('生命之森') %>
+<%- await getwi('南疆生命之森功法') %>
+<%- await getwi('南疆生命之森天材地宝') %>
+<% if (place) { %>
+<%- await getwi('灵月曦') %>
+<%- await getwi('木叶') %>
+<% } %>
+
+<% } else if (subArea === '万毒神教' && _notScanned('万毒神教')) { %>
+<%- await getwi('万毒神教') %>
+<%- await getwi('南疆万毒神教功法') %>
+<%- await getwi('南疆百毒沼泽天材地宝') %>
+<% if (place) { %>
+<%- await getwi('毒娘子') %>
+<%- await getwi('离恨') %>
+<%- await getwi('万骸老祖') %>
+<%- await getwi('夜烬') %>
+<%- await getwi('夜幽') %>
+<% } %>
+
+<% } else if (subArea === '巫神教' && _notScanned('巫神教')) { %>
+<%- await getwi('巫神教') %>
+<%- await getwi('南疆巫神教功法') %>
+<% if (place) { %>
+<%- await getwi('阿蛮') %>
+<%- await getwi('翠儿') %>
+<%- await getwi('大巫祝') %>
+<%- await getwi('巫灵') %>
+<% } %>
+
+<% } else if (subArea === '药神谷' && _notScanned('药神谷')) { %>
+<%- await getwi('药神谷') %>
+<%- await getwi('南疆药神谷功法') %>
+<%- await getwi('南疆药神谷天材地宝') %>
+<% if (place) { %>
+<%- await getwi('林清雪') %>
+<%- await getwi('苏青檀') %>
+<%- await getwi('药童') %>
+<% } %>
+
+<% } else { %>
+<%/* 其他子区域(自然地理区域) */%>
+<% if (subArea === '百毒沼泽' || subArea === '迷雾雨林') { %>
+<%- await getwi('南疆百毒沼泽天材地宝') %>
+<%- await getwi('南疆迷雾雨林天材地宝') %>
+<% } else if (subArea === '炎狱山') { %>
+<%- await getwi('南疆赤阳谷天材地宝') %>
+<% } else if (subArea === '古巫战场') { %>
+<%- await getwi('南疆古巫战场天材地宝') %>
+<% } %>
+<%- await getwi('南疆部族寨子谋生') %>
+<%- await getwi('南疆部族寨子物价') %>
+<% } %>
+
+<% } %>
+<% } %>

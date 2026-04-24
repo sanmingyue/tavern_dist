@@ -1,0 +1,15 @@
+@@preprocessing
+<%
+if (typeof lifeState === 'undefined') var lifeState = getvar('stat_data._寿元状态', { defaults: '正常' });
+if (typeof curRealm3 === 'undefined') var curRealm3 = getvar('stat_data.当前境界', { defaults: '' });
+
+if (curRealm3.indexOf('真仙境') === 0) {
+  if (lifeState === '第一衰' || lifeState === '第二衰' || lifeState === '第三衰' || lifeState === '第四衰' || lifeState === '第五衰') {
+    print(await getwi('天人五衰'));
+  }
+} else {
+  if (lifeState === '衰老初期' || lifeState === '灵力枯竭' || lifeState === '油尽灯枯' || lifeState === '寿终正寝') {
+    print(await getwi('轮回'));
+  }
+}
+%>

@@ -1,0 +1,2 @@
+$(()=>{$('#chat > .mes').not('.last_mes').remove(),$('#form_sheld').hide(),$('#send_form').hide();let e=SillyTavern.getCurrentChatId();eventOn(tavern_events.CHAT_CHANGED,t=>{e!==t&&(e=t,reloadIframe())})});
+//# sourceMappingURL=index.js.map

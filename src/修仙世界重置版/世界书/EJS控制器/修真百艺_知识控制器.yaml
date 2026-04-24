@@ -1,0 +1,50 @@
+@@preprocessing
+<%
+/* ===== 修真百艺知识控制器 =====
+ * 根据"_当前百艺"变量值，动态加载对应的修真百艺世界书知识
+ * 同时检查是否需要加载百艺学习引导
+ */
+
+if (typeof curArt === 'undefined') var curArt = getvar('stat_data._当前百艺', { defaults: '' });
+
+if (curArt === '炼丹') {
+  print(await getwi('炼丹总纲'));
+}
+if (curArt === '炼器') {
+  print(await getwi('炼器总纲'));
+}
+if (curArt === '阵法') {
+  print(await getwi('阵法总纲'));
+}
+if (curArt === '符箓') {
+  print(await getwi('符箓总纲'));
+}
+if (curArt === '驭兽') {
+  print(await getwi('驭兽总纲'));
+}
+if (curArt === '医术') {
+  print(await getwi('医术总纲'));
+}
+if (curArt === '傀儡术') {
+  print(await getwi('傀儡术总纲'));
+}
+if (curArt === '种植采药') {
+  print(await getwi('种植采药总纲'));
+}
+
+// ═══ 百艺学习引导 ═══
+// 只要有任一百艺未学会（境界为空），就加载学习引导条目
+var artRealms = [
+  getvar('stat_data.丹道境界', {defaults:''}),
+  getvar('stat_data.炼器境界', {defaults:''}),
+  getvar('stat_data.阵法境界', {defaults:''}),
+  getvar('stat_data.符箓境界', {defaults:''}),
+  getvar('stat_data.驭兽境界', {defaults:''}),
+  getvar('stat_data.医术境界', {defaults:''}),
+  getvar('stat_data.傀儡术境界', {defaults:''}),
+  getvar('stat_data.种植采药境界', {defaults:''}),
+];
+if (artRealms.some(function(r){ return r === ''; })) {
+  print(await getwi('百艺学习引导'));
+}
+%>

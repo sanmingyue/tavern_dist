@@ -1,0 +1,1386 @@
+```
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>天命轮转 - 角色铭刻</title>
+<style>
+  :root {
+    --bg-primary: #0f0d0a;
+    --bg-card: #1a1714;
+    --bg-card-hover: #231f19;
+    --bg-input: #161310;
+    --text-primary: #e8dcc8;
+    --text-secondary: #b5a78e;
+    --text-muted: #7d7264;
+    --gold: #c9a84c;
+    --gold-light: #e8d5a0;
+    --gold-dark: #8a7230;
+    --border: #3d3428;
+    --shadow-gold: 0 0 30px rgba(201,168,76,0.08);
+    --space-xs: clamp(4px, 1vw, 8px);
+    --space-sm: clamp(8px, 2vw, 12px);
+    --space-md: clamp(12px, 3vw, 16px);
+    --space-lg: clamp(16px, 4vw, 24px);
+    --space-xl: clamp(20px, 5vw, 32px);
+    --space-2xl: clamp(24px, 6vw, 40px);
+    --fs-xs: clamp(10px, 2vw, 11px);
+    --fs-sm: clamp(11px, 2.2vw, 12px);
+    --fs-base: clamp(12px, 2.5vw, 14px);
+    --fs-md: clamp(13px, 2.8vw, 15px);
+    --fs-lg: clamp(15px, 3.2vw, 18px);
+    --fs-xl: clamp(18px, 4vw, 22px);
+    --fs-2xl: clamp(22px, 5vw, 26px);
+    --fs-3xl: clamp(26px, 6vw, 32px);
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg-primary); color: var(--text-primary);
+    font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; justify-content: center; line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .container { position: relative; width: 100%; max-width: 640px; min-height: 100vh; min-height: 100dvh; }
+
+  .page {
+    display: none;
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: var(--space-2xl) var(--space-lg);
+    padding-top: calc(var(--space-2xl) + var(--safe-top));
+    padding-bottom: calc(var(--space-2xl) + var(--safe-bottom) + 36px);
+    padding-left: calc(var(--space-lg) + var(--safe-left));
+    padding-right: calc(var(--space-lg) + var(--safe-right));
+    min-height: 100vh; min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  .page.active { display: flex; }
+
+  .page-inner {
+    width: 100%; max-width: 520px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--space-lg); margin: auto 0; flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .taiji-symbol { animation: none !important; }
+  }
+
+  .taiji-symbol {
+    width: clamp(48px, 10vw, 64px); height: clamp(48px, 10vw, 64px);
+    opacity: 0.7; animation: taiji-spin 30s linear infinite; flex-shrink: 0;
+  }
+  @keyframes taiji-spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  .taiji-symbol.large { width: clamp(80px, 18vw, 120px); height: clamp(80px, 18vw, 120px); opacity: 0.5; animation-duration: 20s; }
+
+  .separator { width: clamp(160px, 50vw, 240px); height: 20px; opacity: 0.5; flex-shrink: 0; }
+
+  .page-title { font-size: var(--fs-2xl); color: var(--gold); letter-spacing: clamp(4px, 1.5vw, 8px); font-weight: 400; text-align: center; flex-shrink: 0; }
+  .page-guide { font-size: var(--fs-base); color: var(--text-secondary); line-height: 2; text-align: center; max-width: 420px; letter-spacing: clamp(0.5px, 0.2vw, 1px); flex-shrink: 0; }
+
+  .input-field {
+    width: 100%; max-width: 360px; padding: clamp(10px, 2.5vw, 14px) clamp(14px, 3vw, 20px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-lg); font-family: inherit;
+    text-align: center; letter-spacing: clamp(2px, 0.8vw, 4px); outline: none;
+    transition: border-color 0.3s; min-height: 44px; flex-shrink: 0;
+  }
+  .input-field:focus { border-color: var(--gold); box-shadow: var(--shadow-gold); }
+  .input-field::placeholder { color: var(--text-muted); letter-spacing: 2px; font-size: var(--fs-base); }
+
+  .card-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); gap: var(--space-md); width: 100%; }
+  .card {
+    padding: clamp(16px, 4vw, 24px) clamp(12px, 3vw, 16px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; text-align: center; transition: all 0.3s; user-select: none; min-height: 44px;
+  }
+  .card:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); transform: translateY(-2px); }
+  .card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); box-shadow: var(--shadow-gold); }
+  .card-title { font-size: var(--fs-xl); color: var(--gold); margin-bottom: var(--space-xs); letter-spacing: clamp(2px, 0.6vw, 4px); }
+  .card-desc { font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.8; }
+
+  .mini-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(60px, 14vw, 80px), 1fr)); gap: var(--space-sm); width: 100%; justify-items: center; }
+  .mini-card {
+    width: 100%; max-width: 80px; aspect-ratio: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; transition: all 0.3s; user-select: none; min-height: 44px;
+  }
+  .mini-card:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); }
+  .mini-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); box-shadow: var(--shadow-gold); }
+  .mini-card .mc-label { font-size: var(--fs-md); color: var(--text-primary); letter-spacing: 2px; }
+
+  .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(80px, 18vw, 100px), 1fr)); gap: var(--space-sm); width: 100%; justify-items: center; }
+  .art-card {
+    width: 100%; max-width: 110px; padding: clamp(10px, 2.5vw, 16px) clamp(6px, 1.5vw, 8px);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; transition: all 0.3s; user-select: none; min-height: 44px;
+  }
+  .art-card:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); }
+  .art-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+  .art-card .art-name { font-size: var(--fs-base); color: var(--text-primary); letter-spacing: 2px; }
+  .art-card .art-desc { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.6; text-align: center; }
+
+  .realm-group { width: 100%; margin-bottom: var(--space-sm); }
+  .realm-group-title { font-size: var(--fs-sm); color: var(--gold-dark); letter-spacing: clamp(1px, 0.5vw, 3px); margin-bottom: var(--space-xs); padding-left: 4px; }
+  .realm-options, .faction-grid { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+  .realm-btn, .faction-btn {
+    padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 14px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-secondary); font-size: var(--fs-sm); font-family: inherit;
+    cursor: pointer; transition: all 0.3s; letter-spacing: 1px; min-height: 36px; touch-action: manipulation;
+  }
+  .realm-btn:hover, .faction-btn:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); color: var(--text-primary); }
+  .realm-btn.selected, .faction-btn.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+  .realm-more-toggle {
+    padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px);
+    background: none; border: 1px dashed var(--border); border-radius: 4px;
+    color: var(--text-muted); font-size: var(--fs-sm); font-family: inherit;
+    cursor: pointer; letter-spacing: 2px; transition: all 0.3s; min-height: 36px; touch-action: manipulation;
+  }
+  .realm-more-toggle:hover { border-color: var(--gold-dark); color: var(--text-secondary); }
+  .realm-advanced { display: none; width: 100%; }
+  .realm-advanced.show { display: block; }
+
+  .custom-wrap { width: 100%; max-width: 400px; margin-top: var(--space-xs); display: flex; gap: var(--space-xs); align-items: center; justify-content: center; flex-wrap: wrap; }
+  .custom-label { font-size: var(--fs-sm); color: var(--text-muted); white-space: nowrap; }
+  .custom-input {
+    flex: 1; min-width: 0; padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-base); font-family: inherit;
+    outline: none; letter-spacing: 2px; transition: border-color 0.3s; min-height: 40px;
+  }
+  .custom-input:focus { border-color: var(--gold); }
+
+  .preview-text { font-size: var(--fs-lg); color: var(--gold-light); letter-spacing: clamp(1px, 0.5vw, 3px); text-align: center; min-height: 24px; transition: all 0.3s; flex-shrink: 0; word-break: break-all; }
+
+  .btn-row { display: flex; gap: var(--space-md); margin-top: var(--space-sm); flex-wrap: wrap; justify-content: center; flex-shrink: 0; }
+  .btn {
+    padding: clamp(10px, 2.5vw, 12px) clamp(24px, 6vw, 36px);
+    background: transparent; border: 1px solid var(--gold); border-radius: 4px;
+    color: var(--gold); font-size: var(--fs-md); font-family: inherit;
+    cursor: pointer; letter-spacing: clamp(2px, 0.6vw, 4px); transition: all 0.3s;
+    min-height: 44px; touch-action: manipulation; white-space: nowrap;
+  }
+  .btn:hover { background: rgba(201,168,76,0.1); box-shadow: var(--shadow-gold); }
+  .btn:active { background: rgba(201,168,76,0.15); }
+  .btn-primary { background: rgba(201,168,76,0.12); }
+  .btn-back { border-color: var(--border); color: var(--text-muted); }
+  .btn-back:hover { border-color: var(--text-secondary); color: var(--text-secondary); background: transparent; box-shadow: none; }
+  .btn-start { padding: clamp(12px, 3vw, 16px) clamp(36px, 8vw, 56px); font-size: var(--fs-lg); letter-spacing: clamp(4px, 1.2vw, 8px); }
+
+  .step-indicator {
+    position: fixed; bottom: calc(var(--space-md) + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+    display: flex; gap: clamp(4px, 1vw, 8px); z-index: 10;
+    padding: 4px 8px; border-radius: 12px; background: rgba(15,13,10,0.8);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .step-dot { width: clamp(5px, 1.2vw, 7px); height: clamp(5px, 1.2vw, 7px); border-radius: 50%; background: var(--border); transition: all 0.3s; }
+  .step-dot.active { background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.4); }
+  .step-dot.done { background: var(--gold-dark); }
+
+  .summary-table { width: 100%; border-collapse: collapse; }
+  .summary-table tr { border-bottom: 1px solid rgba(61,52,40,0.5); }
+  .summary-table td { padding: clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px); font-size: var(--fs-base); vertical-align: top; }
+  .summary-table td:first-child { color: var(--text-muted); letter-spacing: 2px; width: clamp(60px, 16vw, 100px); text-align: right; padding-right: clamp(8px, 2vw, 20px); white-space: nowrap; }
+  .summary-table td:last-child { color: var(--gold-light); letter-spacing: 1px; word-break: break-all; }
+
+  .scroll-area {
+    width: 100%; overflow-x: hidden; padding-right: 4px;
+  }
+  @media (min-width: 769px) {
+    .scroll-area {
+      max-height: 45vh; max-height: 45dvh; overflow-y: auto;
+      -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .scroll-area::-webkit-scrollbar { width: 3px; }
+    .scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  }
+
+  .hint { font-size: var(--fs-xs); color: var(--text-muted); text-align: center; letter-spacing: 1px; flex-shrink: 0; }
+
+  .textarea-field {
+    width: 100%; max-width: 460px; min-height: 120px; padding: clamp(10px, 2.5vw, 14px);
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-size: var(--fs-base); font-family: inherit;
+    line-height: 1.8; letter-spacing: 1px; outline: none; resize: vertical;
+    transition: border-color 0.3s; flex-shrink: 0;
+  }
+  .textarea-field:focus { border-color: var(--gold); box-shadow: var(--shadow-gold); }
+  .textarea-field::placeholder { color: var(--text-muted); }
+
+  .tag-grid { display: flex; flex-wrap: wrap; gap: var(--space-xs); width: 100%; justify-content: center; }
+  .tag-btn {
+    padding: clamp(8px, 2vw, 10px) clamp(14px, 3vw, 18px);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+    color: var(--text-secondary); font-size: var(--fs-sm); font-family: inherit;
+    cursor: pointer; transition: all 0.3s; letter-spacing: 1px; min-height: 36px; touch-action: manipulation;
+  }
+  .tag-btn:hover { background: var(--bg-card-hover); border-color: var(--gold-dark); color: var(--text-primary); }
+  .tag-btn.selected { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold); }
+
+  #region-container { width: 100%; min-height: 36px; }
+
+  @media (max-width: 360px) {
+    .card-row { grid-template-columns: 1fr 1fr; gap: var(--space-xs); }
+    .mini-card-grid { grid-template-columns: repeat(4, 1fr); }
+    .art-grid { grid-template-columns: repeat(3, 1fr); }
+    .custom-wrap { flex-direction: column; align-items: stretch; }
+    .custom-label { text-align: center; }
+    .btn { padding: 10px 20px; }
+    .btn-start { padding: 12px 32px; }
+  }
+  @media (max-height: 480px) and (orientation: landscape) {
+    .page { justify-content: flex-start; padding-top: var(--space-md); padding-bottom: calc(var(--space-md) + 36px); }
+    .page-inner { margin: 0; gap: var(--space-sm); }
+    .taiji-symbol { display: none; }
+    .taiji-symbol.large { display: block; width: 48px; height: 48px; }
+    .separator { display: none; }
+    .page-guide { line-height: 1.6; }
+  }
+  @media (min-width: 768px) {
+    .mini-card-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+    .art-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+  @media (min-width: 1024px) { .container { max-width: 680px; } .scroll-area { max-height: 50vh; max-height: 50dvh; } }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+
+  <!-- PAGE 0: 天命轮转 -->
+  <div class="page active" id="page-0">
+    <div class="page-inner">
+      <svg class="taiji-symbol large" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="48" fill="none" stroke="var(--gold)" stroke-width="0.8" opacity="0.4"/>
+        <circle cx="50" cy="50" r="44" fill="none" stroke="var(--gold)" stroke-width="0.3" opacity="0.2"/>
+        <path d="M50 6 A44 44 0 0 1 50 94 A22 22 0 0 0 50 50 A22 22 0 0 1 50 6" fill="var(--gold)" opacity="0.15"/>
+        <path d="M50 94 A44 44 0 0 1 50 6 A22 22 0 0 1 50 50 A22 22 0 0 0 50 94" fill="var(--gold)" opacity="0.06"/>
+        <circle cx="50" cy="28" r="4" fill="var(--bg-primary)" stroke="var(--gold)" stroke-width="0.5" opacity="0.5"/>
+        <circle cx="50" cy="72" r="4" fill="var(--gold)" opacity="0.2"/>
+      </svg>
+      <h1 class="page-title" style="font-size:var(--fs-3xl); letter-spacing:clamp(6px, 2vw, 12px);">天命轮转</h1>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="40" y1="10" x2="175" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><circle cx="200" cy="10" r="2.5" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.5"/><line x1="225" y1="10" x2="360" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/></svg>
+      <p class="page-guide">混沌未开之时，万物皆寂。<br>忽有一缕灵光自虚无中诞生，<br>穿透九天十地，落于汝之魂魄。<br><br>此刻起，尘缘已断，仙途初启。<br>且随这缕天光，叩开通往另一方天地的门扉。</p>
+      <div class="btn-row" style="margin-top:var(--space-lg);"><button class="btn btn-primary btn-start" onclick="goToPage(1)">踏入仙途</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 1: 道号 -->
+  <div class="page" id="page-1">
+    <div class="page-inner">
+      <svg class="taiji-symbol" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="none" stroke="var(--gold)" stroke-width="0.8" opacity="0.3"/><path d="M50 6 A44 44 0 0 1 50 94 A22 22 0 0 0 50 50 A22 22 0 0 1 50 6" fill="var(--gold)" opacity="0.1"/><circle cx="50" cy="28" r="3" fill="var(--bg-primary)" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><circle cx="50" cy="72" r="3" fill="var(--gold)" opacity="0.15"/></svg>
+      <h2 class="page-title">道号铭刻</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">名者，天地之印记，因果之起始。<br>自今日起，三界六道皆以此名识汝。<br>一字定乾坤，一号通神明。</p>
+      <input class="input-field" id="input-name" type="text" placeholder="铭刻汝之道号" maxlength="20" autocomplete="off">
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(0)">返回</button><button class="btn btn-primary" onclick="saveName()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: 阴阳 -->
+  <div class="page" id="page-2">
+    <div class="page-inner">
+      <h2 class="page-title">阴阳定相</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">天地分阴阳，万物有其序。<br>乾为天、坤为地，阳刚阴柔，各有其道。</p>
+      <div class="card-row">
+        <div class="card" onclick="selectGender(this,'男')"><div class="card-title">乾</div><div class="card-desc">阳刚之体<br>以天为道</div></div>
+        <div class="card" onclick="selectGender(this,'女')"><div class="card-title">坤</div><div class="card-desc">阴柔之体<br>以地为道</div></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(1)">返回</button><button class="btn btn-primary" onclick="saveGender()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 3: 年岁 -->
+  <div class="page" id="page-3">
+    <div class="page-inner">
+      <h2 class="page-title">红尘年华</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">仙途漫漫，始于凡尘。<br>那些年月虽短，却铸就了道心之基。</p>
+      <input class="input-field" id="input-age" type="number" min="10" max="100000" value="18" autocomplete="off" oninput="updateAgeHint(parseInt(this.value)||0)">
+      <p class="hint" id="age-hint">弱冠之年，正值修行入门之龄</p>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(2)">返回</button><button class="btn btn-primary" onclick="saveAge()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: 灵根 -->
+  <div class="page" id="page-4">
+    <div class="page-inner">
+      <h2 class="page-title">灵根显化</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">灵根者，先天之基也。<br>万物皆可化为灵根，天地不拘一格。</p>
+      <div class="realm-group"><div class="realm-group-title">品级</div><div class="realm-options" id="root-grade-options">
+        <button class="realm-btn" onclick="selectRootGrade(this,'天')">天</button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'地')">地</button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'玄')">玄</button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'黄')">黄</button>
+        <button class="realm-btn" onclick="selectRootGrade(this,'杂')">杂</button>
+      </div></div>
+      <div class="realm-group"><div class="realm-group-title">属性 (可选多项，或直接输入自定义灵根)</div><div class="mini-card-grid" id="root-element-grid">
+        <div class="mini-card" onclick="toggleElement(this,'金')"><span class="mc-label">金</span></div>
+        <div class="mini-card" onclick="toggleElement(this,'木')"><span class="mc-label">木</span></div>
+        <div class="mini-card" onclick="toggleElement(this,'水')"><span class="mc-label">水</span></div>
+        <div class="mini-card" onclick="toggleElement(this,'火')"><span class="mc-label">火</span></div>
+        <div class="mini-card" onclick="toggleElement(this,'土')"><span class="mc-label">土</span></div>
+        <div class="mini-card" style="border-style:dashed;" onclick="toggleElement(this,'雷')"><span class="mc-label">雷</span></div>
+        <div class="mini-card" style="border-style:dashed;" onclick="toggleElement(this,'冰')"><span class="mc-label">冰</span></div>
+        <div class="mini-card" style="border-style:dashed;" onclick="toggleElement(this,'风')"><span class="mc-label">风</span></div>
+      </div></div>
+      <div class="custom-wrap"><span class="custom-label">自定义灵根:</span><input class="custom-input" id="root-custom" type="text" placeholder="如: 天品星辰灵根" autocomplete="off" oninput="onCustomRoot()"></div>
+      <div class="preview-text" id="root-preview"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(3)">返回</button><button class="btn btn-primary" onclick="saveRoot()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 5: 体质 -->
+  <div class="page" id="page-5">
+    <div class="page-inner">
+      <h2 class="page-title">天赋体质</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">世间万中无一者，偶得天赋异禀之体。<br>体质乃先天造化所赐，可遇而不可求。<br>大多数修士并无特殊体质，留空即可。</p>
+      <p class="hint">选填，大多数人无特殊体质</p>
+      <div class="custom-wrap"><span class="custom-label">特殊体质:</span><input class="custom-input" id="input-constitution" type="text" placeholder="如: 冰晶玉体、天生剑体、先天道体..." autocomplete="off"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(4)">返回</button><button class="btn btn-primary" onclick="saveConstitution()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 6: 百艺 -->
+  <div class="page" id="page-6">
+    <div class="page-inner">
+      <h2 class="page-title">百艺择道</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">修真之道，百艺争辉。<br>汝心之所向，当择何道？</p>
+      <p class="hint">可选多项，亦可暂不选择</p>
+      <div class="art-grid" id="art-grid">
+        <div class="art-card" onclick="toggleArt(this,'剑修')"><span class="art-name">剑修</span><span class="art-desc">以剑入道<br>万法皆斩</span></div>
+        <div class="art-card" onclick="toggleArt(this,'丹修')"><span class="art-name">丹修</span><span class="art-desc">炉火纯青<br>化腐为奇</span></div>
+        <div class="art-card" onclick="toggleArt(this,'阵法师')"><span class="art-name">阵法师</span><span class="art-desc">布阵困敌<br>万象归虚</span></div>
+        <div class="art-card" onclick="toggleArt(this,'炼器师')"><span class="art-name">炼器师</span><span class="art-desc">锤炼法宝<br>铸器通神</span></div>
+        <div class="art-card" onclick="toggleArt(this,'符篆师')"><span class="art-name">符篆师</span><span class="art-desc">符箓通灵<br>敕令天地</span></div>
+        <div class="art-card" onclick="toggleArt(this,'体修')"><span class="art-name">体修</span><span class="art-desc">以身为器<br>肉身成圣</span></div>
+        <div class="art-card" onclick="toggleArt(this,'法修')"><span class="art-name">法修</span><span class="art-desc">术法如雨<br>万法归宗</span></div>
+        <div class="art-card" onclick="toggleArt(this,'灵植师')"><span class="art-name">灵植师</span><span class="art-desc">草木通灵<br>生机造化</span></div>
+        <div class="art-card" onclick="toggleArt(this,'驯兽师')"><span class="art-name">驯兽师</span><span class="art-desc">驭灵使兽<br>万兽朝宗</span></div>
+        <div class="art-card" onclick="toggleArt(this,'卜算师')"><span class="art-name">卜算师</span><span class="art-desc">推演天机<br>洞察因果</span></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(5)">返回</button><button class="btn btn-primary" onclick="saveArts()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 7: 修为 -->
+  <div class="page" id="page-7">
+    <div class="page-inner">
+      <h2 class="page-title">修为初定</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">凡人望仙路如天堑，炼气士方知天地之广。<br>汝今立于仙途何处？</p>
+      <div class="scroll-area" id="realm-scroll">
+        <div class="realm-group"><div class="realm-group-title">凡尘</div><div class="realm-options"><button class="realm-btn selected" onclick="selectRealm(this,'凡人')">凡人</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">炼气</div><div class="realm-options" id="realm-lianqi"></div></div>
+        <div class="realm-group"><div class="realm-group-title">筑基</div><div class="realm-options" id="realm-zhuji"></div></div>
+        <div class="realm-group"><div class="realm-group-title">金丹</div><div class="realm-options" id="realm-jindan"></div></div>
+        <div style="text-align:center;margin:var(--space-sm) 0;"><button class="realm-more-toggle" onclick="document.getElementById('realm-advanced').classList.toggle('show')">更高境界...</button></div>
+        <div class="realm-advanced" id="realm-advanced">
+          <div class="realm-group"><div class="realm-group-title">元婴</div><div class="realm-options" id="realm-yuanying"></div></div>
+          <div class="realm-group"><div class="realm-group-title">化神</div><div class="realm-options" id="realm-huashen"></div></div>
+          <div class="realm-group"><div class="realm-group-title">炼虚</div><div class="realm-options" id="realm-lianxu"></div></div>
+          <div class="realm-group"><div class="realm-group-title">合体</div><div class="realm-options" id="realm-heti"></div></div>
+          <div class="realm-group"><div class="realm-group-title">大乘</div><div class="realm-options" id="realm-dacheng"></div></div>
+          <div class="realm-group"><div class="realm-group-title">渡劫</div><div class="realm-options" id="realm-dujie"></div></div>
+          <div class="realm-group"><div class="realm-group-title">真仙境</div><div class="realm-options" id="realm-zhenxian"></div></div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(6)">返回</button><button class="btn btn-primary" onclick="saveRealm()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 8: 初始功法 -->
+  <div class="page" id="page-8">
+    <div class="page-inner">
+      <h2 class="page-title">道法传承</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">修行之路，功法为基。<br>汝可于此描述已习得之功法，<br>亦可留白，由天命安排传承。</p>
+      <p class="hint">选填，留空则由天命安排初始功法</p>
+      <div class="realm-group"><div class="realm-group-title">主修功法</div>
+        <div class="custom-wrap"><span class="custom-label">功法名:</span><input class="custom-input" id="input-gongfa-name" type="text" placeholder="如: 太虚剑诀、九转玄功..." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">功法品阶:</span><input class="custom-input" id="input-gongfa-grade" type="text" placeholder="如: 玄级上品、地级下品..." autocomplete="off"></div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">已习术法 (可不填)</div>
+        <textarea class="textarea-field" id="input-arts-desc" style="min-height:80px;" placeholder="如: 五行遁术（小成）、风雷剑诀（入门）...&#10;留空则由天命安排"></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(7)">返回</button><button class="btn btn-primary" onclick="saveGongfa()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 9: 初始法宝 -->
+  <div class="page" id="page-9">
+    <div class="page-inner">
+      <h2 class="page-title">法宝祭炼</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">法器通灵，宝器护道。<br>汝可于此描述随身法宝，<br>亦可留白，由天命安排器物。</p>
+      <p class="hint">选填，留空则由天命安排初始法宝</p>
+      <div class="realm-group"><div class="realm-group-title">本命法宝</div>
+        <div class="custom-wrap"><span class="custom-label">法宝名:</span><input class="custom-input" id="input-weapon-name" type="text" placeholder="如: 青锋剑、玄冰盾..." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">法宝品阶:</span><input class="custom-input" id="input-weapon-grade" type="text" placeholder="如: 灵器、法宝、宝器..." autocomplete="off"></div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">其他法宝 (可不填)</div>
+        <textarea class="textarea-field" id="input-extra-weapons" style="min-height:80px;" placeholder="如: 防御法宝「玄龟盾」（灵器）、储物袋...&#10;留空则由天命安排"></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(8)">返回</button><button class="btn btn-primary" onclick="saveWeapon()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 10: 灵宠/灵兽 (新增) -->
+  <div class="page" id="page-10">
+    <div class="page-inner">
+      <h2 class="page-title">灵兽契约</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">万兽有灵，与修士缔结契约者，可为伴侣。<br>灵兽随主人修行，亦有化形之日。<br>大多数初入修途者并无灵宠，留空即可。</p>
+      <p class="hint">选填，大多数修士初期并无灵宠</p>
+      <div class="realm-group"><div class="realm-group-title">灵宠信息</div>
+        <div class="custom-wrap"><span class="custom-label">灵宠名:</span><input class="custom-input" id="input-pet-name" type="text" placeholder="如: 小白、玄灵..." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">品种:</span><input class="custom-input" id="input-pet-species" type="text" placeholder="如: 白虎幼崽、青鸾、火狐..." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">灵兽阶级:</span><input class="custom-input" id="input-pet-rank" type="text" placeholder="如: 一阶、三阶、灵王..." autocomplete="off"></div>
+      </div>
+      <div class="realm-group"><div class="realm-group-title">灵宠描述 (可不填)</div>
+        <textarea class="textarea-field" id="input-pet-desc" style="min-height:80px;" placeholder="如: 幼年白虎，通体雪白，额间一道金纹...&#10;留空则由天命安排"></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(9)">返回</button><button class="btn btn-primary" onclick="savePet()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 11: 异火 (新增) -->
+  <div class="page" id="page-11">
+    <div class="page-inner">
+      <h2 class="page-title">天地异火</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">天地异火，造化之精。<br>异火品级从一品（最强）到九品，<br>炼丹、炼器皆赖异火之力。<br>拥有异火者万中无一，留空即可。</p>
+      <p class="hint">选填，极少数人开局拥有异火</p>
+      <div class="realm-group"><div class="realm-group-title">异火信息</div>
+        <div class="custom-wrap"><span class="custom-label">异火名:</span><input class="custom-input" id="input-fire-name" type="text" placeholder="如: 碧落天火、寒冰灵焰..." autocomplete="off"></div>
+        <div class="custom-wrap"><span class="custom-label">异火品级:</span>
+          <select class="custom-input" id="input-fire-rank" style="letter-spacing:1px;">
+            <option value="">未选择</option>
+            <option value="九品">九品 (最弱)</option>
+            <option value="八品">八品</option>
+            <option value="七品">七品</option>
+            <option value="六品">六品</option>
+            <option value="五品">五品</option>
+            <option value="四品">四品</option>
+            <option value="三品">三品</option>
+            <option value="二品">二品</option>
+            <option value="一品">一品 (最强)</option>
+            <option value="特殊">特殊</option>
+          </select>
+        </div>
+        <div class="custom-wrap"><span class="custom-label">异火属性:</span><input class="custom-input" id="input-fire-attr" type="text" placeholder="如: 冰/水、雷/天罚、佛/净化..." autocomplete="off"></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(10)">返回</button><button class="btn btn-primary" onclick="saveFire()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 12: 势力 -->
+  <div class="page" id="page-12">
+    <div class="page-inner">
+      <h2 class="page-title">宗门归属</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">天下宗门林立，各怀道统传承。<br>汝当归于何方？</p>
+      <div class="scroll-area" id="faction-scroll">
+        <div class="realm-group"><div class="realm-group-title">独行</div><div class="faction-grid"><button class="faction-btn selected" onclick="selectFaction(this,'散修')">散修</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">六大仙宗 · 上三宗</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'剑宗')">剑宗</button><button class="faction-btn" onclick="selectFaction(this,'丹宗')">丹宗</button><button class="faction-btn" onclick="selectFaction(this,'玄天宗')">玄天宗</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">六大仙宗 · 下三宗</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'太虚宗')">太虚宗</button><button class="faction-btn" onclick="selectFaction(this,'合欢宗')">合欢宗</button><button class="faction-btn" onclick="selectFaction(this,'蛊魔宗')">蛊魔宗</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">正道圣地</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'天剑圣地')">天剑圣地</button><button class="faction-btn" onclick="selectFaction(this,'玉清道宫')">玉清道宫</button><button class="faction-btn" onclick="selectFaction(this,'药神谷')">药神谷</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">正道强宗</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'凛霜剑门')">凛霜剑门</button><button class="faction-btn" onclick="selectFaction(this,'百草庐')">百草庐</button><button class="faction-btn" onclick="selectFaction(this,'万法宗')">万法宗</button><button class="faction-btn" onclick="selectFaction(this,'万兽山庄')">万兽山庄</button><button class="faction-btn" onclick="selectFaction(this,'赤阳谷')">赤阳谷</button><button class="faction-btn" onclick="selectFaction(this,'灵霄宗')">灵霄宗</button><button class="faction-btn" onclick="selectFaction(this,'青云宗')">青云宗</button><button class="faction-btn" onclick="selectFaction(this,'天仙门')">天仙门</button><button class="faction-btn" onclick="selectFaction(this,'天机阁')">天机阁</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">亦正亦邪</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'魅花宫')">魅花宫</button><button class="faction-btn" onclick="selectFaction(this,'极乐宫')">极乐宫</button><button class="faction-btn" onclick="selectFaction(this,'天命神教')">天命神教</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">魔道势力</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'幽冥魔宗')">幽冥魔宗</button><button class="faction-btn" onclick="selectFaction(this,'万禁教')">万禁教</button><button class="faction-btn" onclick="selectFaction(this,'噬心殿')">噬心殿</button><button class="faction-btn" onclick="selectFaction(this,'万毒神教')">万毒神教</button><button class="faction-btn" onclick="selectFaction(this,'噬荒教')">噬荒教</button><button class="faction-btn" onclick="selectFaction(this,'幽血门')">幽血门</button><button class="faction-btn" onclick="selectFaction(this,'归墟魔渊')">归墟魔渊</button><button class="faction-btn" onclick="selectFaction(this,'万魔窟')">万魔窟</button><button class="faction-btn" onclick="selectFaction(this,'天魔帝都')">天魔帝都</button><button class="faction-btn" onclick="selectFaction(this,'玄渊城')">玄渊城</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">大魔国</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'大魔国')">大魔国</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">中立/商会</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'万宝商会')">万宝商会</button><button class="faction-btn" onclick="selectFaction(this,'万法楼')">万法楼</button><button class="faction-btn" onclick="selectFaction(this,'万宝楼')">万宝楼</button><button class="faction-btn" onclick="selectFaction(this,'红尘酒家')">红尘酒家</button><button class="faction-btn" onclick="selectFaction(this,'墨家机关城')">墨家机关城</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">王朝/国度</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'大雍皇朝')">大雍皇朝</button><button class="faction-btn" onclick="selectFaction(this,'苍澜国')">苍澜国</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">佛门/巫道</div><div class="faction-grid">
+          <button class="faction-btn" onclick="selectFaction(this,'小雷音寺')">小雷音寺</button><button class="faction-btn" onclick="selectFaction(this,'巫神教')">巫神教</button>
+        </div></div>
+        <div class="realm-group"><div class="realm-group-title">妖族</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'青丘国')">青丘国</button><button class="faction-btn" onclick="selectFaction(this,'迦楼罗天')">迦楼罗天</button><button class="faction-btn" onclick="selectFaction(this,'万妖国')">万妖国</button><button class="faction-btn" onclick="selectFaction(this,'万蛊噬龙窟')">万蛊噬龙窟</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">龙族</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'东海龙宫')">东海龙宫</button><button class="faction-btn" onclick="selectFaction(this,'南海龙宫')">南海龙宫</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">异域</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'东瀛')">东瀛</button><button class="faction-btn" onclick="selectFaction(this,'生命之森')">生命之森</button></div></div>
+        <div class="realm-group"><div class="realm-group-title">特殊势力</div><div class="faction-grid"><button class="faction-btn" onclick="selectFaction(this,'玲珑绣阁')">玲珑绣阁</button><button class="faction-btn" onclick="selectFaction(this,'并蒂宫')">并蒂宫</button><button class="faction-btn" onclick="selectFaction(this,'归稚宗')">归稚宗</button><button class="faction-btn" onclick="selectFaction(this,'绯家')">绯家</button><button class="faction-btn" onclick="selectFaction(this,'北原王家')">北原王家</button></div></div>
+      </div>
+      <div class="custom-wrap"><span class="custom-label">自定义:</span><input class="custom-input" id="faction-custom" type="text" placeholder="输入势力名称" autocomplete="off" oninput="onCustomFaction()"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(11)">返回</button><button class="btn btn-primary" onclick="saveFaction()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 13: 当前位置 -->
+  <div class="page" id="page-13">
+    <div class="page-inner">
+      <h2 class="page-title">天地方位</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">天地辽阔，九域分野。<br>汝之道途始于何方水土？<br>大域已定，余者可择可不择。</p>
+      <div class="realm-group"><div class="realm-group-title">所在大域</div><div class="faction-grid" id="domain-grid">
+        <button class="faction-btn selected" onclick="selectDomain(this,'中央神州')">中央神州</button>
+        <button class="faction-btn" onclick="selectDomain(this,'东荒妖域')">东荒妖域</button>
+        <button class="faction-btn" onclick="selectDomain(this,'北原魔土')">北原魔土</button>
+        <button class="faction-btn" onclick="selectDomain(this,'南疆巫地')">南疆巫地</button>
+        <button class="faction-btn" onclick="selectDomain(this,'西漠佛国')">西漠佛国</button>
+        <button class="faction-btn" onclick="selectDomain(this,'四海')">四海</button>
+        <button class="faction-btn" onclick="selectDomain(this,'阴曹地府')">阴曹地府</button>
+        <button class="faction-btn" onclick="selectDomain(this,'东瀛')">东瀛</button>
+        <button class="faction-btn" onclick="selectDomain(this,'大魔国')">大魔国</button>
+      </div></div>
+      <div class="realm-group"><div class="realm-group-title">所在区域 (可不填)</div>
+        <div id="region-container" class="faction-grid"></div>
+        <div class="custom-wrap" style="margin-top:var(--space-xs);"><span class="custom-label">自定义:</span><input class="custom-input" id="region-custom" type="text" placeholder="输入区域名" autocomplete="off" oninput="onCustomRegion()"></div>
+      </div>
+      <div class="custom-wrap"><span class="custom-label">具体场景:</span><input class="custom-input" id="input-scene" type="text" placeholder="如: 洗剑池、红尘酒家 (可不填)" autocomplete="off"></div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(12)">返回</button><button class="btn btn-primary" onclick="saveLocation()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 14: 当前状态 -->
+  <div class="page" id="page-14">
+    <div class="page-inner">
+      <h2 class="page-title">身心之态</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">仙途多坎坷，道心存万象。<br>汝踏入此界之时，身处何种境况？</p>
+      <div class="realm-group"><div class="realm-group-title">身体状态</div><div class="faction-grid" id="body-state-grid">
+        <button class="faction-btn selected" onclick="selectBodyState(this,'正常')">正常</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'受伤')">受伤</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'重伤')">重伤</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'中毒')">中毒</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'修炼中')">修炼中</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'闭关')">闭关</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'战斗中')">战斗中</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'被困')">被困</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'疗伤')">疗伤</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'赶路')">赶路</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'昏迷')">昏迷</button>
+        <button class="faction-btn" onclick="selectBodyState(this,'被封印')">被封印</button>
+      </div></div>
+      <div class="realm-group"><div class="realm-group-title">初始资源 (可不填，留空则由天命决定)</div>
+        <textarea class="textarea-field" id="input-resources" placeholder="如: 拥有500下品灵石、一把飞剑、两枚筑基丹...&#10;留空则由天命安排初始装备与资源"></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(13)">返回</button><button class="btn btn-primary" onclick="saveStatus()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 15: 专属境界 -->
+  <div class="page" id="page-15">
+    <div class="page-inner">
+      <h2 class="page-title">专精之境</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">术业有专精，道有高下之分。<br>汝之专精修行，已至何等境界？</p>
+      <p class="hint">选填，亦可留空由天命裁定</p>
+      <div class="realm-group" id="sword-realm-group" style="display:none;">
+        <div class="realm-group-title">剑心境界 (剑修专属)</div>
+        <div class="faction-grid">
+          <button class="faction-btn" onclick="selectSwordRealm(this,'入剑')">入剑</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'剑意')">剑意</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'剑势')">剑势</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'剑心')">剑心</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'剑心通明')">剑心通明</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'无我')">无我</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'无剑')">无剑</button>
+          <button class="faction-btn" onclick="selectSwordRealm(this,'无我无剑')">无我无剑</button>
+        </div>
+      </div>
+      <div class="realm-group" id="alchemy-realm-group" style="display:none;">
+        <div class="realm-group-title">丹道境界 (丹修专属)</div>
+        <div class="faction-grid">
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'炼精化气')">炼精化气</button>
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'炼气化神')">炼气化神</button>
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'炼神还虚')">炼神还虚</button>
+          <button class="faction-btn" onclick="selectAlchemyRealm(this,'炼虚合道')">炼虚合道</button>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(14)">返回</button><button class="btn btn-primary" onclick="saveSpecialRealm()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 16: 背景故事 -->
+  <div class="page" id="page-16">
+    <div class="page-inner">
+      <h2 class="page-title">前尘往事</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">每一位踏入仙途者，皆有一段不可磨灭的前尘。<br>或许是灭门之仇，或许是偶得奇缘。<br>此处可书写汝之来历，亦可留白，由天命安排。</p>
+      <textarea class="textarea-field" id="input-background" style="min-height:160px;" placeholder="在此书写汝之背景故事、特殊经历、目标...&#10;&#10;亦可不填，由天命安排前尘往事。"></textarea>
+      <div class="btn-row"><button class="btn btn-back" onclick="goBackFromBackground()">返回</button><button class="btn btn-primary" onclick="saveBackground()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 17: 开局方向 -->
+  <div class="page" id="page-17">
+    <div class="page-inner">
+      <h2 class="page-title">初入天地</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">仙途万千条，起始各不同。<br>汝期望以何种方式，踏入这方天地？<br>可选可不选，亦可自行描述。</p>
+      <div class="tag-grid" id="opening-tags">
+        <button class="tag-btn" onclick="toggleOpening(this,'宗门日常')">宗门日常</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'野外历练')">野外历练</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'城镇冒险')">城镇冒险</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'历练任务')">历练任务</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'特殊任务')">特殊任务</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'突破修为')">突破修为</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'秘境探索')">秘境探索</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'拍卖竞价')">拍卖竞价</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'宗门大比')">宗门大比</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'奇遇机缘')">奇遇机缘</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'生死危机')">生死危机</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'炼丹')">炼丹</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'炼器')">炼器</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'阵法布置')">阵法布置</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'符箓制作')">符箓制作</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'驭兽')">驭兽</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'狩猎')">狩猎</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'宗门战争')">宗门战争</button>
+        <button class="tag-btn" onclick="toggleOpening(this,'宗门职务')">宗门职务</button>
+      </div>
+      <textarea class="textarea-field" id="input-opening-desc" style="min-height:100px;" placeholder="在此补充你的开局构想...&#10;如: 我想从一场宗门大比开始，与宗门师妹对决"></textarea>
+      <div class="btn-row"><button class="btn btn-back" onclick="goToPage(16)">返回</button><button class="btn btn-primary" onclick="saveOpening()">下一步</button></div>
+    </div>
+  </div>
+
+  <!-- PAGE 18: 总览 -->
+  <div class="page" id="page-18">
+    <div class="page-inner">
+      <h2 class="page-title">天命昭示</h2>
+      <svg class="separator" viewBox="0 0 400 20" aria-hidden="true"><line x1="60" y1="10" x2="180" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/><circle cx="200" cy="10" r="2" fill="none" stroke="var(--gold)" stroke-width="0.5" opacity="0.4"/><line x1="220" y1="10" x2="340" y2="10" stroke="var(--gold)" stroke-width="0.5" opacity="0.3"/></svg>
+      <p class="page-guide">命数已定，天机昭然。<br>回首审视，确认无误后，便踏入这方天地。</p>
+      <div class="scroll-area">
+        <table class="summary-table" id="summary-table"></table>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goToPage(17)">返回</button>
+        <button class="btn btn-primary btn-start" onclick="onConfirm()">踏入天地</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-indicator" id="step-indicator"></div>
+</div>
+
+<script>
+  // ========== 角色创建向导 ==========
+  console.log("========== 角色创建向导 ==========");
+  console.log("脚本开始执行...");
+
+  var userData = {
+    name:'', gender:'', age:18,
+    rootGrade:'', rootElements:[], rootString:'', rootCustom:'',
+    constitution:'',
+    arts:[], realm:'凡人', faction:'散修',
+    gongfaName:'', gongfaGrade:'', artsDesc:'',
+    weaponName:'', weaponGrade:'', extraWeapons:'',
+    petName:'', petSpecies:'', petRank:'', petDesc:'',
+    fireName:'', fireRank:'', fireAttr:'',
+    domain:'中央神州', region:'', regionCustom:'', scene:'',
+    bodyState:'正常', resources:'',
+    swordRealm:'', alchemyRealm:'',
+    background:'',
+    openingTags:[], openingDesc:''
+  };
+
+  var currentPage = 0;
+  var totalPages = 19;
+  var pageSequence = [];
+
+  var regionData = {
+    '中央神州': ['万剑山脉','剑鸣城','丹霞灵原','百草集','星辰山脉','天机城','悬空山','天工坊','万仞寒山','临渊城','长春原','常春城','须弥山脉','万象城','灵霄山','青云山脉','天仙岭','西域草原','百兽城','炎狱山','熔金城','天启城','苍澜城','流金城','洛水城','墨家机关城','玄渊城','天脊山脉','赤魇沼','极乐幻城','玉清峰','天剑峰','并蒂湖','童真谷'],
+    '东荒妖域': ['万妖圣城','青丘国','迦楼罗天','十万大山','百兽谷','无尽林海','雷泽','云梦大泽','落日峡谷','绯山','啸风岭','黑松林'],
+    '北原魔土': ['天魔帝都','永夜城','焚魔焦土','禁锢要塞','血狱深原','泣血山脉','寂灭海','黑冰港','归墟魔渊','万法楼'],
+    '南疆巫地': ['巫神山','千虫市集','迷雾雨林','百毒沼泽','药神峰','玲珑绣阁','生命之森','蛊神谷','极乐宫','炎狱山','万蛊噬龙窟','黎母江'],
+    '西漠佛国': ['灵山','清泉镇','流沙之海','月牙泉','红砂城','望天绿洲','黑石深渊','万魔窟','万宝楼','幽冥魔殿','苦行沙海'],
+    '四海': ['东溟海','碧波城','蓬莱仙岛','西极海','南离海','珊瑚宫','火狱群岛','北冥海','幽落海','龙墓'],
+    '阴曹地府': ['黄泉路','忘川河','望乡台','阎罗殿','枉死城','六道轮回盘','鬼市'],
+    '东瀛': ['常夜幕府','伊势大社'],
+    '大魔国': ['魇皇宫殿','四王封地','魔民集市','炼狱竞技场','暗影森林']
+  };
+
+  function buildRegionButtons(domain) {
+    var c = document.getElementById('region-container');
+    c.innerHTML = '';
+    var regions = regionData[domain] || [];
+    for (var i = 0; i < regions.length; i++) {
+      var b = document.createElement('button');
+      b.className = 'faction-btn';
+      b.textContent = regions[i];
+      (function(r) {
+        b.setAttribute('onclick', "selectRegion(this,'" + r + "')");
+      })(regions[i]);
+      c.appendChild(b);
+    }
+  }
+
+  function selectDomain(el, v) {
+    var btns = document.querySelectorAll('#domain-grid .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.domain = v;
+    userData.region = '';
+    userData.regionCustom = '';
+    document.getElementById('region-custom').value = '';
+    buildRegionButtons(v);
+  }
+
+  function selectRegion(el, v) {
+    var btns = document.querySelectorAll('#region-container .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.region = v;
+    userData.regionCustom = '';
+    document.getElementById('region-custom').value = '';
+  }
+
+  function onCustomRegion() {
+    var v = document.getElementById('region-custom').value.trim();
+    if (v) {
+      var btns = document.querySelectorAll('#region-container .faction-btn');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+      userData.region = '';
+      userData.regionCustom = v;
+    }
+  }
+
+  function saveConstitution() {
+    userData.constitution = document.getElementById('input-constitution').value.trim();
+    goToPage(6);
+  }
+
+  function saveLocation() {
+    var c = document.getElementById('region-custom').value.trim();
+    if (c) userData.regionCustom = c;
+    userData.scene = document.getElementById('input-scene').value.trim();
+    goToPage(14);
+  }
+
+  function selectBodyState(el, v) {
+    var btns = document.querySelectorAll('#body-state-grid .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.bodyState = v;
+  }
+
+  function saveStatus() {
+    userData.resources = document.getElementById('input-resources').value.trim();
+    if (needSpecialRealmPage()) {
+      setupSpecialRealmPage();
+      goToPage(15);
+    } else {
+      goToPage(16);
+    }
+  }
+
+  function needSpecialRealmPage() {
+    return userData.arts.indexOf('剑修') >= 0 || userData.arts.indexOf('丹修') >= 0;
+  }
+
+  function setupSpecialRealmPage() {
+    document.getElementById('sword-realm-group').style.display = userData.arts.indexOf('剑修') >= 0 ? 'block' : 'none';
+    document.getElementById('alchemy-realm-group').style.display = userData.arts.indexOf('丹修') >= 0 ? 'block' : 'none';
+  }
+
+  function selectSwordRealm(el, v) {
+    var btns = document.querySelectorAll('#sword-realm-group .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.swordRealm = v;
+  }
+
+  function selectAlchemyRealm(el, v) {
+    var btns = document.querySelectorAll('#alchemy-realm-group .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.alchemyRealm = v;
+  }
+
+  function saveSpecialRealm() {
+    goToPage(16);
+  }
+
+  function goBackFromBackground() {
+    if (needSpecialRealmPage()) goToPage(15);
+    else goToPage(14);
+  }
+
+  function saveBackground() {
+    userData.background = document.getElementById('input-background').value.trim();
+    goToPage(17);
+  }
+
+  function saveGongfa() {
+    userData.gongfaName = document.getElementById('input-gongfa-name').value.trim();
+    userData.gongfaGrade = document.getElementById('input-gongfa-grade').value.trim();
+    userData.artsDesc = document.getElementById('input-arts-desc').value.trim();
+    goToPage(9);
+  }
+
+  function saveWeapon() {
+    userData.weaponName = document.getElementById('input-weapon-name').value.trim();
+    userData.weaponGrade = document.getElementById('input-weapon-grade').value.trim();
+    userData.extraWeapons = document.getElementById('input-extra-weapons').value.trim();
+    goToPage(10);
+  }
+
+  function savePet() {
+    userData.petName = document.getElementById('input-pet-name').value.trim();
+    userData.petSpecies = document.getElementById('input-pet-species').value.trim();
+    userData.petRank = document.getElementById('input-pet-rank').value.trim();
+    userData.petDesc = document.getElementById('input-pet-desc').value.trim();
+    goToPage(11);
+  }
+
+  function saveFire() {
+    userData.fireName = document.getElementById('input-fire-name').value.trim();
+    userData.fireRank = document.getElementById('input-fire-rank').value;
+    userData.fireAttr = document.getElementById('input-fire-attr').value.trim();
+    goToPage(12);
+  }
+
+  function toggleOpening(el, v) {
+    var idx = userData.openingTags.indexOf(v);
+    if (idx >= 0) { userData.openingTags.splice(idx, 1); el.classList.remove('selected'); }
+    else { userData.openingTags.push(v); el.classList.add('selected'); }
+  }
+
+  function saveOpening() {
+    userData.openingDesc = document.getElementById('input-opening-desc').value.trim();
+    goToPage(18);
+  }
+
+  function rebuildPageSequence() {
+    pageSequence = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+    if (needSpecialRealmPage()) pageSequence.push(15);
+    pageSequence.push(16,17,18);
+  }
+
+  function buildStepIndicator() {
+    var c = document.getElementById('step-indicator');
+    c.innerHTML = '';
+    for (var i = 0; i < totalPages; i++) {
+      var d = document.createElement('div');
+      d.className = 'step-dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('data-page', i);
+      c.appendChild(d);
+    }
+  }
+
+  function updateStepIndicator() {
+    rebuildPageSequence();
+    var dots = document.querySelectorAll('.step-dot');
+    for (var i = 0; i < dots.length; i++) {
+      var pg = parseInt(dots[i].getAttribute('data-page'));
+      dots[i].style.display = pageSequence.indexOf(pg) >= 0 ? '' : 'none';
+      dots[i].className = 'step-dot';
+      if (pg === currentPage) dots[i].className += ' active';
+      else if (pageSequence.indexOf(pg) < pageSequence.indexOf(currentPage)) dots[i].className += ' done';
+    }
+  }
+
+  function buildRealmButtons() {
+    var stages = ['前期','中期','后期','大圆满'];
+    var nums = '一二三四五六七八九十';
+    var groups = {
+      'realm-lianqi': [],
+      'realm-zhuji': [],
+      'realm-jindan': [],
+      'realm-yuanying': [],
+      'realm-huashen': [],
+      'realm-lianxu': [],
+      'realm-heti': [],
+      'realm-dacheng': [],
+      'realm-dujie': [],
+      'realm-zhenxian': []
+    };
+    for (var i = 0; i < 10; i++) groups['realm-lianqi'].push('炼气' + nums[i] + '层');
+    for (var s = 0; s < stages.length; s++) {
+      groups['realm-zhuji'].push('筑基' + stages[s]);
+      groups['realm-jindan'].push('金丹' + stages[s]);
+      groups['realm-yuanying'].push('元婴' + stages[s]);
+      groups['realm-huashen'].push('化神' + stages[s]);
+      groups['realm-lianxu'].push('炼虚' + stages[s]);
+      groups['realm-heti'].push('合体' + stages[s]);
+      groups['realm-dacheng'].push('大乘' + stages[s]);
+      groups['realm-dujie'].push('渡劫' + stages[s]);
+    }
+    for (var j = 0; j < 10; j++) groups['realm-zhenxian'].push('真仙境' + nums[j] + '重天');
+    groups['realm-zhenxian'].push('真仙境十重天大圆满');
+
+    var keys = ['realm-lianqi','realm-zhuji','realm-jindan','realm-yuanying','realm-huashen','realm-lianxu','realm-heti','realm-dacheng','realm-dujie','realm-zhenxian'];
+    for (var k = 0; k < keys.length; k++) {
+      var id = keys[k];
+      var realms = groups[id];
+      var c = document.getElementById(id);
+      if (!c) continue;
+      for (var r = 0; r < realms.length; r++) {
+        var b = document.createElement('button');
+        b.className = 'realm-btn';
+        b.textContent = realms[r];
+        (function(realm) {
+          b.setAttribute('onclick', "selectRealm(this,'" + realm + "')");
+        })(realms[r]);
+        c.appendChild(b);
+      }
+    }
+  }
+
+  function goToPage(n) {
+    console.log("goToPage:", n);
+    if (n < 0 || n >= totalPages) return;
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+    currentPage = n;
+    var page = document.getElementById('page-' + n);
+    if (page) {
+      page.classList.add('active');
+    }
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    updateStepIndicator();
+    if (n === 18) buildSummary();
+  }
+
+  function saveName() {
+    var v = document.getElementById('input-name').value.trim();
+    if (!v) { shakeEl('input-name'); return; }
+    userData.name = v;
+    goToPage(2);
+  }
+  function selectGender(el, v) {
+    var cards = document.querySelectorAll('#page-2 .card');
+    for (var i = 0; i < cards.length; i++) cards[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.gender = v;
+  }
+  function saveGender() { if (!userData.gender) return; goToPage(3); }
+  function saveAge() {
+    var v = parseInt(document.getElementById('input-age').value);
+    if (!v || v < 1) { shakeEl('input-age'); return; }
+    userData.age = Math.max(1, Math.min(100000, v));
+    goToPage(4);
+  }
+  function updateAgeHint(a) {
+    var h = document.getElementById('age-hint');
+    if (a <= 0) h.textContent = '';
+    else if (a < 15) h.textContent = '少年之躯，道心未定，前路漫漫';
+    else if (a < 20) h.textContent = '弱冠之年，正值修行入门之龄';
+    else if (a < 30) h.textContent = '而立之前，根基尚可塑造';
+    else if (a < 50) h.textContent = '半生已过，若非机缘，恐难入道';
+    else if (a < 100) h.textContent = '花甲之年，红尘阅尽，道心或更坚';
+    else if (a < 500) h.textContent = '百岁之躯，已非凡人寿数';
+    else if (a < 1000) h.textContent = '数百载岁月，当已历经数次蜕变';
+    else h.textContent = '千年之上，已是仙人之龄';
+  }
+  function selectRootGrade(el, v) {
+    var btns = document.querySelectorAll('#root-grade-options .realm-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.rootGrade = v;
+    document.getElementById('root-custom').value = '';
+    userData.rootCustom = '';
+    updateRootPreview();
+  }
+  function toggleElement(el, v) {
+    var idx = userData.rootElements.indexOf(v);
+    if (idx >= 0) { userData.rootElements.splice(idx, 1); el.classList.remove('selected'); }
+    else { userData.rootElements.push(v); el.classList.add('selected'); }
+    document.getElementById('root-custom').value = '';
+    userData.rootCustom = '';
+    updateRootPreview();
+  }
+  function onCustomRoot() {
+    userData.rootCustom = document.getElementById('root-custom').value.trim();
+    var btns1 = document.querySelectorAll('#root-grade-options .realm-btn');
+    for (var i = 0; i < btns1.length; i++) btns1[i].classList.remove('selected');
+    var btns2 = document.querySelectorAll('#root-element-grid .mini-card');
+    for (var j = 0; j < btns2.length; j++) btns2[j].classList.remove('selected');
+    userData.rootGrade = '';
+    userData.rootElements = [];
+    updateRootPreview();
+  }
+  function updateRootPreview() {
+    var p = document.getElementById('root-preview');
+    if (userData.rootCustom) {
+      var parsed = parseCustomRoot(userData.rootCustom);
+      p.textContent = parsed !== userData.rootCustom ? parsed + '  ← 已转换' : userData.rootCustom;
+      return;
+    }
+    if (!userData.rootGrade || userData.rootElements.length === 0) { p.textContent = ''; return; }
+    p.textContent = genRootStr(userData.rootGrade, userData.rootElements);
+  }
+  function genRootStr(g, els) {
+    var gn = g + '灵根', basic = ['金','木','水','火','土'], cnt = els.length;
+    var cn = {1:'单',2:'双',3:'三',4:'四',5:'五'};
+    if (cnt === 5) {
+      var allBasic = true;
+      for (var i = 0; i < els.length; i++) { if (basic.indexOf(els[i]) < 0) { allBasic = false; break; } }
+      if (allBasic) return gn + '·五行俱全';
+    }
+    if (cnt === 1) { return basic.indexOf(els[0]) >= 0 ? gn + '·单' + els[0] : gn + '·纯' + els[0]; }
+    return gn + '·' + els.join('') + (cn[cnt] || '');
+  }
+
+  function parseCustomRoot(input) {
+    if (!input) return '';
+    var s = input.trim();
+    if (/^[天地玄黄杂]灵根·/.test(s)) return s;
+    var gradeMap = {
+      '天品': '天', '天级': '天', '天阶': '天', '天': '天',
+      '地品': '地', '地级': '地', '地阶': '地', '地': '地',
+      '玄品': '玄', '玄级': '玄', '玄阶': '玄', '玄': '玄',
+      '黄品': '黄', '黄级': '黄', '黄阶': '黄', '黄': '黄',
+      '杂品': '杂', '杂级': '杂', '杂阶': '杂', '杂': '杂'
+    };
+    var basicElements = ['金', '木', '水', '火', '土'];
+    var mutantElements = ['雷', '冰', '风', '暗', '光', '空间', '时间', '星辰', '阴', '阳', '血', '毒', '魂', '混沌', '太极'];
+    var allElements = basicElements.concat(mutantElements);
+    var countWords = {'单': 1, '双': 2, '三': 3, '四': 4, '五': 5, '纯': 1};
+    var countToWord = {1: '单', 2: '双', 3: '三', 4: '四', 5: '五'};
+    var grade = '';
+    var elements = [];
+    var remaining = s;
+    var gradeKeys = Object.keys(gradeMap).sort(function(a, b) { return b.length - a.length; });
+    for (var i = 0; i < gradeKeys.length; i++) {
+      var gk = gradeKeys[i];
+      if (remaining.indexOf(gk) >= 0) {
+        grade = gradeMap[gk];
+        remaining = remaining.replace(gk, '');
+        break;
+      }
+    }
+    remaining = remaining.replace(/灵根/g, '').trim();
+    if (remaining.indexOf('五行俱全') >= 0 || remaining === '五行') {
+      if (!grade) grade = '杂';
+      return grade + '灵根·五行俱全';
+    }
+    var pureMatch = remaining.match(/纯(.+)/);
+    if (pureMatch) {
+      var pureEl = pureMatch[1].trim();
+      if (!grade) grade = '天';
+      return grade + '灵根·纯' + pureEl;
+    }
+    var countWordKeys = Object.keys(countWords);
+    for (var c = 0; c < countWordKeys.length; c++) {
+      remaining = remaining.replace(new RegExp(countWordKeys[c], 'g'), '');
+    }
+    remaining = remaining.trim();
+    for (var e = 0; e < allElements.length; e++) {
+      if (remaining.indexOf(allElements[e]) >= 0) {
+        elements.push(allElements[e]);
+        remaining = remaining.replace(allElements[e], '');
+      }
+    }
+    if (elements.length > 0) {
+      if (!grade) {
+        if (elements.length === 1) grade = '天';
+        else if (elements.length === 2) grade = '地';
+        else if (elements.length === 3) grade = '玄';
+        else if (elements.length === 4) grade = '黄';
+        else grade = '杂';
+      }
+      if (elements.length === 5) {
+        var allBasic = true;
+        for (var ab = 0; ab < elements.length; ab++) {
+          if (basicElements.indexOf(elements[ab]) < 0) { allBasic = false; break; }
+        }
+        if (allBasic) return grade + '灵根·五行俱全';
+      }
+      if (elements.length === 1) {
+        var isBasic = basicElements.indexOf(elements[0]) >= 0;
+        return grade + '灵根·' + (isBasic ? '单' : '纯') + elements[0];
+      }
+      return grade + '灵根·' + elements.join('') + (countToWord[elements.length] || '');
+    }
+    if (grade) {
+      remaining = remaining.trim();
+      if (remaining) return grade + '灵根·' + remaining;
+      return grade + '灵根';
+    }
+    return s;
+  }
+
+  function saveRoot() {
+    if (userData.rootCustom) {
+      userData.rootString = parseCustomRoot(userData.rootCustom);
+      goToPage(5);
+      return;
+    }
+    if (!userData.rootGrade || userData.rootElements.length === 0) return;
+    userData.rootString = genRootStr(userData.rootGrade, userData.rootElements);
+    goToPage(5);
+  }
+  function toggleArt(el, v) {
+    var idx = userData.arts.indexOf(v);
+    if (idx >= 0) { userData.arts.splice(idx, 1); el.classList.remove('selected'); }
+    else { userData.arts.push(v); el.classList.add('selected'); }
+  }
+  function saveArts() { goToPage(7); }
+  function selectRealm(el, v) {
+    var btns = document.querySelectorAll('.realm-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.realm = v;
+  }
+  function saveRealm() { if (!userData.realm) return; goToPage(8); }
+  function selectFaction(el, v) {
+    var btns = document.querySelectorAll('#faction-scroll .faction-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    el.classList.add('selected');
+    userData.faction = v;
+    document.getElementById('faction-custom').value = '';
+  }
+  function onCustomFaction() {
+    var v = document.getElementById('faction-custom').value.trim();
+    if (v) {
+      var btns = document.querySelectorAll('#faction-scroll .faction-btn');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+      userData.faction = v;
+    }
+  }
+  function saveFaction() {
+    var c = document.getElementById('faction-custom').value.trim();
+    if (c) userData.faction = c;
+    if (!userData.faction) return;
+    goToPage(13);
+  }
+
+  function buildSummary() {
+    var t = document.getElementById('summary-table');
+    var loc = userData.domain + (userData.regionCustom || userData.region ? ' -- ' + (userData.regionCustom || userData.region) : '') + (userData.scene ? ' -- ' + userData.scene : '');
+    var rows = [
+      ['道号', userData.name],
+      ['本相', userData.gender === '男' ? '乾 (男)' : '坤 (女)'],
+      ['年岁', userData.age + ' 岁'],
+      ['灵根', userData.rootString]
+    ];
+    if (userData.constitution) rows.push(['体质', userData.constitution]);
+    rows.push(['百艺', userData.arts.length > 0 ? userData.arts.join('、') : '暂无']);
+    rows.push(['修为', userData.realm]);
+    if (userData.gongfaName) rows.push(['功法', userData.gongfaName + (userData.gongfaGrade ? ' (' + userData.gongfaGrade + ')' : '')]);
+    if (userData.artsDesc) rows.push(['术法', userData.artsDesc.length > 40 ? userData.artsDesc.substring(0,40) + '...' : userData.artsDesc]);
+    if (userData.weaponName) rows.push(['法宝', userData.weaponName + (userData.weaponGrade ? ' (' + userData.weaponGrade + ')' : '')]);
+    if (userData.extraWeapons) rows.push(['其他', userData.extraWeapons.length > 40 ? userData.extraWeapons.substring(0,40) + '...' : userData.extraWeapons]);
+    if (userData.petName) {
+      var petStr = userData.petName;
+      if (userData.petSpecies) petStr += ' (' + userData.petSpecies + ')';
+      if (userData.petRank) petStr += ' [' + userData.petRank + ']';
+      rows.push(['灵宠', petStr]);
+    }
+    if (userData.fireName) {
+      var fireStr = userData.fireName;
+      if (userData.fireRank) fireStr += ' (' + userData.fireRank + ')';
+      if (userData.fireAttr) fireStr += ' [' + userData.fireAttr + ']';
+      rows.push(['异火', fireStr]);
+    }
+    rows.push(['势力', userData.faction]);
+    rows.push(['方位', loc]);
+    rows.push(['身态', userData.bodyState]);
+    if (userData.resources) rows.push(['资源', userData.resources]);
+    if (userData.swordRealm) rows.push(['剑心', userData.swordRealm]);
+    if (userData.alchemyRealm) rows.push(['丹道', userData.alchemyRealm]);
+    if (userData.background) rows.push(['前尘', userData.background.length > 60 ? userData.background.substring(0,60) + '...' : userData.background]);
+    if (userData.openingTags.length > 0) rows.push(['开局', userData.openingTags.join('、')]);
+    if (userData.openingDesc) rows.push(['构想', userData.openingDesc.length > 60 ? userData.openingDesc.substring(0,60) + '...' : userData.openingDesc]);
+    var html = '';
+    for (var i = 0; i < rows.length; i++) html += '<tr><td>' + rows[i][0] + '</td><td>' + rows[i][1] + '</td></tr>';
+    t.innerHTML = html;
+  }
+
+  function formatUserDataAsContent() {
+    var lines = [];
+    lines.push('[用户角色信息]');
+    lines.push('道号: ' + userData.name);
+    lines.push('性别: ' + (userData.gender === '男' ? '男(乾)' : '女(坤)'));
+    lines.push('年岁: ' + userData.age);
+    lines.push('灵根: ' + userData.rootString);
+    if (userData.constitution) lines.push('体质: ' + userData.constitution);
+    if (userData.arts.length > 0) lines.push('修行百艺: ' + userData.arts.join('、'));
+    else lines.push('修行百艺: 暂无');
+    lines.push('修为境界: ' + userData.realm);
+    lines.push('所属势力: ' + userData.faction);
+    var loc = userData.domain
+      + (userData.regionCustom || userData.region ? ' - ' + (userData.regionCustom || userData.region) : '')
+      + (userData.scene ? ' - ' + userData.scene : '');
+    lines.push('当前位置: ' + loc);
+    lines.push('身体状态: ' + userData.bodyState);
+    if (userData.gongfaName) lines.push('主修功法: ' + userData.gongfaName + (userData.gongfaGrade ? ' (' + userData.gongfaGrade + ')' : ''));
+    if (userData.artsDesc) lines.push('已习术法: ' + userData.artsDesc);
+    if (userData.weaponName) lines.push('本命法宝: ' + userData.weaponName + (userData.weaponGrade ? ' (' + userData.weaponGrade + ')' : ''));
+    if (userData.extraWeapons) lines.push('其他法宝: ' + userData.extraWeapons);
+    if (userData.petName) {
+      var petInfo = userData.petName;
+      if (userData.petSpecies) petInfo += '，品种: ' + userData.petSpecies;
+      if (userData.petRank) petInfo += '，阶级: ' + userData.petRank;
+      if (userData.petDesc) petInfo += '，描述: ' + userData.petDesc;
+      lines.push('灵宠: ' + petInfo);
+    }
+    if (userData.fireName) {
+      var fireInfo = userData.fireName;
+      if (userData.fireRank) fireInfo += '，品级: ' + userData.fireRank;
+      if (userData.fireAttr) fireInfo += '，属性: ' + userData.fireAttr;
+      lines.push('异火: ' + fireInfo);
+    }
+    if (userData.resources) lines.push('初始资源: ' + userData.resources);
+    if (userData.swordRealm) lines.push('剑心境界: ' + userData.swordRealm);
+    if (userData.alchemyRealm) lines.push('丹道境界: ' + userData.alchemyRealm);
+    if (userData.background) lines.push('背景故事: ' + userData.background);
+    if (userData.openingTags.length > 0) lines.push('开局方向: ' + userData.openingTags.join('、'));
+    if (userData.openingDesc) lines.push('开局构想: ' + userData.openingDesc);
+    return lines.join('\n');
+  }
+
+  function formatUserDataAsMessage() {
+    var lines = [];
+    lines.push('我的角色信息如下:');
+    lines.push('');
+    lines.push('道号: ' + userData.name);
+    lines.push('性别: ' + (userData.gender === '男' ? '男(乾)' : '女(坤)'));
+    lines.push('年岁: ' + userData.age + '岁');
+    lines.push('灵根: ' + userData.rootString);
+    if (userData.constitution) lines.push('体质: ' + userData.constitution);
+    if (userData.arts.length > 0) lines.push('修行百艺: ' + userData.arts.join('、'));
+    else lines.push('修行百艺: 暂无');
+    lines.push('修为境界: ' + userData.realm);
+    lines.push('所属势力: ' + userData.faction);
+    var loc = userData.domain
+      + (userData.regionCustom || userData.region ? ' - ' + (userData.regionCustom || userData.region) : '')
+      + (userData.scene ? ' - ' + userData.scene : '');
+    lines.push('当前位置: ' + loc);
+    lines.push('身体状态: ' + userData.bodyState);
+    if (userData.gongfaName) lines.push('主修功法: ' + userData.gongfaName + (userData.gongfaGrade ? ' (' + userData.gongfaGrade + ')' : ''));
+    if (userData.artsDesc) lines.push('已习术法: ' + userData.artsDesc);
+    if (userData.weaponName) lines.push('本命法宝: ' + userData.weaponName + (userData.weaponGrade ? ' (' + userData.weaponGrade + ')' : ''));
+    if (userData.extraWeapons) lines.push('其他法宝: ' + userData.extraWeapons);
+    if (userData.petName) {
+      var petInfo = userData.petName;
+      if (userData.petSpecies) petInfo += '（' + userData.petSpecies + '）';
+      if (userData.petRank) petInfo += '，' + userData.petRank;
+      if (userData.petDesc) petInfo += '，' + userData.petDesc;
+      lines.push('灵宠: ' + petInfo);
+    }
+    if (userData.fireName) {
+      var fireInfo = userData.fireName;
+      if (userData.fireRank) fireInfo += '（' + userData.fireRank + '）';
+      if (userData.fireAttr) fireInfo += '，属性: ' + userData.fireAttr;
+      lines.push('异火: ' + fireInfo);
+    }
+    if (userData.resources) lines.push('初始资源: ' + userData.resources);
+    if (userData.swordRealm) lines.push('剑心境界: ' + userData.swordRealm);
+    if (userData.alchemyRealm) lines.push('丹道境界: ' + userData.alchemyRealm);
+    if (userData.background) {
+      lines.push('');
+      lines.push('背景故事: ' + userData.background);
+    }
+    if (userData.openingTags.length > 0) lines.push('开局方向: ' + userData.openingTags.join('、'));
+    if (userData.openingDesc) lines.push('开局构想: ' + userData.openingDesc);
+    lines.push('');
+    lines.push('请根据以上信息，开始这段修仙故事。');
+    return lines.join('\n');
+  }
+
+  function onConfirm() {
+    console.log("onConfirm 被调用");
+    if (typeof getCharWorldbookNames === 'undefined') {
+      alert('当前未在酒馆环境中运行，无法执行写入操作。\n请将此页面作为酒馆前端界面使用。');
+      return;
+    }
+
+    var charWB = getCharWorldbookNames('current');
+    var wbName = charWB.primary;
+
+    if (!wbName) {
+      alert('当前角色卡未绑定主世界书，无法写入用户信息条目。\n请先为角色卡绑定一本世界书。');
+      return;
+    }
+
+    deleteWorldbookEntries(wbName, function(entry) {
+      return entry.name === '用户信息';
+    }).then(function() {
+      return createWorldbookEntries(wbName, [{
+        name: '用户信息',
+        enabled: true,
+        strategy: {
+          type: 'constant',
+          keys: [],
+          keys_secondary: { logic: 'and_any', keys: [] },
+          scan_depth: 'same_as_global'
+        },
+        position: {
+          type: 'before_character_definition',
+          role: 'system',
+          depth: 0,
+          order: 1
+        },
+        content: formatUserDataAsContent(),
+        probability: 100,
+        recursion: {
+          prevent_incoming: true,
+          prevent_outgoing: true,
+          delay_until: null
+        },
+        effect: {
+          sticky: null,
+          cooldown: null,
+          delay: null
+        }
+      }]);
+    }).then(function() {
+      return createChatMessages([{
+        role: 'user',
+        message: formatUserDataAsMessage()
+      }]);
+    }).then(function() {
+      return triggerSlash('/trigger');
+    }).catch(function(err) {
+      alert('操作失败: ' + (err.message || String(err)));
+      console.error('[角色创建] onConfirm error:', err);
+    });
+  }
+
+  function shakeEl(id) {
+    var el = document.getElementById(id);
+    el.style.borderColor = '#8b4513';
+    el.style.transition = 'border-color 0.1s';
+    setTimeout(function() { el.style.borderColor = ''; }, 600);
+    el.focus();
+  }
+
+  // ========== 初始化 ==========
+  function init() {
+    console.log("init() 被调用");
+    buildRealmButtons();
+    buildRegionButtons('中央神州');
+    rebuildPageSequence();
+    buildStepIndicator();
+    updateStepIndicator();
+    console.log("初始化完成");
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  console.log("DOMContentLoaded 已注册");
+</script>
+</body>
+</html>
+```

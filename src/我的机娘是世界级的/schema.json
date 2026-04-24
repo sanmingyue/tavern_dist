@@ -1,0 +1,378 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "世界": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "当前时间": {
+          "type": "string"
+        },
+        "当前地点": {
+          "type": "string"
+        },
+        "_当前状态": {
+          "default": "日常",
+          "type": "string",
+          "enum": [
+            "日常",
+            "赛前准备",
+            "比赛中"
+          ]
+        },
+        "天气": {
+          "default": "晴",
+          "type": "string"
+        }
+      }
+    },
+    "主角": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "车队": {
+          "default": "独立",
+          "type": "string"
+        },
+        "_赛事等级": {
+          "default": "T5",
+          "$ref": "#/$defs/__schema0"
+        },
+        "$赛季积分": {
+          "type": "number"
+        },
+        "$信用点数": {
+          "type": "number"
+        },
+        "$强化点数": {
+          "type": "number"
+        },
+        "$改件仓库": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "外形改件": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema1"
+              }
+            },
+            "技能改件": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema2"
+              }
+            },
+            "强化物品": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "description": "强化物品ID"
+              },
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "$已解锁等级": {
+          "default": "T5",
+          "$ref": "#/$defs/__schema0"
+        },
+        "$晋级赛通过记录": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "机娘库": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "description": "机娘名"
+      },
+      "additionalProperties": {
+        "default": {},
+        "type": "object",
+        "properties": {
+          "_赛车型号": {
+            "type": "string"
+          },
+          "_赛车类型": {
+            "type": "string"
+          },
+          "_天赋维度": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "加速度",
+                "极速",
+                "操控",
+                "漂移",
+                "耐久"
+              ]
+            }
+          },
+          "状态": {
+            "default": "正常",
+            "type": "string",
+            "enum": [
+              "正常",
+              "受伤",
+              "维修中"
+            ]
+          },
+          "_五维": {
+            "$ref": "#/$defs/__schema3"
+          },
+          "_外形改件": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema1"
+            }
+          },
+          "_技能改件": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/__schema2"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "共鸣": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "_技能名": {
+                "default": "未激活",
+                "type": "string"
+              },
+              "_技能描述": {
+                "type": "string"
+              },
+              "_已激活": {
+                "type": "boolean"
+              },
+              "当前共鸣值": {
+                "type": "number"
+              },
+              "_共鸣上限": {
+                "default": 100,
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "当前比赛": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "_赛事名称": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "_赛事类型": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "场地赛",
+                "街道赛",
+                "拉力赛",
+                "漂移赛",
+                "耐力赛"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "_赛事级别": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema0"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "当前圈数": {
+          "type": "number"
+        },
+        "总圈数": {
+          "type": "number"
+        },
+        "当前排名": {
+          "type": "number"
+        },
+        "_搭档机娘": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "_参赛五维": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "赛道状态": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "对手": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "description": "对手名"
+          },
+          "additionalProperties": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "车手名": {
+                "type": "string"
+              },
+              "机娘名": {
+                "type": "string"
+              },
+              "当前排名": {
+                "type": "number"
+              },
+              "参赛五维": {
+                "$ref": "#/$defs/__schema3"
+              },
+              "共鸣技能": {
+                "default": "未知",
+                "type": "string"
+              },
+              "技能已使用": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "__schema0": {
+      "type": "string",
+      "enum": [
+        "T5",
+        "T4",
+        "T3",
+        "T2",
+        "T1",
+        "T0"
+      ]
+    },
+    "__schema1": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "名称": {
+          "type": "string"
+        },
+        "类型": {
+          "default": "花纹",
+          "type": "string",
+          "enum": [
+            "尾翼",
+            "花纹",
+            "灯组",
+            "排气",
+            "空力套件",
+            "轮毂",
+            "赛车服",
+            "核心配色"
+          ]
+        },
+        "描述": {
+          "type": "string"
+        }
+      }
+    },
+    "__schema2": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "名称": {
+          "type": "string"
+        },
+        "效果方向": {
+          "default": "持续微调",
+          "type": "string",
+          "enum": [
+            "持续微调",
+            "反噬缓和",
+            "充能辅助",
+            "附带光效"
+          ]
+        },
+        "描述": {
+          "type": "string"
+        },
+        "是否黑市": {
+          "type": "boolean"
+        }
+      }
+    },
+    "__schema3": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "加速度": {
+          "type": "number"
+        },
+        "极速": {
+          "type": "number"
+        },
+        "操控": {
+          "type": "number"
+        },
+        "漂移": {
+          "type": "number"
+        },
+        "耐久": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

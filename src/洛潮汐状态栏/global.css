@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300;400;500;700&family=Noto+Serif+JP:wght@300;400;500&family=Caveat:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ====== 潮汐配色 —— 八月的海与天 ====== */
+  --tide-deep: #2c4a6e;          /* 深海蓝：标题、重要文字 */
+  --tide-mid: #5b8fb9;           /* 海面蓝：次要元素 */
+  --tide-light: #a8d4e6;         /* 浅海蓝：装饰线、边框 */
+  --tide-foam: #daeef7;          /* 海泡沫：hover、浅色背景 */
+  --tide-sky: #e8f4f8;           /* 晴空：卡片内底色 */
+  --tide-cloud: #f5fafc;         /* 白云：卡片底色 */
+  --tide-white: #ffffff;         /* 纯白 */
+
+  --sunset-warm: #e8a87c;        /* 夕阳暖橙 */
+  --sunset-pink: #d4878f;        /* 晚霞粉 */
+  --sunset-gold: #f0c987;        /* 暮光金 */
+
+  --sand-dark: #8b7e6a;          /* 湿沙：次要文字 */
+  --sand-light: #c4b89a;         /* 干沙：辅助线 */
+  --sand-cream: #f5f0e6;         /* 沙滩色 */
+
+  --night-deep: #1a2a3a;         /* 夜海 */
+  --night-star: #c9d6df;         /* 星光 */
+
+  --wish-pending: #b8d4e6;       /* 愿望：未开始 */
+  --wish-active: #5b8fb9;        /* 愿望：进行中 */
+  --wish-done: #e8a87c;          /* 愿望：已完成 */
+
+  --text-primary: #2c3e50;       /* 主文字 */
+  --text-secondary: #6b8299;     /* 次要文字 */
+  --text-tertiary: #9bb0c4;      /* 更淡的文字 */
+
+  /* ====== 字体 ====== */
+  --font-main: 'Zen Maru Gothic', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  --font-serif: 'Noto Serif JP', 'SimSun', 'STSong', serif;
+  --font-handwrite: 'Ma Shan Zheng', 'Caveat', 'STXingkai', 'KaiTi', cursive;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  background: transparent;
+  line-height: 1.7;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====== 滚动条 ====== */
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tide-light);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tide-mid);
+}
+
+/* ====== 动画 ====== */
+@keyframes tideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tidePulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}

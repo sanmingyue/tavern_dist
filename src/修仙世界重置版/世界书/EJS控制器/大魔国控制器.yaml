@@ -1,0 +1,118 @@
+@@preprocessing
+<%/* 大魔国控制器
+ * 根据位置变量动态激活大魔国相关世界书条目
+ * 会跳过已被扫描控制器激活的条目
+ */-%>
+<%
+if (typeof mainArea === 'undefined') var mainArea = getvar('stat_data.大区域', { defaults: '中央神州' });
+if (typeof subArea === 'undefined') var subArea = getvar('stat_data.子区域', { defaults: '' });
+if (typeof place === 'undefined') var place = getvar('stat_data.具体地点', { defaults: '' });
+if (typeof _scanActivated === 'undefined') var _scanActivated = [];
+function _notScanned(name) { return _scanActivated.indexOf(name) === -1; }
+-%>
+<% if (mainArea === '大魔国') { %>
+<%- await getwi('地图_大魔国') %>
+<%- await getwi('大魔国散修与凡人') %>
+<%- await getwi('入口裂隙') %>
+<%- await getwi('四王议事殿') %>
+<%- await getwi('废墟区') %>
+<%- await getwi('深渊古窟') %>
+<%- await getwi('万梦迷宫') %>
+
+<% if (!subArea) { %>
+<%/* 大区域级: 加载所有原始总览条目 */%>
+<%- await getwi('大魔国功法总览') %>
+<%- await getwi('大魔国天材地宝') %>
+<%- await getwi('大魔国谋生指南') %>
+<%- await getwi('大魔国物价总览') %>
+<% } else { %>
+<%/* 子区域级: 加载通用/流通拆分条目 */%>
+<%- await getwi('大魔国流通功法') %>
+<%- await getwi('大魔国秘境残卷') %>
+<%- await getwi('大魔国通用天材地宝') %>
+<%- await getwi('大魔国通用谋生指南') %>
+<%- await getwi('大魔国通用物价') %>
+
+<% if (subArea === '血战城' && _notScanned('血战城_区域总览')) { %>
+<%- await getwi('血战城_区域总览') %>
+<%- await getwi('大魔国血战城功法') %>
+<%- await getwi('大魔国血战城天材地宝') %>
+<%- await getwi('大魔国四王领地谋生') %>
+<%- await getwi('大魔国四王领地物价') %>
+<%- await getwi('裂血试炼场') %>
+<%- await getwi('铁血军营') %>
+<%- await getwi('血祭祀院') %>
+<%- await getwi('血矿场') %>
+<%- await getwi('战皇台') %>
+<% if (place) { %>
+<% if (_notScanned('蚀夜')) { %><%- await getwi('蚀夜') %><% } %>
+<% if (_notScanned('苏雪')) { %><%- await getwi('苏雪') %><% } %>
+<% } %>
+
+<% } else if (subArea === '冥魂域' && _notScanned('冥魂域_区域总览')) { %>
+<%- await getwi('冥魂域_区域总览') %>
+<%- await getwi('大魔国冥魂域功法') %>
+<%- await getwi('大魔国冥魂域天材地宝') %>
+<%- await getwi('大魔国四王领地谋生') %>
+<%- await getwi('大魔国四王领地物价') %>
+<%- await getwi('魂归所') %>
+<%- await getwi('魂籍殿') %>
+<%- await getwi('噬魂灯塔') %>
+<%- await getwi('亡灵营垒') %>
+<%- await getwi('铸魂坊') %>
+<% if (place) { %>
+<% if (_notScanned('幽临')) { %><%- await getwi('幽临') %><% } %>
+<% } %>
+
+<% } else if (subArea === '焰魂圣域' && _notScanned('焰魂圣域_区域总览')) { %>
+<%- await getwi('焰魂圣域_区域总览') %>
+<%- await getwi('大魔国焰魂圣域功法') %>
+<%- await getwi('大魔国焰魂圣域天材地宝') %>
+<%- await getwi('大魔国四王领地谋生') %>
+<%- await getwi('大魔国四王领地物价') %>
+<%- await getwi('焚魂祭坛') %>
+<%- await getwi('净化之火广场') %>
+<%- await getwi('焰魂大教堂') %>
+<%- await getwi('焰魂锻造坊') %>
+<%- await getwi('朝圣者营地') %>
+<% if (place) { %>
+<% if (_notScanned('血鸦')) { %><%- await getwi('血鸦') %><% } %>
+<% } %>
+
+<% } else if (subArea === '梦魇庭' && _notScanned('梦魇庭_区域总览')) { %>
+<%- await getwi('梦魇庭_区域总览') %>
+<%- await getwi('大魔国梦魇庭功法') %>
+<%- await getwi('大魔国梦魇庭天材地宝') %>
+<%- await getwi('大魔国四王领地谋生') %>
+<%- await getwi('大魔国四王领地物价') %>
+<%- await getwi('百梦阁') %>
+<%- await getwi('幻花集市') %>
+<%- await getwi('幻音回廊') %>
+<%- await getwi('梦境深渊') %>
+<%- await getwi('梦魇宫殿') %>
+<% if (place) { %>
+<% if (_notScanned('璃眠')) { %><%- await getwi('璃眠') %><% } %>
+<% } %>
+
+<% } else if (subArea === '渊煞暗域' && _notScanned('渊煞暗域_区域总览')) { %>
+<%- await getwi('渊煞暗域_区域总览') %>
+<%- await getwi('大魔国渊煞暗域功法') %>
+<%- await getwi('大魔国渊煞暗域天材地宝') %>
+<%- await getwi('大魔国四王领地谋生') %>
+<%- await getwi('大魔国四王领地物价') %>
+<%- await getwi('大魔国暗域集市物价') %>
+<%- await getwi('暗域集市') %>
+<%- await getwi('弃置囚牢') %>
+<%- await getwi('噬魂囚阁(渊煞)') %>
+<% if (place) { %>
+<% if (_notScanned('渊煞')) { %><%- await getwi('渊煞') %><% } %>
+<% if (_notScanned('赵曦月(渊煞)')) { %><%- await getwi('赵曦月(渊煞)') %><% } %>
+<% } %>
+
+<% } else { %>
+<%/* 其他子区域(废墟区、边荒等) */%>
+<%- await getwi('大魔国废墟区谋生') %>
+<% } %>
+
+<% } %>
+<% } %>

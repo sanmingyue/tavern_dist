@@ -1,0 +1,300 @@
+@@preprocessing
+<%
+/* ===== 中央神州控制器 =====
+ * 仅当大区域为"中央神州"时激活
+ * 大区域级(无子区域): 地图 + 完整总览(功法/天材地宝/谋生/物价) + 散修NPC
+ * 子区域级: 地图 + 子区域对应的拆分条目(功法/天材地宝/谋生) + 通用条目(流通功法/通用天材地宝/通用谋生) + 子区域总览/城镇 + 散修与凡人
+ * 具体地点级: 额外激活具体地点(宗门/势力) + 该地点NPC
+ * 会跳过已被扫描控制器激活的条目
+ */
+if (typeof mainArea === 'undefined') var mainArea = getvar('stat_data.大区域', { defaults: '中央神州' });
+if (typeof subArea === 'undefined') var subArea = getvar('stat_data.子区域', { defaults: '' });
+if (typeof place === 'undefined') var place = getvar('stat_data.具体地点', { defaults: '' });
+if (typeof _scanActivated === 'undefined') var _scanActivated = [];
+function _notScanned(name) { return _scanActivated.indexOf(name) === -1; }
+-%>
+<% if (mainArea === '中央神州') { %>
+<%/* === 始终激活: 地图 === */%>
+<%- await getwi('地图_中央神州') %>
+
+<% if (!subArea) { %>
+<%/* === 大区域级: 无子区域时激活完整总览 + 散修NPC === */%>
+<%- await getwi('中央神州功法总览') %>
+<%- await getwi('中央神州天材地宝') %>
+<%- await getwi('中央神州谋生指南') %>
+<%- await getwi('中央神州物价总览') %>
+<%- await getwi('中央神州散修与凡人') %>
+<% if (_notScanned('玄清')) { %><%- await getwi('玄清') %><% } %>
+<% if (_notScanned('秦无伤')) { %><%- await getwi('秦无伤') %><% } %>
+<% if (_notScanned('柳白衣')) { %><%- await getwi('柳白衣') %><% } %>
+<% if (_notScanned('聆溪')) { %><%- await getwi('聆溪') %><% } %>
+<% } %>
+
+<% if (subArea) { %>
+<%/* === 子区域级: 加载通用条目 + 散修与凡人 === */%>
+<%- await getwi('流通功法') %>
+<%- await getwi('通用天材地宝') %>
+<%- await getwi('通用谋生指南') %>
+<%- await getwi('中央神州散修与凡人') %>
+
+<% if (subArea === '万剑山脉') { %>
+<%- await getwi('万剑山脉功法') %>
+<%- await getwi('万剑山脉天材地宝') %>
+<%- await getwi('万剑山脉谋生指南') %>
+<%- await getwi('万剑山脉_区域总览') %>
+<%- await getwi('剑鸣城') %>
+<%- await getwi('红尘酒家') %>
+<% if (place) { %>
+<% if (place === '剑宗' && _notScanned('剑宗')) { %>
+<%- await getwi('剑宗') %>
+<%- await getwi('殷冬雪') %>
+<%- await getwi('卫疏影') %>
+<%- await getwi('姜千青') %>
+<%- await getwi('叶霜寒') %>
+<%- await getwi('谢云流') %>
+<% } %>
+<% if ((place === '洛红尘' || place === '红尘酒家') && _notScanned('洛红尘')) { %>
+<%- await getwi('洛红尘') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '丹霞灵原') { %>
+<%- await getwi('丹霞灵原功法') %>
+<%- await getwi('丹霞灵原天材地宝') %>
+<%- await getwi('丹霞灵原谋生指南') %>
+<%- await getwi('丹霞灵原_区域总览') %>
+<%- await getwi('常春城') %>
+<%- await getwi('百草集') %>
+<% if (_notScanned('采薇')) { %><%- await getwi('采薇') %><% } %>
+<% if (place) { %>
+<% if (place === '丹宗' && _notScanned('丹宗')) { %>
+<%- await getwi('丹宗') %>
+<%- await getwi('云蕴') %>
+<%- await getwi('凌菲') %>
+<% } else if (place === '百草庐' && _notScanned('百草庐')) { %>
+<%- await getwi('百草庐') %>
+<%- await getwi('苏沐青') %>
+<%- await getwi('叶清') %>
+<%- await getwi('萧千翎') %>
+<%- await getwi('姜小满') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '北境寒域') { %>
+<%- await getwi('北境寒域功法') %>
+<%- await getwi('北境寒域天材地宝') %>
+<%- await getwi('北境寒域谋生指南') %>
+<%- await getwi('北境寒域_区域总览') %>
+<%- await getwi('临渊城') %>
+<%- await getwi('青云城') %>
+<%- await getwi('天仙镇') %>
+<% if (place) { %>
+<% if (place === '凛霜剑门' && _notScanned('凛霜剑门')) { %>
+<%- await getwi('凛霜剑门') %>
+<%- await getwi('顾千雪') %>
+<%- await getwi('林寒月') %>
+<%- await getwi('苏清河') %>
+<%- await getwi('叶冰心') %>
+<% } else if (place === '青云宗' && _notScanned('青云宗')) { %>
+<%- await getwi('青云宗') %>
+<%- await getwi('风烬雪') %>
+<%- await getwi('柳如烟') %>
+<%- await getwi('青云道人') %>
+<% } else if (place === '天仙门' && _notScanned('天仙门')) { %>
+<%- await getwi('天仙门') %>
+<%- await getwi('黎萱') %>
+<%- await getwi('陆沉') %>
+<%- await getwi('天仙真人') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '天脊中枢') { %>
+<%- await getwi('天脊中枢功法') %>
+<%- await getwi('天脊中枢天材地宝') %>
+<%- await getwi('天脊中枢谋生指南') %>
+<%- await getwi('天脊中枢_区域总览') %>
+<%- await getwi('万象城') %>
+<% if (place) { %>
+<% if (place === '天剑圣地' && _notScanned('天剑圣地')) { %>
+<%- await getwi('天剑圣地') %>
+<%- await getwi('萧衍') %>
+<%- await getwi('顾清霜') %>
+<%- await getwi('梦涵') %>
+<%- await getwi('柳飞絮') %>
+<%- await getwi('神斩') %>
+<%- await getwi('勿忘') %>
+<%- await getwi('天剑苏媚儿') %>
+<% } else if (place === '玉清道宫' && _notScanned('玉清道宫')) { %>
+<%- await getwi('玉清道宫') %>
+<%- await getwi('玄阳真人') %>
+<%- await getwi('凌风') %>
+<%- await getwi('洛溪月') %>
+<%- await getwi('姚江雪') %>
+<% } else if (place === '万法宗' && _notScanned('万法宗')) { %>
+<%- await getwi('万法宗') %>
+<%- await getwi('沈微澜') %>
+<%- await getwi('洛璃') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '星辰山脉') { %>
+<%- await getwi('星辰山脉功法') %>
+<%- await getwi('星辰山脉天材地宝') %>
+<%- await getwi('星辰山脉谋生指南') %>
+<%- await getwi('星辰山脉_区域总览') %>
+<%- await getwi('天机城') %>
+<%- await getwi('天工坊') %>
+<%- await getwi('星落镇') %>
+<% if (place) { %>
+<% if (place === '太虚宗' && _notScanned('太虚宗')) { %>
+<%- await getwi('太虚宗') %>
+<%- await getwi('曲十一') %>
+<%- await getwi('楚星辰') %>
+<%- await getwi('楚瑶') %>
+<% } else if (place === '玄天宗' && _notScanned('玄天宗')) { %>
+<%- await getwi('玄天宗') %>
+<%- await getwi('玄天真君') %>
+<%- await getwi('星渊') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '天启城域') { %>
+<%- await getwi('天启城域功法') %>
+<%- await getwi('天启城域天材地宝') %>
+<%- await getwi('天启城域谋生指南') %>
+<%- await getwi('天启城域_区域总览') %>
+<%- await getwi('天启城') %>
+<%- await getwi('流金城') %>
+<%- await getwi('洛水城') %>
+<% if (place) { %>
+<% if (place === '合欢宗' && _notScanned('合欢宗')) { %>
+<%- await getwi('合欢宗') %>
+<%- await getwi('九娘') %>
+<%- await getwi('柳倾城') %>
+<%- await getwi('宋馨') %>
+<%- await getwi('沈艺清') %>
+<% } else if (place === '天命神教' && _notScanned('天命神教')) { %>
+<%- await getwi('天命神教') %>
+<%- await getwi('司命玄') %>
+<%- await getwi('叶非凡') %>
+<%- await getwi('容月') %>
+<%- await getwi('曦瑶') %>
+<% } else if (place === '大雍皇朝' && _notScanned('大雍皇朝')) { %>
+<%- await getwi('大雍皇朝') %>
+<%- await getwi('姬皓月') %>
+<%- await getwi('姬清舞') %>
+<%- await getwi('姬灵均') %>
+<%- await getwi('姬瑶华') %>
+<%- await getwi('方巧儿') %>
+<%- await getwi('赵长安') %>
+<%- await getwi('赵铁柱') %>
+<%- await getwi('元宝') %>
+<% } else if (place === '墨家机关城' && _notScanned('墨家机关城')) { %>
+<%- await getwi('墨家机关城') %>
+<%- await getwi('凰') %>
+<%- await getwi('巨子') %>
+<%- await getwi('墨染') %>
+<%- await getwi('沈墨') %>
+<% } else if (place === '万宝商会' && _notScanned('万宝商会')) { %>
+<%- await getwi('万宝商会') %>
+<%- await getwi('萧远山') %>
+<%- await getwi('林月华') %>
+<%- await getwi('萧凝霜') %>
+<%- await getwi('周老三') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '西域草原') { %>
+<%- await getwi('西域草原功法') %>
+<%- await getwi('西域草原天材地宝') %>
+<%- await getwi('西域草原谋生指南') %>
+<%- await getwi('西域草原_区域总览') %>
+<%- await getwi('苍澜城') %>
+<%- await getwi('百兽城') %>
+<% if (place) { %>
+<% if (place === '苍澜国' && _notScanned('苍澜国')) { %>
+<%- await getwi('苍澜国') %>
+<%- await getwi('苍曜·景祁') %>
+<%- await getwi('苍曜·璃音') %>
+<%- await getwi('苍曜·锦程') %>
+<%- await getwi('苍曜·无瑜') %>
+<%- await getwi('炎祯') %>
+<%- await getwi('苏念卿') %>
+<%- await getwi('苍澜小倩') %>
+<%- await getwi('驭灵营') %>
+<% } else if (place === '万兽山庄' && _notScanned('万兽山庄')) { %>
+<%- await getwi('万兽山庄') %>
+<%- await getwi('北冥玄狩') %>
+<%- await getwi('苍阙影') %>
+<%- await getwi('北冥幽荧') %>
+<%- await getwi('北冥寂月') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '东南暗域') { %>
+<%- await getwi('东南暗域功法') %>
+<%- await getwi('东南暗域天材地宝') %>
+<%- await getwi('东南暗域_区域总览') %>
+<%- await getwi('玄渊城') %>
+<% if (place) { %>
+<% if (place === '噬心殿' && _notScanned('噬心殿')) { %>
+<%- await getwi('噬心殿') %>
+<%- await getwi('玉横枝') %>
+<%- await getwi('苏妍') %>
+<%- await getwi('楼玄烬') %>
+<% } else if (place === '归稚宗' && _notScanned('归稚宗')) { %>
+<%- await getwi('归稚宗') %>
+<%- await getwi('明玥') %>
+<%- await getwi('童谣') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '南境水乡') { %>
+<%- await getwi('南境水乡功法') %>
+<%- await getwi('南境水乡天材地宝') %>
+<%- await getwi('南境水乡谋生指南') %>
+<%- await getwi('南境水乡_区域总览') %>
+<%- await getwi('莲华镇') %>
+<% if (place) { %>
+<% if (place === '蝶化宗' && _notScanned('蝶化宗')) { %>
+<%- await getwi('蝶化宗') %>
+<%- await getwi('花千落') %>
+<%- await getwi('柳如梦') %>
+<%- await getwi('沈清辞') %>
+<%- await getwi('苏暮烟') %>
+<%- await getwi('谢怜舟') %>
+<%- await getwi('容锦书') %>
+<% } else if (place === '并蒂宫' && _notScanned('并蒂宫')) { %>
+<%- await getwi('并蒂宫') %>
+<%- await getwi('白星') %>
+<%- await getwi('温如玉') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '独立势力') { %>
+<%- await getwi('独立势力功法') %>
+<% if (place) { %>
+<% if (place === '灵霄宗' && _notScanned('灵霄宗')) { %>
+<%- await getwi('灵霄宗') %>
+<%- await getwi('灵霄城') %>
+<%- await getwi('云倾颜') %>
+<%- await getwi('灵霄真人') %>
+<%- await getwi('沐清漪') %>
+<% } else if (place === '天机阁' && _notScanned('天机阁')) { %>
+<%- await getwi('天机阁') %>
+<%- await getwi('白瑶光') %>
+<%- await getwi('司星瑶') %>
+<% } %>
+<% } %>
+
+<% } else if (subArea === '青冥秘境') { %>
+<%- await getwi('秘境残卷') %>
+<%- await getwi('青冥秘境') %>
+
+<% } else if (subArea === '星河秘境') { %>
+<%- await getwi('秘境残卷') %>
+<%- await getwi('星河秘境') %>
+
+<% } %>
+<% } %>
+<% } %>

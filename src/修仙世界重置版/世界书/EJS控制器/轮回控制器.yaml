@@ -1,0 +1,8 @@
+@@preprocessing
+<%
+if (typeof reincState === 'undefined') var reincState = getvar('stat_data._轮回状态', { defaults: '正常' });
+
+if (reincState === '轮回中') {
+  print(await getwi('轮回流程'));
+}
+%>

@@ -1,0 +1,629 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "大区域": {
+      "default": "",
+      "type": "string"
+    },
+    "子区域": {
+      "default": "",
+      "type": "string"
+    },
+    "具体地点": {
+      "default": "",
+      "type": "string"
+    },
+    "在场角色": {
+      "default": "",
+      "type": "string"
+    },
+    "灵根": {
+      "default": "",
+      "type": "string"
+    },
+    "道途": {
+      "default": "",
+      "type": "string",
+      "enum": [
+        "",
+        "正道",
+        "邪道",
+        "魔道",
+        "中立",
+        "混乱中立"
+      ]
+    },
+    "所属势力": {
+      "default": "",
+      "type": "string"
+    },
+    "宗门地位": {
+      "default": "",
+      "type": "string"
+    },
+    "阴阳历": {
+      "default": "",
+      "type": "string"
+    },
+    "时辰": {
+      "default": "",
+      "type": "string",
+      "enum": [
+        "",
+        "子时",
+        "丑时",
+        "寅时",
+        "卯时",
+        "辰时",
+        "巳时",
+        "午时",
+        "未时",
+        "申时",
+        "酉时",
+        "戌时",
+        "亥时"
+      ]
+    },
+    "主修功法": {
+      "default": "",
+      "type": "string"
+    },
+    "功法品级": {
+      "default": "",
+      "type": "string"
+    },
+    "功法总层数": {
+      "default": 0,
+      "type": "number"
+    },
+    "功法已修层数": {
+      "default": 0,
+      "type": "number"
+    },
+    "习得术法": {
+      "anyOf": [
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "剑心境界": {
+      "default": "",
+      "type": "string"
+    },
+    "丹道境界": {
+      "default": "",
+      "type": "string"
+    },
+    "异火列表": {
+      "default": "",
+      "type": "string"
+    },
+    "储物戒_药材": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_矿石": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_丹药": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_符纸": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_灵墨": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_符箓": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_灵材": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_阵旗": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_饲料": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_傀儡件": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_种子": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_鱼饵": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_鱼获": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_成品": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_杂物": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "储物戒_其他": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "下品灵石": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "中品灵石": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "上品灵石": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "极品灵石": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "凡俗货币": {
+      "default": "",
+      "type": "string"
+    },
+    "未装备_武器": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "未装备_防具": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "未装备_饰品": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "关系列表": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "description": "角色名"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "description": "性别|修为|所属|关系态度|重要事件"
+      }
+    },
+    "$钓鱼_成功次数": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "$钓鱼_鱼获记录": {
+      "default": "",
+      "type": "string"
+    },
+    "$钓鱼_最高记录": {
+      "default": "",
+      "type": "string"
+    },
+    "习得百艺": {
+      "default": "",
+      "type": "string"
+    },
+    "当前境界": {
+      "default": "",
+      "type": "string"
+    },
+    "炼器境界": {
+      "default": "",
+      "type": "string"
+    },
+    "阵法境界": {
+      "default": "",
+      "type": "string"
+    },
+    "符箓境界": {
+      "default": "",
+      "type": "string"
+    },
+    "驭兽境界": {
+      "default": "",
+      "type": "string"
+    },
+    "医术境界": {
+      "default": "",
+      "type": "string"
+    },
+    "傀儡术境界": {
+      "default": "",
+      "type": "string"
+    },
+    "种植采药境界": {
+      "default": "",
+      "type": "string"
+    },
+    "装备_傀儡": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "$傀儡状态列表": {
+      "default": "",
+      "type": "string"
+    },
+    "装备_灵兽": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "$灵兽状态列表": {
+      "default": "",
+      "type": "string"
+    },
+    "装备_丹炉": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "装备_锻造台": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "装备_一寸地": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "$一寸地_种植列表": {
+      "default": "",
+      "type": "string"
+    },
+    "装备_符笔": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "装备_阵盘": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "$阵盘_存放阵法": {
+      "default": "",
+      "type": "string"
+    },
+    "装备_药箱": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "$药箱_工具": {
+      "default": "",
+      "type": "string"
+    },
+    "心魔名": {
+      "default": "",
+      "type": "string"
+    },
+    "心魔执念": {
+      "default": "",
+      "type": "string"
+    },
+    "心魔态度": {
+      "default": "",
+      "type": "string"
+    },
+    "$心魔记忆": {
+      "default": "",
+      "type": "string"
+    },
+    "_当前百艺": {
+      "default": "",
+      "type": "string",
+      "enum": [
+        "",
+        "炼丹",
+        "炼器",
+        "阵法",
+        "符箓",
+        "驭兽",
+        "医术",
+        "傀儡术",
+        "种植采药",
+        "钓鱼"
+      ]
+    },
+    "_修炼状态": {
+      "default": "",
+      "type": "string",
+      "enum": [
+        "",
+        "修炼中",
+        "突破中",
+        "渡劫中",
+        "引气入体"
+      ]
+    },
+    "$修炼进度": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "心魔状态": {
+      "default": "无",
+      "type": "string",
+      "enum": [
+        "无",
+        "潜伏",
+        "活跃",
+        "对峙中"
+      ]
+    },
+    "当前年纪": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "当前寿元": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "_剩余寿元": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "_寿元状态": {
+      "default": "正常",
+      "type": "string",
+      "enum": [
+        "正常",
+        "衰老初期",
+        "灵力枯竭",
+        "油尽灯枯",
+        "寿终正寝",
+        "第一世",
+        "第二世",
+        "第三世",
+        "第四世",
+        "第五世"
+      ]
+    },
+    "_轮回状态": {
+      "default": "正常",
+      "type": "string",
+      "enum": [
+        "正常",
+        "轮回中"
+      ]
+    },
+    "_装备_武器": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "_装备_防具": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "_装备_饰品": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "_钓鱼_钓鱼次数": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0
+    },
+    "装备_鱼竿": {
+      "default": "",
+      "type": "string"
+    },
+    "装备_渔网": {
+      "default": "",
+      "type": "string"
+    },
+    "装备_钓箱": {
+      "default": "",
+      "type": "string"
+    },
+    "$功法库": {
+      "default": "",
+      "type": "string"
+    },
+    "$炼丹_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$炼丹_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "$炼器_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$炼器_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "$阵法_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$阵法_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "$符箓_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$符箓_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "$驭兽_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$驭兽_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "$医术_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$医术_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "$傀儡术_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$傀儡术_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "$种植采药_熟练度": {
+      "default": 0,
+      "type": "number"
+    },
+    "$种植采药_经验值": {
+      "default": 0,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    }
+  },
+  "$defs": {
+    "__schema0": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema1": {
+      "default": "",
+      "type": "string"
+    }
+  }
+}

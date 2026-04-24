@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>致谢</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    font-family: 'Georgia', 'Noto Serif SC', 'Source Han Serif SC', '宋体', serif;
+  }
+  .card {
+    width: 100%;
+    max-width: 520px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 60px rgba(60,100,160,0.15);
+    position: relative;
+  }
+  .banner {
+    width: 100%;
+    aspect-ratio: 2/ 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;display: block;
+  }
+  .banner-overlay {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 60%;
+    background: linear-gradient(180deg, transparent 0%, rgba(12,20,35,0.85) 100%);
+    z-index: 1;
+  }
+  .body-bg {
+    background: linear-gradient(180deg,
+      rgba(12,20,35,0.95) 0%,
+      rgba(15,25,45,0.97) 40%,
+      rgba(10,18,32,0.98) 100%
+    );
+  }
+  .content {
+    position: relative;
+    z-index: 2;
+    padding: 32px 32px 36px;
+    text-align: center;
+    color: #c8d8ef;
+  }
+  .deco-line {
+    width: 50px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(100,160,220,0.5), transparent);
+    margin: 0 auto 22px;
+  }
+  .gift-line {
+    font-size: 1.05em;
+    letter-spacing: 0.12em;
+    color: #8bb8e0;
+    margin: 0 0 8px;line-height: 1.8;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  }
+  .gift-line .name {
+    color: #a0d4f0;
+    font-weight: 600;
+    font-size: 1.08em;
+    text-shadow: 0 0 12px rgba(100,180,240,0.3);
+  }
+  .sep {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; margin: 20px 0; opacity: 0.5;
+  }
+  .sep-line-l { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, #5a8ab5); }
+  .sep-line-r { width: 40px; height: 1px; background: linear-gradient(90deg, #5a8ab5, transparent); }
+  .sep-dot { font-size: 0.65em; color: #5a8ab5; }
+  .credits-title {
+    font-size: 0.85em; letter-spacing: 0.3em; color: #6a9ec5;
+    margin: 0 0 20px;
+    text-shadow: 0 0 12px rgba(80,140,200,0.25);
+  }
+  .credits {
+    font-size: 0.88em; line-height: 2.2; color: #b0c8e0;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  }
+  .credits .sub { opacity: 0.85; font-size: 0.82em; color: #8aa5be; margin: 0 0 6px; }
+  .credits .thin-line { width: 30px; height: 1px; background: rgba(80,130,180,0.3); margin: 12px auto; }
+  .credits p { margin: 0; }
+  .credits .minor { opacity: 0.8; font-size: 0.85em; color: #8aa5be; }
+  .credits .minor-s { opacity: 0.75; font-size: 0.82em; color: #7a95ae; margin-bottom: 4px; }
+  .bottom-sep {
+    margin-top: 28px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; opacity: 0.45;
+  }
+  .bottom-sep .l { width: 35px; height: 1px; background: linear-gradient(90deg, transparent, #5a8ab5); }
+  .bottom-sep .r { width: 35px; height: 1px; background: linear-gradient(90deg, #5a8ab5, transparent); }
+  .thanks {
+    font-size: 1em; letter-spacing: 0.25em; color: #a0cce8;
+    margin: 16px 0 0; font-weight: 500;
+    text-shadow: 0 0 16px rgba(80,160,220,0.2), 0 1px 8px rgba(0,0,0,0.4);
+  }
+  .bottom-line {
+    width: 50px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(80,140,200,0.35), transparent);
+    margin: 20px auto 0;
+  }
+  .start-btn {
+    background: linear-gradient(135deg, rgba(40,80,130,0.3) 0%, rgba(50,100,160,0.4) 50%, rgba(40,80,130,0.3) 100%);
+    border: 1.5px solid rgba(80,140,200,0.35);
+    border-radius: 24px;
+    padding: 12px 28px;
+    color: #b0d4ef;
+    font-family: 'Georgia', 'Noto Serif SC', 'Source Han Serif SC', '宋体', serif;
+    font-size: 0.9em;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 16px rgba(40,80,140,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+    position: relative;
+    overflow: hidden;
+    margin-top: 28px;
+    line-height: 1.6;
+  }
+  .start-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(50,100,160,0.4) 0%, rgba(60,120,180,0.5) 50%, rgba(50,100,160,0.4) 100%);
+    border-color: rgba(100,170,230,0.5);
+    box-shadow: 0 4px 24px rgba(50,100,170,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+    transform: translateY(-1px);
+    text-shadow: 0 0 12px rgba(100,180,240,0.3), 0 1px 6px rgba(0,0,0,0.4);
+  }
+  .start-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 12px rgba(40,80,140,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .start-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .btn-dash {
+    display: block;
+    font-size: 0.85em;
+    color: #7aa5c8;
+    margin-top: 2px;
+    letter-spacing: 0.3em;
+  }
+  .wave-deco {
+    margin-top: 16px;
+    font-size: 0.6em;
+    color: #4a7a9e;
+    letter-spacing: 0.5em;
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="banner">
+    <img src="https://i.postimg.cc/Z5CTcHnG/17-54-08-795032305087951-00001.png" alt="" />
+    <div class="banner-overlay"></div>
+  </div>
+  <div class="body-bg">
+    <div class="content">
+      <div class="deco-line"></div>
+      <p class="gift-line">这是送给<span class="name">【萌萌雪】</span>的礼物</p>
+
+      <div class="sep">
+        <span class="sep-line-l"></span>
+        <span class="sep-dot">◆</span>
+        <span class="sep-line-r"></span>
+      </div>
+
+      <p class="credits-title">致 谢</p>
+
+      <div class="credits">
+        <p class="sub">过去、现在、未来玩我的卡的所有玩家</p>
+        <div class="thin-line"></div>
+        <p>青空莉</p>
+        <p>安安和咖啡的公益站</p>
+        <p>MagicalAstrogy</p>
+        <div class="thin-line"></div>
+        <p class="minor">以及未提及的所有</p>
+        <p class="minor">在我写卡路上帮助过我的老师们</p>
+        <p class="minor-s">还有多到我写不完的朋友们</p>
+      </div>
+
+      <div class="bottom-sep">
+        <span class="l"></span>
+        <span class="sep-dot">◆</span>
+        <span class="r"></span>
+      </div>
+
+      <p class="thanks">谢谢你们</p>
+      <div class="bottom-line"></div>
+
+      <button class="start-btn" id="startBtn">潮去汐来，她一直在<span class="btn-dash">——</span></button>
+      <div class="wave-deco">〜〜 〜</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var sendAIMessage = function(text, replaceZeroLayer) {
+  if (!text || text.trim().length === 0) return;
+  if (typeof createChatMessages === 'function') {
+    if (replaceZeroLayer) {
+      if (typeof deleteChatMessages === 'function') {
+        deleteChatMessages([0], { refresh: 'none' }).then(function() {
+          createChatMessages([{ role: 'assistant', message: text }], { insert_at: 0, refresh: 'all' });
+        }).catch(function() {
+          if (typeof setChatMessages === 'function') {
+            setChatMessages([{ message_id: 0, role: 'assistant', message: text }], { refresh: 'all' });
+          }
+        });
+      } else if (typeof setChatMessages === 'function') {
+        setChatMessages([{ message_id: 0, role: 'assistant', message: text }], { refresh: 'all' });
+      }
+    }}
+};
+
+document.getElementById('startBtn').addEventListener('click', function() {
+  var btn = this;
+  var tag = String.fromCharCode(60) + 'sanmingyue' + String.fromCharCode(62);
+  var musicTag = String.fromCharCode(60) + 'music' + String.fromCharCode(62) + '983zho.ogg' + String.fromCharCode(60) + '/music' + String.fromCharCode(62);
+
+  var msgBody = '```{{user}}\u5BB6\u95E8\u53E3\u8D70\u5ECA\u00B7' +
+    '2024\u5E748\u67081\u65E5\u00B7\u661F\u671F\u56DB\u00B79:30```\n\n' +
+    '\u516B\u6708\u7684\u8D70\u5ECA\u91CC\u6CA1\u6709\u98CE\u3002\n\n' +
+    '\u697C\u68AF\u95F4\u7684\u7A97\u6237\u5F00\u7740\u3002\u70ED\u6C14\u5835\u5728\u90A3\u91CC\u4E0D\u52A8\u3002\n\n' +
+    '\u8749\u5728\u5916\u9762\u53EB\u3002\u58F0\u97F3\u95F7\u95F7\u7684\uFF0C\u9694\u4E86\u4E00\u5C42\u5899\u8FDB\u6765\uFF0C\u53D8\u6210\u55E1\u55E1\u7684\u5E95\u566A\u3002\u8D70\u5ECA\u7684\u706F\u6CA1\u4EAE\uFF0C\u767D\u5929\u4E0D\u9700\u8981\u3002\u5149\u4ECE\u7A97\u6237\u90A3\u8FB9\u659C\u8FC7\u6765\uFF0C\u7167\u5230\u5730\u9762\u4E00\u534A\u5C31\u505C\u4E86\u3002\n\n' +
+    '\u5BF9\u9762\u90A3\u6241\u95E8\u5173\u7740\u3002\n\n' +
+    '\u95E8\u4E0A\u7684\u6625\u8054\u662F\u53BB\u5E74\u8D34\u7684\u3002\u201C\u4E07\u4E8B\u5982\u610F\u201D\u90A3\u4E2A\u201C\u610F\u201D\u5B57\u7684\u53F3\u4E0B\u89D2\u7FD8\u8D77\u6765\u4E86\uFF0C\u9732\u51FA\u5E95\u4E0B\u65E7\u7684\u4E00\u5C42\u3002\u95E8\u628A\u624B\u4E0A\u6CA1\u6709\u7070\u3002\u6709\u4EBA\u64E6\u3002\u4F46\u5F00\u5408\u7684\u9891\u7387\u5F88\u4F4E\u3002\u4F4F\u5BF9\u9762\u7684\u4EBA\u80FD\u542C\u51FA\u6765\u2014\u2014\u95E8\u9501\u8F6C\u52A8\u7684\u58F0\u97F3\u9694\u4E86\u4E00\u9762\u5899\u4E5F\u6E05\u695A\u3002\u8FD9\u4E00\u5E74\u91CC\uFF0C\u90A3\u4E2A\u58F0\u97F3\u8D8A\u6765\u8D8A\u5C11\u3002\n\n' +
+    '\u6D1B\u6F6E\u6C50\u53BB\u5E74\u4E5D\u6708\u8D70\u7684\u3002\n\n' +
+    '\u8D70\u7684\u610F\u601D\u662F\u4E0D\u5728\u8FD9\u680B\u697C\u91CC\u4E0A\u4E0B\u697C\u4E86\u3002\u5979\u5988\u8DDF\u697C\u4E0B\u7684\u90BB\u5C45\u8BF4\u662F\u8F6C\u5B66\uFF0C\u8F6C\u53BB\u4E86\u4EB2\u621A\u90A3\u8FB9\u3002\u90A3\u8FB9\u6559\u5B66\u8D28\u91CF\u597D\u3002\u90BB\u5C45\u4EEC\u70B9\u70B9\u5934\uFF0C\u6CA1\u6709\u591A\u95EE\u3002\u4E4B\u540E\u5076\u5C14\u770B\u89C1\u5979\u7238\u5988\u8FDB\u51FA\u3002\u811A\u6B65\u8F7B\u3002\u4E1C\u897F\u591A\u3002\u6709\u65F6\u5019\u62CE\u7740\u4FDD\u6E29\u6876\uFF0C\u6709\u65F6\u5019\u62CE\u7740\u88C5\u4E86\u8863\u670D\u7684\u888B\u5B50\u3002\n\n' +
+    '\u6691\u5047\u8FC7\u4E86\u4E00\u534A\u3002\n\n' +
+    '\u697C\u9053\u91CC\u767D\u5929\u51E0\u4E4E\u6CA1\u4EBA\u3002\u7A7A\u8C03\u5916\u673A\u55E1\u55E1\u5730\u8F6C\uFF0C\u5404\u5BB6\u7684\u58F0\u97F3\u90FD\u538B\u5728\u95E8\u91CC\u9762\u3002\u6D1B\u5C18\u7684\u95E8\u5173\u7740\u3002\u5C4B\u91CC\u7A7A\u8C03\u5F00\u5230\u4E8C\u5341\u516D\u5EA6\uFF0C\u7535\u89C6\u653E\u7740\u4EC0\u4E48\u7EFC\u827A\uFF0C\u58F0\u97F3\u4E0D\u5927\u3002\n\n' +
+    '\u4E00\u4E2A\u666E\u901A\u7684\u4E0B\u5348\u3002\n\n' +
+    '\u548C\u524D\u4E00\u5929\u4E00\u6837\u3002\u548C\u518D\u524D\u4E00\u5929\u4E5F\u4E00\u6837\u3002\n\n' +
+    '\u5BF9\u9762\u7684\u9501\u54CD\u4E86\u3002\n\n' +
+    '\u90A3\u4E2A\u58F0\u97F3\u6D1B\u5C18\u592A\u719F\u4E86\u2014\u2014\u91D1\u5C5E\u82AF\u8F6C\u52A8\uFF0C\u7136\u540E\u95E8\u8F74\u8F7B\u8F7B\u53EB\u4E86\u4E00\u58F0\u3002\u8FD9\u6241\u95E8\u5F88\u4E45\u6CA1\u6709\u53D1\u51FA\u8FD9\u4E2A\u58F0\u97F3\u4E86\u3002\n\n' +
+    '\u7136\u540E\u662F\u811A\u6B65\u3002\u5F88\u8F7B\u7684\u3002\u8DE8\u8FC7\u4E24\u5BB6\u4E4B\u95F4\u90A3\u4E0D\u5230\u4E09\u7C73\u7684\u8DDD\u79BB\u3002\n\n' +
+    '\u6572\u95E8\u58F0\u3002\u4E09\u4E0B\u3002\u95F4\u9694\u5747\u5300\u3002\u529B\u5EA6\u4E0D\u5927\u3002\u843D\u5728\u95E8\u677F\u4E0A\u7684\u58F0\u97F3\u662F\u5B9E\u7684\u3002\n\n' +
+    '\u95E8\u5F00\u4E86\u3002\n\n' +
+    '\u8D70\u5ECA\u91CC\u7684\u5149\u4ECE\u7A97\u6237\u90A3\u8FB9\u659C\u8FC7\u6765\uFF0C\u7167\u4E86\u4E00\u534A\u5730\u9762\u3002\n\n' +
+    '\u5979\u7AD9\u5728\u5149\u548C\u5F71\u7684\u4EA4\u754C\u7EBF\u4E0A\u3002\u6CA1\u6709\u8D34\u7740\u95E8\uFF0C\u5F80\u540E\u9000\u4E86\u534A\u6B65\u7684\u8DDD\u79BB\u3002\n\n' +
+    '\u9ED1\u8272\u7684\u957F\u5934\u53D1\uFF0C\u76F4\u7684\uFF0C\u5782\u5230\u8170\u7684\u4F4D\u7F6E\u3002\u767D\u8272T\u6064\uFF0C\u5F88\u666E\u901A\u7684\u6B3E\u5F0F\uFF0C\u8896\u53E3\u6709\u70B9\u5927\uFF0C\u98CE\u4E00\u5439\u4F1A\u6643\u3002\u5DE6\u80A9\u4E0A\u631E\u7740\u4E00\u4E2A\u5E06\u5E03\u7684\u5C0F\u5305\uFF0C\u5E26\u5B50\u6709\u70B9\u957F\uFF0C\u5305\u5782\u5728\u80EF\u7684\u4F4D\u7F6E\u3002\u9501\u9AA8\u4E0A\u65B9\u51F9\u4E0B\u53BB\u4E00\u9053\u6D45\u6C9F\u3002\u4E0B\u988C\u7684\u7EBF\u6761\u6BD4\u4EE5\u524D\u660E\u663E\u4E86\u3002\n\n' +
+    '\u773C\u775B\u3002\n\n' +
+    '\u6DE1\u84DD\u8272\u7684\u3002\u5149\u6253\u8FDB\u90A3\u4E2A\u989C\u8272\u91CC\uFF0C\u5E95\u4E0B\u662F\u4EAE\u7684\u3002\n\n' +
+    '\u5979\u770B\u7740\u95E8\u91CC\u9762\u7AD9\u7740\u7684\u4EBA\u3002\u89C6\u7EBF\u505C\u4E86\u4E00\u79D2\u3002\u7136\u540E\u843D\u5230\u95E8\u6846\u4E0A\u3002\n\n' +
+    '\u201C\u2026\u2026\u597D\u4E45\u4E0D\u89C1\u3002\u201D\n' +
+    '<recap>\n' +
+    '<details><summary>\u5C0F\u603B\u7ED3</summary>\n\n' +
+    '- \u65F6\u95F4\uFF1A2024\u5E748\u67081\u65E5\u00B7\u661F\u671F\u56DB\u00B79:30\n' +
+    '- \u5730\u70B9\uFF1A{{user}}\u5BB6\u5916\u7684\u8D70\u5ECA\n' +
+    '- \u53D1\u751F\u7684\u4E8B\uFF1A\u4E00\u5E74\u672A\u89C1\u7684\u6D1B\u6F6E\u6C50\u6572\u5F00\u4E86{{user}}\u7684\u95E8\u3002\u5979\u80CC\u7740\u5E06\u5E03\u5C0F\u5305\uFF0C\u6A21\u6837\u6BD4\u4EE5\u524D\u6D88\u7626\u3002\u5979\u5411{{user}}\u6253\u62DB\u547C\uFF0C\u5E76\u5728\u5305\u91CC\u53D1\u51FA\u8F7B\u5FAE\u78B0\u649E\u58F0\u540E\u8FC5\u901F\u6309\u4F4F\u4E86\u5305\uFF0C\u968F\u540E\u8BE2\u95EE{{user}}\u662F\u5426\u80FD\u8FDB\u53BB\u5750\u5750\u3002\n\n' +
+    '</details>\n' +
+    '</recap>\n\n' +
+    '<StatusPlaceHolderImpl/>';
+
+  var msg = tag + musicTag + msgBody;
+  try {
+    sendAIMessage(msg, true);
+    btn.textContent = '\u2728\u6F6E\u5DF2\u6765\u2026';
+    btn.disabled = true;
+  } catch(e) {
+    btn.textContent = '\u26A0 \u542F\u52A8\u5931\u8D25';
+    btn.style.borderColor = 'rgba(255,150,150,0.5)';
+    setTimeout(function() {
+      btn.innerHTML = '\u6F6E\u53BB\u6C50\u6765\uFF0C\u5979\u4E00\u76F4\u5728<span class="btn-dash">\u2014\u2014</span>';
+      btn.style.borderColor = '';
+    }, 2000);
+  }
+});
+</script>
+
+</body>
+</html>

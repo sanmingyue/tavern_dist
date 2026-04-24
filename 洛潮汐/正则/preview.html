@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>潮汐正则预览</title>
+    <style>
+      body {
+        background: #1a1a2e;
+        font-family: 'Microsoft YaHei', sans-serif;
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 60px;
+      }
+      h2 {
+        color: #9bb0c4;
+        font-weight: 300;
+        letter-spacing: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>变量更新中</h2>
+
+    <div style="text-align: center; margin: 10px 0">
+      <div style="display: inline-block; text-align: left">
+        <details class="tide-thinking" open style="border: none; background: none">
+          <summary
+            style="
+              list-style: none;
+              cursor: pointer;
+              display: inline-flex;
+              align-items: center;
+              gap: 0;
+              position: relative;
+              padding: 0;
+            "
+          >
+            <!-- 左侧潮汐线 -->
+            <span
+              class="tide-line-left"
+              style="
+                display: block;
+                width: 120px;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(168, 212, 230, 0.6));
+                position: relative;
+                flex-shrink: 0;
+              "
+              ><span
+                style="
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: linear-gradient(90deg, transparent, rgba(91, 143, 185, 0.8));
+                  animation: tide-line-pulse 2.5s ease-in-out infinite;
+                  opacity: 0;
+                "
+              ></span>
+            </span>
+
+            <!-- 圆形头像 -->
+            <span
+              style="
+                display: inline-block;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                overflow: hidden;
+                border: 1.5px solid rgba(168, 212, 230, 0.4);
+                box-shadow:
+                  0 0 12px rgba(91, 143, 185, 0.25),
+                  0 0 24px rgba(168, 212, 230, 0.1);
+                flex-shrink: 0;
+                z-index: 3;
+                position: relative;
+                margin: 0 12px;
+                animation: tide-avatar-glow 3s ease-in-out infinite;
+              "
+            >
+              <img
+                src="https://i.postimg.cc/63rcSzsY/6.png"
+                style="width: 100%; height: 100%; object-fit: cover; display: block"
+                alt="洛潮汐"
+              />
+            </span>
+
+            <!-- 右侧潮汐线 -->
+            <span
+              class="tide-line-right"
+              style="
+                display: block;
+                width: 120px;
+                height: 1px;
+                background: linear-gradient(90deg, rgba(168, 212, 230, 0.6), transparent);
+                position: relative;
+                flex-shrink: 0;
+              "
+            >
+              <span
+                style="
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: linear-gradient(90deg, rgba(91, 143, 185, 0.8), transparent);
+                  animation: tide-line-pulse 2.5s ease-in-out infinite 1.25s;
+                  opacity: 0;
+                "
+              ></span>
+            </span>
+
+            <!-- 展开箭头 -->
+            <span
+              style="
+                margin-left: 8px;
+                font-size: 0.7em;
+                color: rgba(168, 212, 230, 0.5);
+                transition: transform 0.3s ease;
+                flex-shrink: 0;
+              "
+              >▾</span
+            >
+          </summary>
+          <div
+            style="
+              max-height: 320px;
+              overflow-y: auto;
+              margin-top: 8px;
+              padding: 14px 20px;
+              color: #9bb0c4;
+              line-height: 1.8;
+              white-space: pre-wrap;
+              background: linear-gradient(
+                135deg,
+                rgba(15, 23, 42, 0.5) 0%,
+                rgba(30, 41, 59, 0.4) 50%,
+                rgba(15, 23, 42, 0.5) 100%
+              );
+              border: 1px solid rgba(168, 212, 230, 0.15);
+              border-radius: 12px;
+              font-size: 0.9em;
+              box-shadow: 0 2px 12px rgba(44, 74, 110, 0.1);
+              max-width: 450px;
+              margin-left: auto;
+              margin-right: auto;
+            "
+          >
+            这是变量更新中的思维链内容... 正在分析角色状态变化... 好感度+5 当前地点：海边
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <style>
+      .tide-thinking summary::marker {
+        display: none;
+      }
+      .tide-thinking[open] > div {
+        animation: tide-content-in 0.4s ease forwards;
+      }
+
+      @keyframes tide-line-pulse {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes tide-avatar-glow {
+        0%,
+        100% {
+          box-shadow:
+            0 0 12px rgba(91, 143, 185, 0.25),
+            0 0 24px rgba(168, 212, 230, 0.1);
+          border-color: rgba(168, 212, 230, 0.4);
+        }
+        50% {
+          box-shadow:
+            0 0 18px rgba(91, 143, 185, 0.4),
+            0 0 36px rgba(168, 212, 230, 0.2);
+          border-color: rgba(168, 212, 230, 0.7);
+        }
+      }
+
+      @keyframes tide-content-in {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+
+    <hr style="border: none; border-top: 1px solid rgba(168, 212, 230, 0.15); width: 80%" />
+
+    <h2>变量完成</h2>
+
+    <div style="text-align: center; margin: 10px 0">
+      <div style="display: inline-block; text-align: left">
+        <details class="tide-done" open style="border: none; background: none">
+          <summary
+            style="
+              list-style: none;
+              cursor: pointer;
+              display: inline-flex;
+              align-items: center;
+              gap: 0;
+              position: relative;
+              padding: 0;
+            "
+          >
+            <!-- 左侧潮汐线（静态） -->
+            <span
+              style="
+                display: block;
+                width: 120px;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(168, 212, 230, 0.5));
+                flex-shrink: 0;
+              "
+            ></span>
+
+            <!-- 圆形头像 -->
+            <span
+              style="
+                display: inline-block;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                overflow: hidden;
+                border: 1.5px solid rgba(168, 212, 230, 0.35);
+                box-shadow:
+                  0 0 10px rgba(91, 143, 185, 0.15),
+                  0 0 20px rgba(168, 212, 230, 0.08);
+                flex-shrink: 0;
+                z-index: 3;
+                position: relative;
+                margin: 0 12px;
+              "
+            >
+              <img
+                src="https://i.postimg.cc/RF5GXyY7/1.png"
+                style="width: 100%; height: 100%; object-fit: cover; display: block"
+                alt="洛潮汐"
+              />
+            </span>
+
+            <!-- 右侧潮汐线（静态） -->
+            <span
+              style="
+                display: block;
+                width: 120px;
+                height: 1px;
+                background: linear-gradient(90deg, rgba(168, 212, 230, 0.5), transparent);
+                flex-shrink: 0;
+              "
+            ></span>
+
+            <!-- 展开箭头 -->
+            <span
+              style="
+                margin-left: 8px;
+                font-size: 0.7em;
+                color: rgba(168, 212, 230, 0.4);
+                transition: transform 0.3s ease;
+                flex-shrink: 0;
+              "
+              >▾</span
+            >
+          </summary>
+          <div
+            style="
+              max-height: 320px;
+              overflow-y: auto;
+              margin-top: 8px;
+              padding: 14px 20px;
+              color: #9bb0c4;
+              line-height: 1.8;
+              white-space: pre-wrap;
+              background: linear-gradient(
+                135deg,
+                rgba(15, 23, 42, 0.5) 0%,
+                rgba(30, 41, 59, 0.4) 50%,
+                rgba(15, 23, 42, 0.5) 100%
+              );
+              border: 1px solid rgba(168, 212, 230, 0.12);
+              border-radius: 12px;
+              font-size: 0.9em;
+              box-shadow: 0 2px 12px rgba(44, 74, 110, 0.08);
+              max-width: 450px;
+              margin-left: auto;
+              margin-right: auto;
+            "
+          >
+            变量已完成更新。 好感度:75 当前地点: 海边 天气: 晴
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <style>
+      .tide-done summary::marker {
+        display: none;
+      }
+      .tide-done[open] > div {
+        animation: tide-done-in 0.4s ease forwards;
+      }
+
+      @keyframes tide-done-in {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </body>
+</html>

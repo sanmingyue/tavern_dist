@@ -1,0 +1,232 @@
+@@preprocessing
+<%
+/* ===== 东荒妖域控制器 =====
+ * 仅当大区域为"东荒妖域"时激活
+ * 大区域级: 激活地图 + 所有总览 + 独立NPC
+ * 子区域级: 额外激活对应功法 + 自然地理/秘境
+ * 具体地点级: 额外激活具体势力 + 子地点 + NPC
+ * 会跳过已被扫描控制器激活的条目
+ */
+if (typeof mainArea === 'undefined') var mainArea = getvar('stat_data.大区域', { defaults: '中央神州' });
+if (typeof subArea === 'undefined') var subArea = getvar('stat_data.子区域', { defaults: '' });
+if (typeof place === 'undefined') var place = getvar('stat_data.具体地点', { defaults: '' });
+if (typeof _scanActivated === 'undefined') var _scanActivated = [];
+function _notScanned(name) { return _scanActivated.indexOf(name) === -1; }
+-%>
+<% if (mainArea === '东荒妖域') { %>
+<%- await getwi('地图_东荒妖域') %>
+<%- await getwi('东荒天材地宝') %>
+<%- await getwi('东荒物价总览') %>
+<%- await getwi('东荒散修与凡人') %>
+<% if (_notScanned('阿福')) { %><%- await getwi('阿福') %><% } %>
+<% if (_notScanned('阿狸')) { %><%- await getwi('阿狸') %><% } %>
+<% if (_notScanned('银月')) { %><%- await getwi('银月') %><% } %>
+
+<% if (!subArea) { %>
+<%/* 大区域级: 加载原始总览 */%>
+<%- await getwi('东荒功法总览') %>
+<%- await getwi('东荒谋生指南') %>
+<% } else { %>
+<%/* 子区域级: 加载拆分功法 + 谋生 */%>
+<%- await getwi('东荒各族功法') %>
+<%- await getwi('东荒谋生指南') %>
+
+<% if (subArea === '雷泽') { %>
+<%- await getwi('东荒_雷泽') %>
+<% } else if (subArea === '十万大山') { %>
+<%- await getwi('东荒_十万大山') %>
+<% } else if (subArea === '碎星海峡') { %>
+<%- await getwi('东荒_碎星海峡') %>
+<% } else if (subArea === '无尽林海') { %>
+<%- await getwi('东荒_无尽林海') %>
+<% } else if (subArea === '无声沼泽') { %>
+<%- await getwi('东荒_无声沼泽') %>
+<% } else if (subArea === '云梦大泽') { %>
+<%- await getwi('东荒_云梦大泽') %>
+<% } else if (subArea === '百禽祖梧桐') { %>
+<%- await getwi('百禽祖梧桐') %>
+<% } else if (subArea === '古妖战场') { %>
+<%- await getwi('古妖战场') %>
+
+<% } else if (subArea === '万妖国' && _notScanned('万妖国')) { %>
+<%- await getwi('万妖国') %>
+<%- await getwi('万妖圣城_百族坊') %>
+<%- await getwi('万妖圣城_朝圣古道') %>
+<%- await getwi('万妖圣城_天妖演武场') %>
+<%- await getwi('万妖圣城_万灵血池') %>
+<%- await getwi('万妖圣城_妖皇殿') %>
+<%- await getwi('万妖圣城_妖兽苑') %>
+<% if (place) { %>
+<%- await getwi('白灵') %>
+<%- await getwi('金翅大鹏王') %>
+<%- await getwi('老树精') %>
+<%- await getwi('厉牙') %>
+<%- await getwi('墨瞳') %>
+<%- await getwi('万妖国岩') %>
+<% } %>
+
+<% } else if (subArea === '青丘国' && _notScanned('青丘国')) { %>
+<%- await getwi('青丘国') %>
+<%- await getwi('鸣月林') %>
+<%- await getwi('千梦渡') %>
+<%- await getwi('天狐幻境') %>
+<% if (place) { %>
+<%- await getwi('涂山鸾') %>
+<%- await getwi('涂山瑶') %>
+<%- await getwi('涂山月') %>
+<% } %>
+
+<% } else if (subArea === '迦楼罗天' && _notScanned('迦楼罗天')) { %>
+<%- await getwi('迦楼罗天') %>
+<%- await getwi('九霄天顶_金羽殿') %>
+<%- await getwi('天怒峰') %>
+<% if (place) { %>
+<%- await getwi('金翅鹏王') %>
+<%- await getwi('苍翎') %>
+<%- await getwi('飞羽') %>
+<%- await getwi('风吟') %>
+<%- await getwi('裂空') %>
+<%- await getwi('擎怒') %>
+<%- await getwi('羽洛') %>
+<% } %>
+
+<% } else if (subArea === '噬荒教' && _notScanned('噬荒教')) { %>
+<%- await getwi('噬荒教') %>
+<%- await getwi('荒魔堡') %>
+<%- await getwi('噬荒教角斗场') %>
+<% if (place) { %>
+<%- await getwi('弥苍赦') %>
+<%- await getwi('炽刀') %>
+<%- await getwi('苏翎霜') %>
+<% } %>
+
+<% } else if (subArea === '绯家' && _notScanned('绯家')) { %>
+<%- await getwi('绯家') %>
+<%- await getwi('百音谷') %>
+<% if (place) { %>
+<%- await getwi('绯锦瑟') %>
+<%- await getwi('绯玄音') %>
+<%- await getwi('绯烟') %>
+<% } %>
+
+<% } else if (subArea === '百禽林' && _notScanned('百禽林')) { %>
+<%- await getwi('百禽林') %>
+<%- await getwi('百鸣谷') %>
+<%- await getwi('凤栖台') %>
+<% if (place) { %>
+<%- await getwi('鹤仙') %>
+<%- await getwi('孔雀明王') %>
+<%- await getwi('锐翼') %>
+<% } %>
+
+<% } else if (subArea === '毕方巢' && _notScanned('毕方巢')) { %>
+<%- await getwi('毕方巢') %>
+<%- await getwi('焚天台') %>
+<% if (place) { %>
+<%- await getwi('毕方长老') %>
+<%- await getwi('焰翅') %>
+<% } %>
+
+<% } else if (subArea === '蛟龙渊' && _notScanned('蛟龙渊')) { %>
+<%- await getwi('蛟龙渊') %>
+<%- await getwi('化龙台') %>
+<%- await getwi('蛟皇宫') %>
+<%- await getwi('珊瑚墟') %>
+<% if (place) { %>
+<%- await getwi('蛟龙王') %>
+<%- await getwi('赤蛟') %>
+<%- await getwi('青鳞') %>
+<% } %>
+
+<% } else if (subArea === '九尾火狐部' && _notScanned('九尾火狐部')) { %>
+<%- await getwi('九尾火狐部') %>
+<%- await getwi('业火台') %>
+<% if (place) { %>
+<%- await getwi('炎姬') %>
+<% } %>
+
+<% } else if (subArea === '夔牛部' && _notScanned('夔牛部')) { %>
+<%- await getwi('夔牛部') %>
+<%- await getwi('雷鸣祭坛') %>
+<%- await getwi('雷王殿') %>
+<% if (place) { %>
+<%- await getwi('夔牛王') %>
+<%- await getwi('轰雷') %>
+<%- await getwi('雷奔') %>
+<% } %>
+
+<% } else if (subArea === '鲲鹏后裔' && _notScanned('鲲鹏后裔')) { %>
+<%- await getwi('鲲鹏后裔') %>
+<%- await getwi('化鹏台') %>
+<% if (place) { %>
+<%- await getwi('鲲鹏遗子') %>
+<%- await getwi('天翔') %>
+<% } %>
+
+<% } else if (subArea === '貔貅族' && _notScanned('貔貅族')) { %>
+<%- await getwi('貔貅族') %>
+<%- await getwi('灵矿集') %>
+<% if (place) { %>
+<%- await getwi('貔貅尊') %>
+<%- await getwi('金算') %>
+<%- await getwi('银舌') %>
+<% } %>
+
+<% } else if (subArea === '麒麟谷' && _notScanned('麒麟谷')) { %>
+<%- await getwi('麒麟谷') %>
+<%- await getwi('仁德殿') %>
+<%- await getwi('圣林') %>
+<% if (place) { %>
+<%- await getwi('古麟') %>
+<%- await getwi('青麟') %>
+<%- await getwi('瑞光') %>
+<%- await getwi('玉麟') %>
+<% } %>
+
+<% } else if (subArea === '饕餮窟' && _notScanned('饕餮窟')) { %>
+<%- await getwi('饕餮窟') %>
+<%- await getwi('饥荒祭坛') %>
+<% if (place) { %>
+<%- await getwi('饕餮王') %>
+<%- await getwi('裂腹') %>
+<%- await getwi('噬风') %>
+<% } %>
+
+<% } else if (subArea === '螣蛇窟' && _notScanned('螣蛇窟')) { %>
+<%- await getwi('螣蛇窟') %>
+<%- await getwi('螣蛇窟暗市') %>
+<%- await getwi('蛇母窟') %>
+<% if (place) { %>
+<%- await getwi('蛇母') %>
+<%- await getwi('夜影') %>
+<% } %>
+
+<% } else if (subArea === '獬豸部' && _notScanned('獬豸部')) { %>
+<%- await getwi('獬豸部') %>
+<%- await getwi('明镜台') %>
+<% if (place) { %>
+<%- await getwi('獬豸长老') %>
+<%- await getwi('獬豸部明镜') %>
+<%- await getwi('铁角') %>
+<% } %>
+
+<% } else if (subArea === '玄武渊' && _notScanned('玄武渊')) { %>
+<%- await getwi('玄武渊') %>
+<%- await getwi('龟息殿') %>
+<% if (place) { %>
+<%- await getwi('玄甲大圣') %>
+<%- await getwi('黑鳞') %>
+<%- await getwi('灵龟') %>
+<% } %>
+
+<% } else if (subArea === '猿王峰' && _notScanned('猿王峰')) { %>
+<%- await getwi('猿王峰') %>
+<%- await getwi('藏经石窟') %>
+<% if (place) { %>
+<%- await getwi('通臂猿王') %>
+<%- await getwi('石猴') %>
+<% } %>
+
+<% } %>
+<% } %>
+<% } %>

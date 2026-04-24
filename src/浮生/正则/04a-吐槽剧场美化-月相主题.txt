@@ -1,0 +1,156 @@
+<div style="width: 80%; margin: 20px auto;">
+<details data-theater="chaoxi" style="
+  background: linear-gradient(135deg, #051a2e 0%, #0d2b45 50%, #051a2e 100%);
+  border: 1px solid rgba(127, 201, 255, 0.25);
+  border-radius: 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 60, 120, 0.4),
+    inset 0 1px 0 rgba(127, 201, 255, 0.15),
+    0 0 60px rgba(45, 106, 159, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(12px);
+">
+  <summary style="
+    padding: 16px 24px;
+    color: #e0f7ff;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+  ">
+    <span style="font-size: 1.3em; filter: drop-shadow(0 0 12px rgba(127, 201, 255, 0.8)); animation: pulse 3s ease-in-out infinite;">🎭</span>
+    <span style="flex: 1; letter-spacing: 1px;">潮汐的小剧场</span>
+    <small style="color: #8bb8d8; font-size: 0.85em; margin-left: 8px;">
+      <span class="curtain-toggle" data-close="展开潮汐 ▶" data-open="收起 ▼"></span>
+    </small>
+    <span class="curtain-shimmer" style="
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(127, 201, 255, 0.03) 2px,
+        rgba(127, 201, 255, 0.03) 4px
+      );
+      animation: waveScan 8s linear infinite;
+      pointer-events: none;
+    "></span>
+    <span class="spotlight" style="
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150%;
+      height: 200%;
+      background: radial-gradient(ellipse at center, rgba(127, 201, 255, 0.1) 0%, transparent 60%);
+      animation: tideGlow 6s ease-in-out infinite;
+      pointer-events: none;
+    "></span>
+  </summary>
+  <div style="
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 16px 24px;
+    color: #b0d4ff;
+    line-height: 1.7;
+    transition: all 0.3s ease;
+    white-space: pre-wrap;
+    background: rgba(5, 26, 46, 0.6);
+    border-top: 1px solid rgba(127, 201, 255, 0.2);
+  ">$1</div>
+</details>
+</div>
+<style>
+  @scope (div[style*="width: 80%; margin: 20px auto;"]) {
+    details::-webkit-scrollbar {
+      width: 6px;
+    }
+    details::-webkit-scrollbar-track {
+      background: #051a2e;
+      border-radius: 3px;
+    }
+    details::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #1a4a6e, #7fc9ff);
+      border-radius: 3px;
+      opacity: 0.5;
+    }
+    details::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #2d6a9f, #a8e6ff);
+      opacity: 0.8;
+    }
+
+    details[open] {
+      box-shadow:
+        0 12px 40px rgba(0, 80, 160, 0.5),
+        inset 0 1px 0 rgba(127, 201, 255, 0.25),
+        0 0 80px rgba(45, 106, 159, 0.2) !important;
+      border-color: rgba(127, 201, 255, 0.5) !important;
+    }
+    details[open] > div {
+      animation: tideRise 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    details summary:hover {
+      background: rgba(127, 201, 255, 0.08);
+    }
+    details[open] summary {
+      background: rgba(13, 43, 69, 0.5);
+    }
+    details summary::marker {
+      display: none;
+    }
+
+    details[open] .curtain-toggle::after {
+      content: attr(data-open);
+    }
+    details:not([open]) .curtain-toggle::after {
+      content: attr(data-close);
+    }
+
+    @keyframes waveScan {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(4px);
+      }
+    }
+
+    @keyframes tideGlow {
+      0%, 100% {
+        opacity: 0.4;
+        transform: translateX(-50%) scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: translateX(-50%) scale(1.05);
+      }
+    }
+
+    @keyframes tideRise {
+      from {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+  }
+</style>

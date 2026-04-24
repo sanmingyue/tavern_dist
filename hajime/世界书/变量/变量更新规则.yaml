@@ -1,0 +1,114 @@
+---
+变量更新规则:
+  日期:
+    format: "MM月DD日"
+    check:
+      - 仅在跨日事件时更新，箱庭内通常不变
+  时间:
+    format: "HH:MM"
+    check:
+      - 按照行动实际经历的时间更新，每次行动后更新
+  当前房间:
+    check:
+      - 仅在通过 interact 工具触发房间转移时更新
+      - "可选值：第一层·起始之间、第二层·记忆走廊、第三层·机关庭院、第四层·镜之间、第五层·最终之门"
+  已解锁房间:
+    type: "Array<string>"
+    check:
+      - 进入新房间时将房间名 insert 到数组中
+  通关状态:
+    check:
+      - "默认为'进行中'，仅在选择最终之门时更新为对应结局"
+      - "可选结局：结局A·并肩黎明、结局B·独行者、结局C·留在箱庭"
+  选择记录:
+    信任始:
+      type: number
+      range: "0~100"
+      check:
+        - "合作行动、坦诚交流时 +3~+15"
+        - "独自行动、拒绝始的帮助时 -3~-10"
+        - 影响结局走向
+    独立行动次数:
+      type: number
+      check:
+        - 玩家选择独自探索、拒绝合作时 +1~+2
+    合作行动次数:
+      type: number
+      check:
+        - 玩家选择与始合作、共同行动时 +1~+2
+    牺牲选择:
+      type: "Array<string>"
+      check:
+        - 在关键抉择中记录玩家选择的简短描述
+    发现的秘密:
+      type: "Array<string>"
+      check:
+        - 发现箱庭真相线索时 insert 简短描述
+        - "秘密数量 >= 4 时解锁第五层无名之门"
+    始的心墙:
+      type: number
+      range: "0~100"
+      check:
+        - "合作、坦诚、触碰始内心时 delta -3~-20"
+        - "独自行动、疏远始时 delta +3~+10"
+        - 影响始的情感开放程度
+  主角:
+    持有物品:
+      type: |-
+        Array<{
+          name: string;
+          description: string;
+          interactions: Array<Record<string, string>>;
+        }>
+      check:
+        - 获取新物品时 insert，使用或丢弃后 remove
+        - 物品可跨层携带使用（如第一层的六角形金属块用于第三层喷泉）
+        - 每个物品的 interactions 描述调用条件和工具
+    状态:
+      check:
+        - "可选值：正常、轻伤、中毒、疲惫"
+        - 受伤或特殊事件时更新
+  场景物品:
+    type: |-
+      Array<{
+        name: string;
+        description: string;
+        interactions: Array<Record<string, string>>;
+      }>
+    check:
+      - 进入新房间时整体替换为该房间的场景物品
+      - 物品被拿走后 remove，转入主角.持有物品
+      - 物品状态变化时更新 description 和 interactions
+  始:
+    当前位置:
+      check:
+        - 始移动或转移房间后更新
+    重要物品:
+      check:
+        - 获得或失去重要物品时更新
+    重要记忆:
+      check:
+        - 获得关键经历或剧情节点时更新
+    着装:
+      check:
+        - 随剧情变化更新，需详细描述所有衣物
+    "情绪状态.${pleasure|arousal|dominance|affinity}":
+      type: number
+      range: "-1~1"
+      check:
+        - "pleasure：-1 极端痛苦 → 1 极端喜悦"
+        - "arousal：-1 松弛 → 1 肾上腺素爆发"
+        - "dominance：-1 彻底被情势拖着走 → 1 全盘掌握节奏"
+        - "affinity：-1 排斥疏远 → 1 亲昵依赖"
+        - 随交互和剧情推进更新，保留一位小数
+    当前所想:
+      check:
+        - 始当前的内心独白，随互动实时更新
+        - 应体现始的性格特质（清单思维、技术性描述情感）
+    线索:
+      check:
+        - 始当前掌握的关键推理线索或下一步计划
+    状态:
+      check:
+        - "可选值：正常、紧张、动摇、坦诚"
+        - 根据剧情压力和始的心墙值调整

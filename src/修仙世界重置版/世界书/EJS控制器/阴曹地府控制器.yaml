@@ -1,0 +1,29 @@
+@@preprocessing
+<%/* 阴曹地府控制器
+ * 根据位置变量动态激活阴曹地府相关世界书条目
+ * 阴曹地府无子区域分级，进入即激活全部地点和NPC
+ * 会跳过已被扫描控制器激活的条目
+ */-%>
+<%
+if (typeof mainArea === 'undefined') var mainArea = getvar('stat_data.大区域', { defaults: '中央神州' });
+if (typeof _scanActivated === 'undefined') var _scanActivated = [];
+function _notScanned(name) { return _scanActivated.indexOf(name) === -1; }
+-%>
+<% if (mainArea === '阴曹地府') { %>
+<%- await getwi('地图_阴曹地府') %>
+<%- await getwi('黄泉路') %>
+<%- await getwi('忘川河') %>
+<%- await getwi('望乡台') %>
+<%- await getwi('阎罗殿') %>
+<%- await getwi('枉死城') %>
+<%- await getwi('六道轮回盘') %>
+<%- await getwi('地藏道场') %>
+<%- await getwi('鬼市') %>
+<%- await getwi('轮回禁地') %>
+<% if (_notScanned('崔钰')) { %><%- await getwi('崔钰') %><% } %>
+<% if (_notScanned('孟婆')) { %><%- await getwi('孟婆') %><% } %>
+<% if (_notScanned('画皮')) { %><%- await getwi('画皮') %><% } %>
+<% if (_notScanned('小倩')) { %><%- await getwi('小倩') %><% } %>
+<% if (_notScanned('幽冥花')) { %><%- await getwi('幽冥花') %><% } %>
+<% if (_notScanned('钟馗')) { %><%- await getwi('钟馗') %><% } %>
+<% } %>

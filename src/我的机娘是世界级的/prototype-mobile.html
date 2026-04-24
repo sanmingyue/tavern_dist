@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>机娘 - 手机版</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-deepest: #060a13;
+  --bg-deep: #0c1120;
+  --bg-panel: #111827;
+  --bg-card: #1a2236;
+  --bg-card-hover: #212d47;
+  --border: rgba(99,130,255,0.15);
+  --border-active: rgba(99,130,255,0.5);
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-glow: rgba(99,102,241,0.3);
+  --gold: #f59e0b;
+  --gold-light: #fbbf24;
+  --cyan: #06b6d4;
+  --red: #ef4444;
+  --green: #10b981;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+body {
+  font-family: -apple-system, 'Noto Sans SC', system-ui, sans-serif;
+  background: var(--bg-deepest);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+}
+.view { position: absolute; inset: 0; transition: opacity 0.25s, transform 0.25s; }
+.view.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+.view.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+/* ══════ 视图切换浮动按钮 ══════ */
+.fab-toggle {
+  position: fixed;
+  bottom: calc(70px + var(--safe-bottom));
+  right: 16px;
+  z-index: 100;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border-active);
+  background: rgba(17,24,39,0.95);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.fab-toggle svg { width: 20px; height: 20px; }
+
+/* ══════════════════════════════════════════
+   剧情视图
+   ══════════════════════════════════════════ */
+#story-view { display: flex; flex-direction: column; background: var(--bg-deepest); }
+.m-story-header {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-deep);
+  flex-shrink: 0;
+}
+.m-story-title { font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 2px; }
+.m-story-state { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.m-story-state.daily { background: rgba(16,185,129,0.15); color: var(--green); }
+.m-story-body { flex: 1; padding: 20px 16px; overflow-y: auto; }
+.m-story-body::-webkit-scrollbar { display: none; }
+.m-story-text { font-size: 14px; line-height: 1.9; }
+.m-story-text p { margin-bottom: 14px; }
+.m-story-text .dialogue { color: var(--gold-light); }
+.m-story-text .narration { color: var(--text-dim); font-style: italic; }
+
+/* ══════════════════════════════════════════
+   操作视图
+   ══════════════════════════════════════════ */
+#game-view { display: flex; flex-direction: column; background: var(--bg-deepest); }
+
+/* 顶栏 */
+.m-topbar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-deep);
+  flex-shrink: 0;
+}
+.m-topbar-logo { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: var(--accent-light); }
+.m-topbar-stat { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+.m-topbar-stat svg { width: 14px; height: 14px; opacity: 0.6; }
+.m-topbar-stat .val { font-weight: 700; }
+.m-topbar-stat .val.credit { color: var(--gold-light); }
+.m-topbar-stat .val.enhance { color: var(--cyan); }
+.m-topbar-state { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.m-topbar-state.daily { background: rgba(16,185,129,0.15); color: var(--green); }
+
+/* 内容区 */
+.m-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  padding-bottom: calc(70px + var(--safe-bottom));
+}
+.m-content::-webkit-scrollbar { display: none; }
+.m-panel { display: none; }
+.m-panel.active { display: block; }
+.m-panel-title { font-size: 18px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.m-panel-title::before { content: ''; width: 3px; height: 16px; background: var(--accent); border-radius: 2px; }
+
+/* 底部 Tab 栏 */
+.m-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: calc(56px + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  z-index: 50;
+}
+.m-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 56px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.m-tab.active { color: var(--accent-light); }
+.m-tab svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+.m-tab span { font-size: 10px; font-weight: 600; }
+
+/* ══════ 通用组件 ══════ */
+.m-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 10px; }
+.m-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.m-btn-primary { background: linear-gradient(135deg, var(--accent), #4f46e5); color: #fff; }
+.m-btn-secondary { background: var(--bg-card); color: var(--text-dim); border: 1px solid var(--border); }
+.m-btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.m-btn-gold { background: linear-gradient(135deg, var(--gold), #d97706); color: #000; }
+.m-btn-sm { padding: 5px 10px; font-size: 11px; }
+.m-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.m-badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+.m-badge-gold { background: rgba(245,158,11,0.15); color: var(--gold); }
+.m-badge-blue { background: rgba(99,102,241,0.15); color: var(--accent-light); }
+
+/* 五维条 */
+.m-stat-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.m-stat-lbl { width: 30px; font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: right; }
+.m-stat-bar { flex: 1; height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+.m-stat-fill { height: 100%; border-radius: 3px; }
+.m-stat-fill.acc { background: linear-gradient(90deg, #ef4444, #f97316); }
+.m-stat-fill.spd { background: linear-gradient(90deg, #f59e0b, #eab308); }
+.m-stat-fill.hdl { background: linear-gradient(90deg, #06b6d4, #0ea5e9); }
+.m-stat-fill.dft { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.m-stat-fill.end { background: linear-gradient(90deg, #10b981, #34d399); }
+.m-stat-val { width: 24px; font-size: 11px; font-weight: 700; text-align: right; }
+
+/* 总览数字卡 */
+.m-overview-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.m-ov-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+.m-ov-card .num { font-size: 22px; font-weight: 800; }
+.m-ov-card .num.gold { color: var(--gold-light); }
+.m-ov-card .num.cyan { color: var(--cyan); }
+.m-ov-card .num.purple { color: var(--accent-light); }
+.m-ov-card .sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* 机娘头像 */
+.m-avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.m-avatar svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 1.5; }
+
+/* 共鸣条 */
+.m-res-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+.m-res-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--gold)); border-radius: 4px; }
+
+/* 商品行 */
+.m-shop-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.m-shop-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--bg-card-hover); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.m-shop-icon svg { width: 18px; height: 18px; stroke: var(--accent-light); fill: none; stroke-width: 1.5; }
+
+/* 配置滑条 */
+.m-pt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 8px 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.m-pt-dim { width: 32px; font-size: 11px; font-weight: 700; }
+.m-pt-slider { flex: 1; -webkit-appearance: none; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; }
+.m-pt-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 2px solid var(--accent-light); }
+.m-pt-val { width: 28px; text-align: center; font-size: 13px; font-weight: 700; }
+.m-pt-max { font-size: 10px; color: var(--text-muted); }
+
+/* 对手行 */
+.m-opp-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.m-opp-rank { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: var(--bg-card); border: 1px solid var(--border); flex-shrink: 0; }
+.m-opp-rank.r1 { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; }
+.m-opp-rank.r2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #000; border: none; }
+.m-opp-rank.r3 { background: linear-gradient(135deg, #b45309, #92400e); color: #fff; border: none; }
+
+/* 子Tab */
+.m-sub-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.m-sub-tab { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); }
+.m-sub-tab.active { background: rgba(99,102,241,0.15); color: var(--accent-light); border-color: var(--border-active); }
+</style>
+</head>
+<body>
+
+<!-- 视图切换 FAB -->
+<button class="fab-toggle" onclick="mToggleView()" id="mFab">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" id="mFabIcon">
+    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+  </svg>
+</button>
+
+<!-- ═══ 剧情视图 ═══ -->
+<div class="view visible" id="story-view">
+  <div class="m-story-header">
+    <span class="m-story-title">MECH GIRL</span>
+    <span class="m-story-state daily">日 常</span>
+  </div>
+  <div class="m-story-body">
+    <div class="m-story-text">
+      <p class="narration">雨后的赛道散发着橡胶和沥青混合的气味。路灯把积水照成了碎金色的镜面。</p>
+      <p>兰月明靠在车库的铁门上，双臂抱在胸前，粉色的双马尾蒙了一层细密的水雾。</p>
+      <p class="dialogue">"……又来一个。"</p>
+      <p class="dialogue">"弯道过不去，直道再快也没用。听了多少遍了？"</p>
+      <p>她的嘴角翘着，但眼睛没在笑。胸口的黑色结晶体发出极微弱的嗡鸣。</p>
+      <p class="dialogue">"……你站那么近干嘛。"</p>
+      <p>V12的低频嗡鸣比刚才重了一点。</p>
+      <p class="narration">她的手指不自觉地攥了一下袖口。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 操作视图 ═══ -->
+<div class="view hidden" id="game-view">
+  <!-- 顶栏 -->
+  <div class="m-topbar">
+    <span class="m-topbar-logo">MG</span>
+    <div class="m-topbar-stat"><svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2 2"/></svg><span class="val credit">12,500</span></div>
+    <div class="m-topbar-stat"><svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg><span class="val enhance">8</span></div>
+    <span class="m-topbar-state daily">日常</span>
+  </div>
+
+  <!-- 内容区 -->
+  <div class="m-content">
+
+    <!-- 总览 Tab -->
+    <div class="m-panel active" id="mp-home">
+      <div class="m-panel-title">总览</div>
+      <div class="m-overview-row">
+        <div class="m-ov-card"><div class="num gold">12,500</div><div class="sub">信用</div></div>
+        <div class="m-ov-card"><div class="num cyan">8</div><div class="sub">强化</div></div>
+        <div class="m-ov-card"><div class="num purple">T4</div><div class="sub">赛事</div></div>
+      </div>
+      <div class="m-card">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">当前搭档</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="m-avatar"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:14px">兰月明</div><div style="font-size:11px;color:var(--text-muted)">Veneno · V12自吸</div></div>
+          <span class="m-badge m-badge-green">正常</span>
+        </div>
+      </div>
+      <div class="m-card">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">机库 · 兰月明</div>
+        <div class="m-stat-row"><span class="m-stat-lbl">ACC</span><div class="m-stat-bar"><div class="m-stat-fill acc" style="width:99%"></div></div><span class="m-stat-val">99</span></div>
+        <div class="m-stat-row"><span class="m-stat-lbl">SPD</span><div class="m-stat-bar"><div class="m-stat-fill spd" style="width:95%"></div></div><span class="m-stat-val">95</span></div>
+        <div class="m-stat-row"><span class="m-stat-lbl">HDL</span><div class="m-stat-bar"><div class="m-stat-fill hdl" style="width:30%"></div></div><span class="m-stat-val">30</span></div>
+        <div class="m-stat-row"><span class="m-stat-lbl">DFT</span><div class="m-stat-bar"><div class="m-stat-fill dft" style="width:15%"></div></div><span class="m-stat-val">15</span></div>
+        <div class="m-stat-row"><span class="m-stat-lbl">END</span><div class="m-stat-bar"><div class="m-stat-fill end" style="width:55%"></div></div><span class="m-stat-val">55</span></div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:6px">天赋：加速度、极速 · 共鸣：<span style="color:var(--cyan)">直道唯一的女王</span></div>
+      </div>
+    </div>
+
+    <!-- 商店 Tab -->
+    <div class="m-panel" id="mp-shop">
+      <div class="m-panel-title">商店</div>
+      <div class="m-sub-tabs"><div class="m-sub-tab active">外形改件</div><div class="m-sub-tab">技能改件</div></div>
+      <div class="m-card" style="padding:10px 14px">
+        <div class="m-shop-row">
+          <div class="m-shop-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg></div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600">碳纤维GT尾翼</div><div style="font-size:10px;color:var(--text-muted)">尾翼</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--gold-light)">2,000</div>
+          <button class="m-btn m-btn-primary m-btn-sm">购买</button>
+        </div>
+        <div class="m-shop-row">
+          <div class="m-shop-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600">月光银线拉花</div><div style="font-size:10px;color:var(--text-muted)">花纹</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--gold-light)">1,500</div>
+          <button class="m-btn m-btn-primary m-btn-sm">购买</button>
+        </div>
+        <div class="m-shop-row" style="border:none">
+          <div class="m-shop-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:600">冰蓝LED灯组</div><div style="font-size:10px;color:var(--text-muted)">灯组</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--gold-light)">3,200</div>
+          <button class="m-btn m-btn-primary m-btn-sm">购买</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 赛事 Tab -->
+    <div class="m-panel" id="mp-race">
+      <div class="m-panel-title">赛事</div>
+      <div class="m-sub-tabs"><div class="m-sub-tab active">报名</div><div class="m-sub-tab">配置</div><div class="m-sub-tab">比赛</div></div>
+      <!-- 报名子页 -->
+      <div class="m-card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="m-badge m-badge-blue">T4 城市赛</span><span style="font-size:10px;color:var(--text-muted)">报名费 800</span></div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">新港城街道赛</div>
+        <div style="font-size:11px;color:var(--text-dim)">街道赛 · 12圈</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px">点数 200 · 单项 65</div>
+        <button class="m-btn m-btn-primary m-btn-sm" style="margin-top:8px;width:100%">报名</button>
+      </div>
+      <div class="m-card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="m-badge m-badge-blue">T4 城市赛</span><span style="font-size:10px;color:var(--text-muted)">报名费 650</span></div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">海滨大道耐力赛</div>
+        <div style="font-size:11px;color:var(--text-dim)">耐力赛 · 4h</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px">点数 200 · 单项 65</div>
+        <button class="m-btn m-btn-primary m-btn-sm" style="margin-top:8px;width:100%">报名</button>
+      </div>
+    </div>
+
+    <!-- 改装 Tab -->
+    <div class="m-panel" id="mp-mod">
+      <div class="m-panel-title">改装 · 兰月明</div>
+      <div class="m-sub-tabs"><div class="m-sub-tab active">已装备</div><div class="m-sub-tab">仓库</div><div class="m-sub-tab">强化</div></div>
+      <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:6px">外形改件</div>
+      <div class="m-card" style="display:flex;align-items:center;gap:10px">
+        <div class="m-shop-icon" style="width:36px;height:36px"><svg viewBox="0 0 24 24" width="16" height="16"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg></div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:600">碳纤维GT尾翼</div></div>
+        <button class="m-btn m-btn-danger m-btn-sm">拆卸</button>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin:12px 0 6px">技能改件</div>
+      <div class="m-card" style="display:flex;align-items:center;gap:10px;border-style:dashed">
+        <div style="width:36px;height:36px;border-radius:8px;border:1px dashed var(--text-muted);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--text-muted)" fill="none" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div style="flex:1;font-size:11px;color:var(--text-muted)">T1+ 赛事解锁</div>
+      </div>
+    </div>
+
+    <!-- 比赛实况 Tab（嵌套在赛事中，也可单独作为 Tab 内容） -->
+    <div class="m-panel" id="mp-live">
+      <div class="m-panel-title">比赛实况</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><div style="font-size:10px;color:var(--text-muted)">排名</div><div style="font-size:36px;font-weight:900;color:var(--gold-light)">P3</div></div>
+        <div style="text-align:center"><div style="font-size:10px;color:var(--text-muted)">新港城街道赛</div><div style="font-size:13px;font-weight:700;margin-top:2px">T4 街道赛</div></div>
+        <div style="text-align:right"><div style="font-size:13px">圈 <span style="font-weight:700;font-size:16px">7</span>/12</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">湿滑</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;margin-bottom:4px">共鸣值</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px"><div class="m-res-bar" style="flex:1"><div class="m-res-fill" style="width:72%"></div></div><span style="font-size:12px;font-weight:700;color:var(--cyan)">72</span></div>
+      <div style="font-size:11px;font-weight:600;margin-bottom:6px">排行榜</div>
+      <div class="m-opp-row"><div class="m-opp-rank r1">1</div><div style="flex:1"><div style="font-size:12px;font-weight:600">陈风</div><div style="font-size:10px;color:var(--text-muted)">红雪</div></div><div style="font-size:10px;color:var(--cyan)">高转哀泣</div></div>
+      <div class="m-opp-row"><div class="m-opp-rank r2">2</div><div style="flex:1"><div style="font-size:12px;font-weight:600">李明远</div><div style="font-size:10px;color:var(--text-muted)">璃音</div></div><div style="font-size:10px;color:var(--text-muted);text-decoration:line-through">星坠反转✓</div></div>
+      <div class="m-opp-row"><div class="m-opp-rank r3">3</div><div style="flex:1"><div style="font-size:12px;font-weight:600">你</div><div style="font-size:10px;color:var(--text-muted)">兰月明</div></div><div style="font-size:10px;color:var(--cyan)">直道唯一的女王</div></div>
+      <div class="m-opp-row" style="border:none"><div class="m-opp-rank">4</div><div style="flex:1"><div style="font-size:12px;font-weight:600">张一凡</div><div style="font-size:10px;color:var(--text-muted)">NPC</div></div><div style="font-size:10px;color:var(--text-muted);text-decoration:line-through">疾风突进✓</div></div>
+    </div>
+
+  </div>
+
+  <!-- 底部 Tab 栏 -->
+  <div class="m-tabbar">
+    <div class="m-tab active" onclick="mSwitchTab('home',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>总览</span>
+    </div>
+    <div class="m-tab" onclick="mSwitchTab('shop',this)">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span>商店</span>
+    </div>
+    <div class="m-tab" onclick="mSwitchTab('race',this)">
+      <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      <span>赛事</span>
+    </div>
+    <div class="m-tab" onclick="mSwitchTab('mod',this)">
+      <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+      <span>改装</span>
+    </div>
+    <div class="m-tab" onclick="mSwitchTab('live',this)">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span>比赛</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let mView = 'story';
+function mToggleView() {
+  const s = document.getElementById('story-view'), g = document.getElementById('game-view'), icon = document.getElementById('mFabIcon');
+  if (mView === 'story') {
+    s.classList.replace('visible','hidden'); g.classList.replace('hidden','visible');
+    icon.innerHTML = '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>';
+    mView = 'game';
+  } else {
+    g.classList.replace('visible','hidden'); s.classList.replace('hidden','visible');
+    icon.innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
+    mView = 'story';
+  }
+}
+function mSwitchTab(name, el) {
+  document.querySelectorAll('.m-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.m-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('mp-' + name).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

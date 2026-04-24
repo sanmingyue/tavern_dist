@@ -1,0 +1,452 @@
+LorebookToolCall 使用指南
+========================
+
+虚拟世界书文件系统，通过 function calling 让 AI 以类文件系统的方式读写世界书条目及角色卡数据。
+
+════════════════════════════════════════════
+一、虚拟路径规则（POSIX 风格）
+════════════════════════════════════════════
+
+/                                          根目录（列出所有可用路径）
+/Worldbooks/                               世界书目录前缀
+/Worldbooks/<世界书名>/                    世界书根目录
+/Worldbooks/<世界书名>/<条目路径>          具体条目
+/Characters/<角色名>/                      角色卡目录
+/Characters/<角色名>/Description.md        角色描述
+/Characters/<角色名>/WorldBook/            角色绑定世界书
+/Characters/<角色名>/FirstMessages/        开局消息
+/Characters/<角色名>/Regex/                角色正则
+/Characters/<角色名>/Scripts/              角色脚本
+/Schemas/                                  JSON Schema 目录
+
+条目名中的 / 会自动形成虚拟目录层级：
+  条目名 "测试1/喵喵"  → 虚拟路径 /Worldbooks/-SnowYuki/测试1/喵喵
+  条目名 "测试2/呜呜"  → 虚拟路径 /Worldbooks/-SnowYuki/测试2/呜呜
+  条目名 "角色/白娅"   → 虚拟路径 /Worldbooks/我的世界书/角色/白娅
+  条目名 "设定/世界观" → 虚拟路径 /Worldbooks/我的世界书/设定/世界观
+
+  在酒馆的世界书面板中，这些条目会自动显示为树状文件夹结构：
+    📁 -SnowYuki
+      📁 测试1
+        📄 喵喵
+      📁 测试2
+        📄 呜呜
+      📄 [InitVar]初始变量1
+      📄 [mvu_update]变量更新规则
+      📄 角色信息
+      ...
+
+虚拟目录的核心用途——按需暴露内容给 LLM：
+  条目用 / 分层后，LLM 通过 Glob/Grep 只能逐层浏览，而不会一次性看到
+  世界书的全部内容。这让你可以：
+  - 将大量设定按主题分组（如 "角色/"、"设定/"、"剧情/"），
+    LLM 必须先 Glob 查看目录结构，再 Read 具体条目
+  - 控制 token 消耗：LLM 不会把整本世界书的内容一次性塞进上下文
+  - 实现渐进式信息获取：LLM 先了解整体结构，再按需深入读取
+
+════════════════════════════════════════════
+二、工具列表
+════════════════════════════════════════════
+
+注：所有工具返回统一的 JSON 结果格式，成功失败都会包装为标准响应。
+
+────────────────────────────────────────────
+1. Glob(pattern, path?)
+────────────────────────────────────────────
+
+快速文件名模式匹配工具，适用于任意规模的代码库。
+
+参数：
+  pattern  (必填) 用于匹配文件名的 glob 模式。
+           例如 "*"、"**/*"、"[mvu_update]*"。
+           若不提供 path，也兼容绝对写法，如 "/Schemas/*"。
+  path     (可选) 要搜索的虚拟目录路径。使用绝对路径，
+           如 "/Worldbooks/设定集"、"/Characters/角色名" 或 "/Schemas"。
+           省略时默认为根目录 "/"。
+
+说明：
+  - 优先将 path 作为基目录、pattern 作为相对 glob
+  - 若省略 path，也接受绝对模式如 "/${LorebookName}/[mvu_update]*"、
+    "/${LorebookName}/*"、"/Schemas/*"，会自动拆分父路径为 path
+  - 返回匹配文件按修改时间排序
+  - 适合查找需要按名称定位的文件
+  - 可在单次响应中调用多个工具并行搜索
+  - 对于开放式搜索（需要多轮 glob + grep），建议投机性地并行执行
+
+示例：
+  Glob("*", "/${LorebookName}")                  列出某世界书下所有条目
+  Glob("**/*", "/Worldbooks/写卡知识库")          递归列出所有条目
+  Glob("[mvu_update]*", "/${LorebookName}")       匹配以 [mvu_update] 开头的条目
+  Glob("/Schemas/*")                              列出所有 Schema
+
+────────────────────────────────────────────
+2. Grep(pattern, path, options?)
+────────────────────────────────────────────
+
+基于 ripgrep 的强力内容搜索工具。应始终优先使用 Grep 进行搜索任务。
+
+参数：
+  pattern  (必填) 用于搜索条目内容的正则表达式模式。
+           支持完整正则语法（如 "log.*Error"、"function\\s+\\w+"）。
+  path     (必填) 搜索起点的绝对虚拟路径。
+           必须位于某个确定的 "/${LorebookName}" 或
+           "/Characters/<Name>" 子树内，不能是根目录 "/"
+           或裸世界书根目录。
+
+可选参数（options）：
+  glob       用于过滤文件路径的 glob 模式，匹配基于 path 的相对路径。
+  type       按文件扩展名近似过滤的类型名，如 "ts"、"js"、"json"、"md"、"yaml"。
+  output_mode  输出模式：
+               "content"            返回匹配内容（默认）
+               "files_with_matches" 返回文件路径
+               "count"              返回每个文件的命中次数
+  -B         (仅 output_mode 为 content 时) 为每个匹配额外返回前面的 N 行。
+  -A         (仅 output_mode 为 content 时) 为每个匹配额外返回后面的 N 行。
+  -C         context 的别名：为每个匹配同时返回前后各 N 行。
+  context    (仅 output_mode 为 content 时) 为每个匹配同时返回前后各 N 行。
+  -n         是否显示行号。当前 content 输出天然带行号分隔格式，
+             默认行为保持开启。
+  -i         是否忽略大小写。
+  head_limit 跳过 offset 后，最多返回前 N 条结果或内容块；
+             0 或省略表示不限制。
+  offset     跳过前 N 条结果或内容块后再开始返回；默认从 0 开始。
+  multiline  是否启用多行正则模式，让模式可以跨行匹配。
+
+说明：
+  - 针对权限和访问控制进行了优化
+  - 可用 glob 参数过滤文件（如 "/${LorebookName}/*"、
+    "/${LorebookName}/[mvu_update]*"）
+  - output_mode 有三种：content 显示匹配行、files_with_matches 返回文件路径、
+    count 显示命中次数
+  - 适合开放式搜索（需要多轮搜索）时使用
+  - 模式语法：使用 ripgrep (非 grep) — 大括号需转义 (如 "interface\\{\\}")
+  - 默认模式匹配在单行内，跨行模式如 struct \\{[\\s\\S]*?field
+    需设置 multiline: true
+
+示例：
+  Grep("好感度", "/${LorebookName}/")
+  Grep("function\\s+\\w+", "/Worldbooks/我的世界书/", { output_mode: "count" })
+  Grep("log.*Error", "/${LorebookName}/", { "-C": 3 })
+
+────────────────────────────────────────────
+3. Read(file_path, offset?, limit?)
+────────────────────────────────────────────
+
+读取一个世界书条目的文本内容。
+
+参数：
+  file_path  (必填) 世界书条目的绝对虚拟路径，
+             如 "/Worldbooks/设定集/NPC/理理"。
+             只接受条目路径，不接受世界书根或虚拟目录。
+  offset     (可选) 从第几行开始读取，0 表示从第一行开始；
+             仅在内容较长时提供。
+  limit      (可选) 最多读取多少行；省略时会读取尽可能多的内容，
+             但超长内容会触发保护限制。
+
+说明：
+  - 默认读取整个条目从头开始
+  - 可通过 offset 和 limit 实现分页读取
+  - 结果使用 cat -n 格式返回（带行号，从 1 开始）
+  - 只能读取条目路径，不能读取世界书根或虚拟目录
+  - 可在单次响应中调用多个工具
+  - 建议投机性地并行读取多个可能有用的条目
+
+示例：
+  Read("/Worldbooks/写卡知识库/EJS/EJS基础语法")
+  Read("/Worldbooks/设定集/角色/白娅", 0, 50)          读前50行
+  Read("/Worldbooks/设定集/角色/白娅", 50)             从第50行开始读
+
+────────────────────────────────────────────
+4. Write(file_path, content)
+────────────────────────────────────────────
+
+写入/创建一个世界书条目。
+
+参数：
+  file_path  (必填) 世界书条目的绝对虚拟路径，
+             如 "/Worldbooks/设定集/NPC/理理"。
+             只能操作条目路径，不能操作世界书根或虚拟目录。
+  content    (必填) 要写入条目的完整文本内容。
+
+说明：
+  - 若条目已存在则整体覆盖
+  - 若目标路径不存在则在该虚拟路径创建新世界书条目
+  - 若只需替换条目中的一小部分，优先使用 Edit 工具
+  - file_path 必须是绝对虚拟路径如 "/${LorebookName}/Entry"
+
+示例：
+  Write("/Worldbooks/白娅的世界书/角色/白娅", "白娅的人设内容...")
+
+────────────────────────────────────────────
+5. Edit(file_path, old_string, new_string, replace_all?)
+────────────────────────────────────────────
+
+对已有世界书条目执行精确字符串替换。
+
+参数：
+  file_path    (必填) 世界书条目的绝对虚拟路径。
+               只能操作条目路径，不能操作世界书根或虚拟目录。
+  old_string   (必填) 要在条目内容中查找并替换的原始文本。
+  new_string   (必填) 用于替换 old_string 的新文本。
+  replace_all  (可选) 设为 true 时替换全部命中；
+               省略或 false 时要求 old_string 只能命中一次。
+
+说明：
+  - 用于不重写整个条目而只替换其中一段文本
+  - 若 old_string 未找到则编辑失败
+  - 若 old_string 匹配多处且 replace_all 不为 true 则也会失败
+
+示例：
+  Edit("/Worldbooks/用户世界书/角色/白娅", "好感度:30", "好感度:50")
+  Edit("/Worldbooks/用户世界书/设定/世界观", "旧内容", "新内容", true)
+
+────────────────────────────────────────────
+6. Delete(file_path)
+────────────────────────────────────────────
+
+删除一个世界书条目。
+
+参数：
+  file_path  (必填) 世界书条目的绝对虚拟路径。
+
+说明：
+  - 只能删除条目，不能删除世界书本身
+  - 不会删除虚拟目录；若路径解析为目录前缀则请求失败
+  - 当需要移除某个特定世界书条目时使用
+
+示例：
+  Delete("/Worldbooks/用户世界书/角色/旧角色")
+
+────────────────────────────────────────────
+7. CreateLorebook(lorebook_name)
+────────────────────────────────────────────
+
+创建一个新的空世界书。
+
+参数：
+  lorebook_name  (必填) 要创建的世界书名称，
+                 必须与 SillyTavern 中显示的名称一致，
+                 且不能包含 "/"。
+
+说明：
+  - 若同名世界书已存在则请求失败
+  - 当需要新的世界书根来写入条目时使用
+
+示例：
+  CreateLorebook("我的角色卡世界书")
+
+────────────────────────────────────────────
+8. AskUserQuestion(question) [当前已注释禁用]
+────────────────────────────────────────────
+
+弹出输入框向用户提问。
+
+参数：
+  question  (必填) 需要直接询问用户的问题文本。
+            用于补充缺失信息、澄清歧义或请求用户提供内容。
+
+说明：
+  - 弹出输入弹窗并返回用户的回答（字符串）
+  - 若用户取消弹窗则请求以 USER_REJECTED 失败
+  - 仅在无法从当前上下文安全推断所需信息时才使用此工具
+  - 注意：当前版本中此工具已被注释掉（正常对话本身就是问答，
+    所以不需要额外弹窗）
+
+────────────────────────────────────────────
+9. GetAttribute(file_path)
+────────────────────────────────────────────
+
+读取一个世界书条目的完整属性对象。
+
+参数：
+  file_path  (必填) 世界书条目的绝对虚拟路径。
+
+说明：
+  - 属性只存在于条目上，不存在于世界书根或虚拟目录
+  - 返回的属性直接复用 WorldbookEntry 结构
+  - 当需要获取元数据（如启用状态、插入位置、触发策略或其他条目字段）时使用
+
+返回的属性对象包含以下字段（均可选）：
+  uid          条目在当前世界书内部的 uid（仅在该世界书内有意义）
+  name         条目的显示名称
+  enabled      条目是否启用（布尔值）
+  strategy     激活策略：
+    type       激活策略类型：constant(常量蓝灯)、selective(关键字绿灯)、vectorized(向量化)
+    keys       主要关键字列表（可以是普通文本或正则表达式字符串）
+    keys_secondary  次要关键字规则：
+      logic    次要关键字的匹配逻辑：and_any、and_all、not_all、not_any
+      keys     次要关键字列表
+    scan_depth 扫描深度（0 表示继承全局设置，1 表示扫描最后一条消息，
+               2 表示最后两条，以此类推）
+  position     插入位置：
+    type       位置类型：before/after_character_definition、
+               before/after_example_messages、before/after_author_note、
+               at_depth、outlet
+    role       消息身份（system/assistant/user），仅 type 为 at_depth 时有效
+    depth      插入深度，仅 type 为 at_depth 时有效
+    order      同一插入位置下的排序值
+  content      条目激活后插入到上下文中的文本内容
+  probability  条目的激活概率百分比
+  recursion    递归控制：
+    prevent_incoming  禁止其他条目通过递归激活本条目
+    prevent_outgoing  禁止本条目通过递归激活其他条目
+    delay_until       延迟到第 n 级递归检查时才能激活（0 表示不延迟）
+  effect       激活效果（控制黏性、冷却和聊天轮次延迟）：
+    sticky     黏性效果：条目激活后在之后 n 条消息内持续激活（null 表示关闭）
+    cooldown   冷却效果：条目激活后在之后 n 条消息内不能再次激活（null 表示关闭）
+    delay      延迟效果：聊天至少有 n 条消息后条目才允许激活（null 表示关闭）
+  extra        绑定在条目上的额外自定义字段（键值对）
+
+示例：
+  GetAttribute("/Worldbooks/书名/角色/白娅")
+
+────────────────────────────────────────────
+10. SetAttribute(file_path, attributes)
+────────────────────────────────────────────
+
+以 lossy patch 方式更新世界书条目属性。
+
+参数：
+  file_path   (必填) 世界书条目的绝对虚拟路径。
+  attributes  (必填) 要应用到条目的属性补丁。
+              接受部分 WorldbookEntry 形状的对象。
+
+补丁合并规则：
+  - 对象字段递归合并（深度合并）
+  - 数组字段整体替换
+  - 标量字段整体替换
+  - 未提供字段保持不变
+  - 若补丁修改 comment（名称）导致规范化路径冲突则请求失败
+
+特殊值约定：
+  - strategy.scan_depth 传 0 表示继承全局设置（same_as_global）
+  - recursion.delay_until 传 0 表示不延迟（null）
+  - effect.sticky / effect.cooldown / effect.delay 传 0 表示关闭（null）
+
+示例：
+  SetAttribute("/Worldbooks/书名/条目", { enabled: false })
+  SetAttribute("/Worldbooks/书名/条目", {
+    strategy: { type: "selective", keys: ["白娅", "好感"] },
+    position: { type: "at_depth", depth: 4, role: "system" }
+  })
+  SetAttribute("/Worldbooks/书名/条目", {
+    effect: { sticky: 3, cooldown: 0 }
+  })
+
+════════════════════════════════════════════
+三、典型用法
+════════════════════════════════════════════
+
+查看所有世界书目录：
+  Glob("*", "/Worldbooks/")
+
+查看知识库完整目录：
+  Glob("**/*", "/Worldbooks/写卡知识库")
+
+读取特定知识：
+  Read("/Worldbooks/写卡知识库/EJS/EJS基础语法")
+
+搜索所有包含"好感度"的条目：
+  Grep("好感度", "/Worldbooks/我的世界书/")
+
+只看匹配了哪些文件（不看内容）：
+  Grep("好感度", "/Worldbooks/我的世界书/", { output_mode: "files_with_matches" })
+
+统计命中次数：
+  Grep("好感度", "/Worldbooks/我的世界书/", { output_mode: "count" })
+
+带上下文搜索：
+  Grep("好感度", "/Worldbooks/我的世界书/", { "-C": 5 })
+
+忽略大小写搜索：
+  Grep("hello", "/Worldbooks/我的世界书/", { "-i": true })
+
+创建世界书并写入条目：
+  CreateLorebook("白娅的世界书")
+  Write("/Worldbooks/白娅的世界书/角色/白娅", "白娅的人设内容...")
+
+部分编辑条目内容：
+  Edit("/Worldbooks/用户世界书/角色/白娅", "好感度:30", "好感度:50")
+
+全局替换条目中的内容：
+  Edit("/Worldbooks/用户世界书/设定/世界观", "旧名", "新名", true)
+
+查看条目的完整属性：
+  GetAttribute("/Worldbooks/书名/角色/白娅")
+
+禁用某个条目：
+  SetAttribute("/Worldbooks/书名/条目", { enabled: false })
+
+修改条目的插入位置和深度：
+  SetAttribute("/Worldbooks/书名/条目", {
+    position: { type: "at_depth", depth: 4, role: "system" }
+  })
+
+修改条目的激活策略和关键字：
+  SetAttribute("/Worldbooks/书名/条目", {
+    strategy: {
+      type: "selective",
+      keys: ["白娅", "/好感/i"],
+      keys_secondary: { logic: "and_any", keys: ["变化"] },
+      scan_depth: 3
+    }
+  })
+
+设置条目的黏性和冷却效果：
+  SetAttribute("/Worldbooks/书名/条目", {
+    effect: { sticky: 5, cooldown: 10 }
+  })
+
+设置条目的递归控制：
+  SetAttribute("/Worldbooks/书名/条目", {
+    recursion: { prevent_incoming: true, delay_until: 2 }
+  })
+
+添加条目的自定义扩展字段：
+  SetAttribute("/Worldbooks/书名/条目", {
+    extra: { "custom_field": "自定义值" }
+  })
+
+删除条目：
+  Delete("/Worldbooks/用户世界书/角色/旧角色")
+
+列出 Schema 目录：
+  Glob("*", "/Schemas/")
+
+════════════════════════════════════════════
+四、注意事项
+════════════════════════════════════════════
+
+路径规则：
+  - 世界书名必须与酒馆中完全一致
+  - 路径用 / 分隔，自动规范化（去除多余斜杠等）
+  - 条目路径中的 / 会被当作目录分隔符显示
+
+读写行为：
+  - Write 不存在的路径会自动创建条目
+  - Edit 的 old_string 必须精确匹配，未找到则失败
+  - Edit 在 old_string 匹配多处且 replace_all 不为 true 时也会失败
+  - Read 支持 offset/limit 分页读取大条目
+
+属性操作：
+  - GetAttribute 返回条目的完整属性对象（WorldbookEntry 结构）
+  - SetAttribute 采用 lossy patch 语义：对象递归合并、数组整体替换、标量覆盖、
+    未提供的字段保持原值
+  - SetAttribute 中若修改 comment（名称）导致路径冲突则请求失败
+  - 关键字 (keys) 支持普通文本和正则表达式字符串两种形式
+
+特殊哨兵值：
+  - strategy.scan_depth = 0 → 继承全局设置 (same_as_global)
+  - recursion.delay_until = 0 → 不延迟 (null)
+  - effect.sticky / cooldown / delay = 0 → 关闭该效果 (null)
+
+工具调用注意：
+  - 可在单次响应中调用多个工具并行执行
+  - 建议投机性地并行读取/搜索多个条目以提高效率
+  - 所有工具返回统一的 JSON 结果格式（成功/失败包装）
+  - AskUserQuestion 当前已注释禁用（正常对话即可获取信息）
+
+已注册工具列表（v1）：
+  Glob, Grep, Read, Write, Edit, Delete,
+  CreateLorebook, GetAttribute, SetAttribute
+  （AskUserQuestion 已注释禁用）
