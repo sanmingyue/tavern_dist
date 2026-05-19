@@ -2634,7 +2634,7 @@
                     "enabled": true,
                     "name": "明月与秋青",
                     "id": "fae24f26-946c-4107-a35d-93cd7e3c2262",
-                    "content": "import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mqzn-v0.1.7/dist/明月秋青脚本/index.js'\n",
+                    "content": "import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mqzn-v0.2.0/dist/明月秋青脚本/index.js'\n",
                     "info": "",
                     "button": {
                         "enabled": true,
