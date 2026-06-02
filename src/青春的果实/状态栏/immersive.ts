@@ -1,4 +1,4 @@
-/**
+ /**
  * 沉浸式攻略面板 v4
  *
  * 三页画面布局：
@@ -9,12 +9,14 @@
  * 手机端：底部抽屉面板，带下拉关闭手势
  */
 
+import { CHARACTER_LIST } from './store';
 import { generateTheater, getIsGenerating } from './theater/generator';
 import type { TheaterResult } from './theater/types';
-import { CHARACTER_LIST } from './store';
+import { getCharacterVisuals, type CharacterRuntimeData } from './visuals';
 
 // ── DOM ID ──
 const STYLE_ID = 'fruit-immersive-style-v4';
+const BACKDROP_ID = 'fruit-im-backdrop';
 const PANEL_ID = 'fruit-im-panel';
 const SWIPE_HINT_CLASS = 'fruit-im-swipe-hint';
 
@@ -22,7 +24,6 @@ const SWIPE_HINT_CLASS = 'fruit-im-swipe-hint';
 const resultCache: Record<string, TheaterResult> = {};
 let currentCharacter: string | null = null;
 let onCloseCallback: (() => void) | null = null;
-let savedBackground: string | null = null;
 
 // ── SVG 图标 ──
 const SVG_CLOSE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
@@ -48,7 +49,26 @@ function isMobile(): boolean {
 function ensureStyles() {
   if ($(`#${STYLE_ID}`).length > 0) return;
 
-  $('<style>').attr('id', STYLE_ID).html(`
+  $('<style>')
+    .attr('id', STYLE_ID)
+    .html(
+      `
+    /* ━━━━ 全屏背景覆盖层 ━━━━ */
+    #${BACKDROP_ID} {
+      position: fixed;
+      inset: 0;
+      z-index: 9990;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      pointer-events: none;
+      transition: background-image 0.5s ease, opacity 0.5s ease;
+    }
+    #${BACKDROP_ID}.fruit-im-active {
+      opacity: 0.1;
+    }
+
     /* ━━━━ 沉浸模式聊天滚动条 ━━━━ */
     body.fruit-immersive-active #chat::-webkit-scrollbar {
       width: 4px;
@@ -68,22 +88,18 @@ function ensureStyles() {
       scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
     }
 
-    /* ━━━━ 左侧面板：占满 #chat 左边空白 ━━━━ */
+    /* ━━━━ 左侧面板 ━━━━ */
     #${PANEL_ID} {
       position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
       overflow-y: auto;
-      padding: 60px 24px 24px;
-      z-index: 1;
+      z-index: 9991;
       pointer-events: auto;
       font-family: 'Microsoft YaHei', 'PingFang SC', system-ui, sans-serif;
       color: rgba(255, 255, 255, 0.85);
-      background: transparent;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
       border: none;
       box-shadow: none;
-      animation: fruit-im-fade-in 0.4s ease-out;
     }
     /* 隐藏滚动条 */
     #${PANEL_ID}::-webkit-scrollbar { width: 0; height: 0; }
@@ -94,7 +110,7 @@ function ensureStyles() {
       position: fixed;
       top: 8px;
       left: 8px;
-      z-index: 2;
+      z-index: 9992;
       display: flex;
       align-items: center;
       gap: 4px;
@@ -281,10 +297,10 @@ function ensureStyles() {
     /* ━━━━ 手机端 ━━━━ */
     @media (max-width: 768px) {
       #${PANEL_ID} {
-        left: 0;
-        right: 0;
-        bottom: 0;
-        top: auto;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
         width: 100% !important;
         max-height: 75vh;
         padding: 0 16px 16px;
@@ -292,6 +308,7 @@ function ensureStyles() {
         backdrop-filter: blur(12px);
         border-top: 1px solid rgba(255,255,255,0.08);
         border-radius: 16px 16px 0 0;
+        z-index: 9999;
         animation: fruit-im-slide-up 0.3s ease-out;
       }
       .${SWIPE_HINT_CLASS} {
@@ -301,7 +318,9 @@ function ensureStyles() {
         display: none;
       }
     }
-  `).appendTo('head');
+  `,
+    )
+    .appendTo('head');
 }
 
 // ── 工具函数 ──
@@ -311,11 +330,18 @@ function escapeHTML(str: string): string {
 
 function getRelationClass(relation: string): string {
   switch (relation) {
-    case '恋人': return 'fruit-im-relation--lover';
-    case '暧昧': return 'fruit-im-relation--ambiguous';
-    case '熟悉': return 'fruit-im-relation--familiar';
-    case '决裂': case '封心': case '疏远': return 'fruit-im-relation--broken';
-    default: return 'fruit-im-relation--default';
+    case '恋人':
+      return 'fruit-im-relation--lover';
+    case '暧昧':
+      return 'fruit-im-relation--ambiguous';
+    case '熟悉':
+      return 'fruit-im-relation--familiar';
+    case '决裂':
+    case '封心':
+    case '疏远':
+      return 'fruit-im-relation--broken';
+    default:
+      return 'fruit-im-relation--default';
   }
 }
 
@@ -340,20 +366,42 @@ function buildResultHTML(result: TheaterResult): string {
   `;
 }
 
-/** 更新面板宽度以匹配 #chat 左侧空白（仅 PC 端） */
+/** 更新面板宽度/位置 */
 function updatePanelWidth() {
   const $panel = $(`#${PANEL_ID}`);
   if ($panel.length === 0) return;
 
-  // 手机端不设置 inline width，让 CSS media query 接管
   if (isMobile()) {
-    $panel.css('width', '');
+    // 手机端：直接用 JS 设置底部抽屉定位（不依赖 CSS media query）
+    $panel.css({
+      left: '0',
+      right: '0',
+      bottom: '0',
+      top: 'auto',
+      width: '100%',
+      'max-height': '75vh',
+      padding: '0 16px 16px',
+      background: 'rgba(10,10,20,0.95)',
+      'backdrop-filter': 'blur(12px)',
+      'border-top': '1px solid rgba(255,255,255,0.08)',
+      'border-radius': '16px 16px 0 0',
+      'z-index': '9999',
+      animation: 'fruit-im-slide-up 0.3s ease-out',
+    });
     return;
   }
 
+  // PC 端：左侧面板定位
   const leftOffset = getChatLeftOffset();
   const width = Math.max(200, leftOffset - 16);
-  $panel.css('width', `${width}px`);
+  $panel.css({
+    left: '0',
+    top: '0',
+    bottom: '0',
+    width: `${width}px`,
+    padding: '60px 24px 24px',
+    animation: 'fruit-im-fade-in 0.4s ease-out',
+  });
 }
 
 // ── 手机端下拉关闭手势 ──
@@ -385,34 +433,27 @@ function onSwipePointerUp(e: PointerEvent) {
 }
 
 /** 进入沉浸模式或切换角色 */
-export async function enterImmersive(
-  characterName: string,
-  relation: string,
-  favor: number,
-  onClose: () => void,
-) {
+export async function enterImmersive(characterName: string, charData: CharacterRuntimeData, onClose: () => void) {
   ensureStyles();
   onCloseCallback = onClose;
   currentCharacter = characterName;
 
   const meta = CHARACTER_LIST.find(c => c.name === characterName);
-  const image = meta?.image ?? '';
+  const visuals = meta ? getCharacterVisuals(meta, charData) : null;
+  const image = visuals?.background ?? '';
   const intro = meta?.intro ?? '';
   const identity = meta?.identity ?? '';
+  const relation = charData.关系状态;
+  const favor = charData.好感度;
 
-  // ── 设置酒馆真正背景 ──
+  // ── 全屏背景覆盖层 ──
   if (image) {
-    // 保存当前背景以便退出时恢复
-    savedBackground = $('#bg1').css('background-image') ?? null;
-    try {
-      await eventEmit(tavern_events.FORCE_SET_BACKGROUND, {
-        url: `url("${image}")`,
-        path: image,
-      });
-    } catch (e) {
-      console.warn('[沉浸模式] FORCE_SET_BACKGROUND 失败，回退到直接设置:', e);
-      $('#bg1').css('background-image', `url("${image}")`);
+    let $backdrop = $(`#${BACKDROP_ID}`);
+    if ($backdrop.length === 0) {
+      $backdrop = $('<div>').attr('id', BACKDROP_ID).appendTo('body');
     }
+    $backdrop.css('background-image', `url("${image}"), url("${visuals?.fallback ?? image}")`);
+    requestAnimationFrame(() => $backdrop.addClass('fruit-im-active'));
   }
 
   // ── 添加沉浸模式 body class（用于滚动条样式） ──
@@ -461,56 +502,46 @@ export async function enterImmersive(
   $closeBtn.off('click').on('click', exitImmersive);
 
   // ── 窥探内心按钮事件 ──
-  $panel.find('.fruit-im-peek-btn').off('click').on('click', async () => {
-    if (getIsGenerating()) return;
-    const charName = currentCharacter;
-    if (!charName) return;
+  $panel
+    .find('.fruit-im-peek-btn')
+    .off('click')
+    .on('click', async () => {
+      if (getIsGenerating()) return;
+      const charName = currentCharacter;
+      if (!charName) return;
 
-    const $btn = $panel.find('.fruit-im-peek-btn');
-    const $result = $panel.find('.fruit-im-result');
+      const $btn = $panel.find('.fruit-im-peek-btn');
+      const $result = $panel.find('.fruit-im-result');
 
-    $btn.prop('disabled', true).html(`${SVG_SPINNER} 窥探中...`);
-    $result.html('');
+      $btn.prop('disabled', true).html(`${SVG_SPINNER} 窥探中...`);
+      $result.html('');
 
-    try {
-      const theaterResult = await generateTheater(charName, relation, favor);
-      resultCache[charName] = theaterResult;
-      if (currentCharacter === charName) {
-        $result.html(buildResultHTML(theaterResult));
+      try {
+        const theaterResult = await generateTheater(charName, relation, favor);
+        resultCache[charName] = theaterResult;
+        if (currentCharacter === charName) {
+          $result.html(buildResultHTML(theaterResult));
+        }
+      } catch (e) {
+        if (currentCharacter === charName) {
+          $result.html(
+            `<div class="fruit-im-section" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#fca5a5;font-size:12px;padding:8px 10px;">${escapeHTML(String(e))}</div>`,
+          );
+        }
+      } finally {
+        if (currentCharacter === charName) {
+          $btn.prop('disabled', false).html(`${SVG_EYE} 窥探内心`);
+        }
       }
-    } catch (e) {
-      if (currentCharacter === charName) {
-        $result.html(`<div class="fruit-im-section" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#fca5a5;font-size:12px;padding:8px 10px;">${escapeHTML(String(e))}</div>`);
-      }
-    } finally {
-      if (currentCharacter === charName) {
-        $btn.prop('disabled', false).html(`${SVG_EYE} 窥探内心`);
-      }
-    }
-  });
+    });
 }
 
 /** 退出沉浸模式 */
-export async function exitImmersive() {
-  // 恢复背景
-  if (savedBackground) {
-    try {
-      // 尝试恢复为原来的背景
-      const bgMatch = savedBackground.match(/url\("?(.+?)"?\)/);
-      if (bgMatch && bgMatch[1] && !bgMatch[1].includes('__transparent')) {
-        await eventEmit(tavern_events.FORCE_SET_BACKGROUND, {
-          url: savedBackground,
-          path: bgMatch[1],
-        });
-      } else {
-        // 原来是透明背景，直接还原 CSS
-        $('#bg1').css('background-image', savedBackground);
-      }
-    } catch {
-      $('#bg1').css('background-image', savedBackground);
-    }
-    savedBackground = null;
-  }
+export function exitImmersive() {
+  // 移除背景覆盖层
+  const $backdrop = $(`#${BACKDROP_ID}`);
+  $backdrop.removeClass('fruit-im-active');
+  setTimeout(() => $backdrop.remove(), 500);
 
   // 移除沉浸模式 body class
   $('body').removeClass('fruit-immersive-active');
