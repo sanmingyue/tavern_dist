@@ -53,7 +53,7 @@
 | **8bit的幻想控制台** | **`8bit-v`** | **`8bit-v1.0.8`** | **8bit 世界 AIRP 前端控制台正式入口** |
 | **裂隙纪元前端版控制台** | **`rift-v`** | **`rift-v0.0.1`** | **裂隙纪元 AIRP 伪0层大型前端卡控制台** |
 | **卫疏影开局脚本** | **`wsy-v`** | **`wsy-v0.0.1`** | **卫疏影角色卡开局导入脚本** |
-| **明月秋青智脑脚本** | **`zhino-v`** | **`zhino-v1.0.0`** | **智脑系统：大总结+梦呓+倒果为因+NSFW隔离+情绪积累** |
+| **明月秋青智脑脚本** | **`zhino-v`** | **`zhino-v4.0.0`** | **智脑系统：大总结+梦呓+倒果为因+NSFW隔离+情绪积累+后台角色行动推演** |
 | **青春的果实状态栏** | **`fruit-v`** | **`fruit-v5.0.0`** | **青春的果实角色卡 MVU 状态栏悬浮窗** |
 | **onion状态栏** | **`onion-v`** | **`onion-v0.0.1`** | **一脸嫌弃给你看胖次的onion IF线状态栏** |
 
@@ -111,19 +111,20 @@ C:\Users\三明月\Desktop\tavern_dist_repo\ ← 发布仓库（只放打包产�
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@zhino-v1.0.0/dist/明月秋青脚本/index.js'
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@zhino-v4.0.0/dist/明月秋青脚本/index.js'
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\明月秋青脚本\index.js" "C:\Users\三明月\Desktop\tavern_dist_repo\dist\明月秋青脚本\" && cd /d C:\Users\三明月\Desktop\tavern_dist_repo && git add . && git commit -m "明月秋青智脑脚本更新" && git tag zhino-v1.0.X && git push && git push origin zhino-v1.0.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\明月秋青脚本" "dist\明月秋青脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "明月秋青智脑脚本 v4.0.0" && git tag zhino-v4.0.0 && git push && git push origin zhino-v4.0.0
 ```
 
 **版本历史**
 
 | 版本号 | 日期 | 更新内容 |
 |--------|------|----------|
+| zhino-v4.0.0 | 2026-06-03 | B3.3 大版本发布：后台角色行动推演系统、大总结 Delta 增量存储、串行调度 v2、角色库 NSFW 记忆和逻辑树展示、梦呓多角色修复、数据导入 safeParse 校验、倒计时和楼层隐藏修复 |
 | zhino-v1.0.0 | 2026-05-25 | 正式发布：智脑系统v1.0，包含大总结（含NSFW第四SECTION）、梦呓分析（含NSFW分流）、倒果为因（剧情走向预测+节奏控制）、NSFW隔离层（自动检测预设变量）、情绪积累系统（走预设流程读世界书）、撤回/恢复机制、历史楼层补录fallback |
 
 ---
@@ -618,6 +619,6 @@ git tag -l "lanjing-v*" --sort=-creatordate  # 澜景市前端脚本
 | 预设JSON CDN 目录 | `@latest/dist/presets/` |
 | **酒馆联机脚本 CDN** | `@online-v0.2.2/dist/酒馆联机脚本/index.js` |
 | **卫疏影开局脚本 CDN** | `@wsy-v0.0.1/dist/卫疏影/index.js` |
-| **明月秋青智脑脚本 CDN** | `@zhino-v1.0.0/dist/明月秋青脚本/index.js` |
+| **明月秋青智脑脚本 CDN** | `@zhino-v4.0.0/dist/明月秋青脚本/index.js` |
 | **onion状态栏 CDN** | `@onion-v0.0.6/dist/一脸嫌弃给你看胖次的onion/状态栏/index.js` |
 | 角色卡PNG CDN 目录 | `@char-v1.0.0/dist/characters/` |
