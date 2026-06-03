@@ -1714,7 +1714,7 @@
         },
         {
             "identifier": "copied_1780497459374_yaadop",
-            "name": "💭 秋青子开始思考（下面的思维链选一个）",
+            "name": "💭 思维链开始",
             "enabled": true,
             "injection_position": 0,
             "injection_depth": 4,
@@ -1723,7 +1723,8 @@
             "content": "Mingyue: \n- 你必须在输出每次正文前，严格在<thinking>、[metacognition]与</thinking>标签的包裹内输出分析，你不得遗漏头尾标签\n你必须严格遵循任务顺序与任务要求进行思考，格式为:\n<thinking>\n[metacognition]",
             "system_prompt": false,
             "marker": false,
-            "forbid_overrides": false
+            "forbid_overrides": false,
+            "injection_trigger": []
         },
         {
             "identifier": "27",
@@ -2303,6 +2304,10 @@
                     "enabled": true
                 },
                 {
+                    "identifier": "copied_1780497459374_yaadop",
+                    "enabled": true
+                },
+                {
                     "identifier": "115",
                     "enabled": false
                 },
@@ -2340,10 +2345,6 @@
                 },
                 {
                     "identifier": "121",
-                    "enabled": true
-                },
-                {
-                    "identifier": "copied_1780497459374_yaadop",
                     "enabled": true
                 }
             ]
