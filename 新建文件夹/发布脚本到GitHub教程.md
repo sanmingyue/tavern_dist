@@ -19,12 +19,9 @@
   - [创意工坊脚本](#创意工坊脚本ws-v)
   - [明月秋青智脑脚本](#明月秋青智脑脚本zhino-v)
   - [秋青子写卡IDE](#秋青子写卡ideide-v)
-  - [莱姆戴森球计划控制台](#莱姆戴森球计划控制台dyson-v)
   - [澜景市地图编辑器](#澜景市地图编辑器map-v)
-  - [澜景市前端脚本](#澜景市前端脚本lanjing-v)
   - [酒馆联机脚本](#酒馆联机脚本online-v)
   - [8bit的幻想控制台](#8bit的幻想控制台8bit-v)
-  - [裂隙纪元前端版控制台](#裂隙纪元前端版控制台rift-v)
 - **CDN 资源**
   - [预设JSON文件](#预设json文件preset-v)
   - [角色卡PNG文件](#角色卡png文件char-v)
@@ -39,19 +36,16 @@
 | 项目 | 版本号前缀 | 示例 | 说明 |
 |------|-----------|------|------|
 | 修仙世界脚本 | `xw-v` | `xw-v1.1.3` | 状态栏 + CE脚本 |
-| 潮汐预设脚本 | `cp-v` | `cp-v1.5.6` | 预设悬浮窗 + 预设仓库 |
-| 预设JSON文件 | `preset-v` | `preset-v1.2.11` | CDN分发的预设文件 |
+| 潮汐预设脚本 | `cp-v` | `cp-v2.0.0` | 预设悬浮窗 + 预设仓库 |
+| 预设JSON文件 | `preset-v` | `preset-v1.2.12` | CDN分发的预设文件 |
 | 角色卡PNG文件 | `char-v` | `char-v1.0.0` | CDN分发的角色卡PNG |
 | 点赞致谢数据 | `reactions-v` | `reactions-v1.0.0` | CDN分发的点赞JSON数据 |
 | 小手机脚本 | `phone-v` | `phone-v0.2.2` | 虚拟手机模拟器 |
 | 创意工坊脚本 | `ws-v` | `ws-v2.1.1` | 创意工坊悬浮窗（Zeabur后端） |
 | **秋青子写卡IDE** | **`ide-v`** | **`ide-v1.0.16`** | **写卡预设全屏IDE工作环境** |
-| **莱姆戴森球计划控制台** | **`dyson-v`** | **`dyson-v1.0.6`** | **戴森球沙盒建造 AIRP 前端控制台** |
 | **澜景市地图编辑器** | **`map-v`** | **`map-v1.0.2`** | **世界书地图树状编辑器** |
-| **澜景市前端脚本** | **`lanjing-v`** | **`lanjing-v0.0.1`** | **澜景市 Part2 前端脚本与规则接口，小手机内置版** |
 | **酒馆联机脚本** | **`online-v`** | **`online-v0.2.2`** | **多人 AIRP 联机房间（SSE实时通信 + Zeabur后端）** |
 | **8bit的幻想控制台** | **`8bit-v`** | **`8bit-v1.0.8`** | **8bit 世界 AIRP 前端控制台正式入口** |
-| **裂隙纪元前端版控制台** | **`rift-v`** | **`rift-v0.0.1`** | **裂隙纪元 AIRP 伪0层大型前端卡控制台** |
 | **卫疏影开局脚本** | **`wsy-v`** | **`wsy-v0.0.1`** | **卫疏影角色卡开局导入脚本** |
 | **明月秋青智脑脚本** | **`zhino-v`** | **`zhino-v4.0.0`** | **智脑系统：大总结+梦呓+倒果为因+NSFW隔离+情绪积累+后台角色行动推演** |
 | **青春的果实状态栏** | **`fruit-v`** | **`fruit-v5.0.0`** | **青春的果实角色卡 MVU 状态栏悬浮窗** |
@@ -64,40 +58,30 @@
 ## 目录结构
 
 ```
-C:\Users\三明月\Desktop\三明月\           ← 开发项目（源码，不上传）
+C:\Users\三明月\Desktop\三明月\           ← 当前 GitHub/CDN 仓库（源码 + 打包产物）
 ├── src\明月秋青脚本\                     ← 明月秋青智脑脚本源码
 ├── src\创意工坊\                         ← 创意工坊脚本源码
 ├── src\修仙世界状态栏\                   ← 修仙世界状态栏源码
 ├── src\修仙世界重置版\脚本\CE脚本\       ← 修仙世界CE脚本源码
 ├── src\潮汐预设脚本\                     ← 潮汐预设脚本源码
-├── src\莱姆戴森球计划\脚本\控制台\        ← 莱姆戴森球计划控制台源码
 ├── src\澜景市地图编辑器\                 ← 澜景市地图编辑器源码
-├── src\澜景市\                           ← 澜景市前端脚本源码
 ├── src\8bit的幻想\脚本\控制台\           ← 8bit的幻想控制台源码
-├── src\裂隙纪元前端版\前端脚本\控制台\    ← 裂隙纪元前端版控制台源码
 ├── 我的预设\                             ← 预设JSON文件（源）
 ├── 我的角色卡\                           ← 角色卡PNG文件（源）
-└── dist\                                ← 打包产物
+└── dist\                                ← CDN 分发目录（提交到 GitHub）
+    ├── 创意工坊\index.js
+    ├── 修仙世界状态栏\index.js
+    ├── 修仙世界重置版\脚本\CE脚本\index.js
+    ├── 潮汐预设脚本\index.js
+    ├── 小手机\index.js
+    ├── 澜景市地图编辑器\index.js
+    ├── 酒馆联机脚本\index.js
+    ├── 8bit的幻想\脚本\控制台\index.js
+    ├── presets\                         ← CDN分发的预设JSON
+    ├── characters\                      ← CDN分发的角色卡PNG
+    └── reactions\                       ← CDN分发的点赞数据
 
 C:\Users\三明月\Desktop\workshop-server\  ← 创意工坊后端（独立仓库，部署在Zeabur）
-
-C:\Users\三明月\Desktop\tavern_dist_repo\ ← 发布仓库（只放打包产物）
-├── dist\
-│   ├── 创意工坊\index.js
-│   ├── 修仙世界状态栏\index.js
-│   ├── 修仙世界重置版\脚本\CE脚本\index.js
-│   ├── 潮汐预设脚本\index.js
-│   ├── 小手机\index.js
-│   ├── 莱姆戴森球计划\脚本\控制台\index.js
-│   ├── 澜景市地图编辑器\index.js
-│   ├── 澜景市\index.js
-│   ├── 酒馆联机脚本\index.js
-│   ├── 8bit的幻想\脚本\控制台\index.js
-│   ├── 裂隙纪元前端版\前端脚本\控制台\index.js
-│   ├── presets\                         ← CDN分发的预设JSON
-│   ├── characters\                      ← CDN分发的角色卡PNG
-│   └── reactions\                       ← CDN分发的点赞数据
-└── README.md
 ```
 
 ---
@@ -167,7 +151,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@onion-v0.0.6/di
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\一脸嫌弃给你看胖次的onion\状态栏\index.js" "C:\Users\三明月\Desktop\tavern_dist_repo\dist\一脸嫌弃给你看胖次的onion\状态栏\" && xcopy /Y "src\一脸嫌弃给你看胖次的onion\图片\*.png" "C:\Users\三明月\Desktop\tavern_dist_repo\dist\一脸嫌弃给你看胖次的onion\状态栏\assets\" && cd /d C:\Users\三明月\Desktop\tavern_dist_repo && git add . && git commit -m "onion状态栏更新" && git tag onion-v0.0.X && git push && git push origin onion-v0.0.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && New-Item -ItemType Directory -Force "dist\一脸嫌弃给你看胖次的onion\状态栏\assets" && Copy-Item "src\一脸嫌弃给你看胖次的onion\图片\*.png" "dist\一脸嫌弃给你看胖次的onion\状态栏\assets\" -Force && git add "src\一脸嫌弃给你看胖次的onion" "dist\一脸嫌弃给你看胖次的onion" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "onion状态栏更新" && git tag onion-v0.0.X && git push && git push origin onion-v0.0.X
 ```
 
 **版本历史**
@@ -189,7 +173,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@wsy-v0.0.1/dist
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\卫疏影\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\卫疏影\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "卫疏影开局脚本更新" && git tag wsy-v0.0.X && git push && git push origin wsy-v0.0.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\卫疏影" "dist\卫疏影" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "卫疏影开局脚本更新" && git tag wsy-v0.0.X && git push && git push origin wsy-v0.0.X
 ```
 
 **版本历史**
@@ -197,33 +181,6 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\卫疏�
 | 版本号 | 日期 | 更新内容 |
 |--------|------|----------|
 | wsy-v0.0.1 | 2026-05-12 | 初始发布：修复 ready 页面导入角色图显示（左侧竖长方形立绘）、删除背景下雪动画、写完0层后自动关闭脚本 |
-
----
-
-### 裂隙纪元前端版控制台（rift-v）
-
-**CDN 链接**
-
-```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@rift-v0.0.6/dist/裂隙纪元前端版/前端脚本/控制台/index.js'
-```
-
-**一键更新**
-
-```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\裂隙纪元前端版\前端脚本\控制台\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\裂隙纪元前端版\前端脚本\控制台\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "裂隙纪元前端版控制台更新" && git tag rift-v0.0.X && git push && git push origin rift-v0.0.X
-```
-
-**版本历史**
-
-| 版本号 | 日期 | 更新内容 |
-|--------|------|----------|
-| rift-v0.0.6 | 2026-05-14 | 紧急修复点击开始游戏后黑屏：修正可达地点数据结构读取错误，外部退出按钮常驻可见，并增加 Vue 运行时错误兜底页面 |
-| rift-v0.0.5 | 2026-05-14 | 重排游玩界面：AIRP 正文默认作为大舞台展开，右侧固定回想日志，可一键收起正文；隐藏开发者感较强的大总结入口，修复斜切美化导致文字裁切，并增加加载失败提示与正文生成超时兜底 |
-| rift-v0.0.4 | 2026-05-14 | 重构正文生成提示词分层：保留酒馆预设正文结构，用户最新输入只承载本轮行动；前端记忆包单独注入，世界书关键词使用 should_scan 触发绿灯，AI仅负责描写不决定前端权威状态 |
-| rift-v0.0.3 | 2026-05-13 | 调整正文上下文读取：正文 AI 改为读取“最新大总结 + 当前未总结日志 + 本次行动轨迹”，避免最近3条正文与日志重复通道造成记忆断层 |
-| rift-v0.0.2 | 2026-05-13 | 完成 AIRP 正文核心玩法：全新红黑白高反差舞台界面、每次前端行动后自动生成正文、主界面只显示最新3条正文、旧正文日志化、每10条正文由前端 generateRaw 总结、生成后自动清理临时酒馆楼层 |
-| rift-v0.0.1 | 2026-05-13 | 初始测试发布：裂隙纪元 AIRP 伪0层前端控制台，包含权威存档、地图旅行、任务链、战斗、NPC互动、商店装备、势力称号、叙事注入与调试面板 |
 
 ---
 
@@ -238,7 +195,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@8bit-v1.0.9/dis
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\8bit的幻想\脚本\控制台\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\8bit的幻想\脚本\控制台\" && xcopy /Y "src\8bit的幻想\脚本\控制台\图片素材\*.png" "C:\Users\三明月\Desktop\tavern_dist\dist\8bit的幻想\脚本\控制台\assets\" && xcopy /Y "src\8bit的幻想\专属预设和世界书\*.json" "C:\Users\三明月\Desktop\tavern_dist\dist\8bit的幻想\专属预设和世界书\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "8bit的幻想 v1.0.9" && git tag 8bit-v1.0.9 && git push && git push origin 8bit-v1.0.9
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && New-Item -ItemType Directory -Force "dist\8bit的幻想\脚本\控制台\assets" "dist\8bit的幻想\专属预设和世界书" && Copy-Item "src\8bit的幻想\脚本\控制台\图片素材\*.png" "dist\8bit的幻想\脚本\控制台\assets\" -Force && Copy-Item "src\8bit的幻想\专属预设和世界书\*.json" "dist\8bit的幻想\专属预设和世界书\" -Force && git add "src\8bit的幻想" "dist\8bit的幻想" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "8bit的幻想 v1.0.9" && git tag 8bit-v1.0.9 && git push && git push origin 8bit-v1.0.9
 ```
 
 **版本历史**
@@ -263,34 +220,6 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\8bit的�
 
 ---
 
-### 莱姆戴森球计划控制台（dyson-v）
-
-**CDN 链接**
-
-```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@dyson-v1.0.6/dist/莱姆戴森球计划/脚本/控制台/index.js'
-```
-
-**一键更新**
-
-```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\莱姆戴森球计划\脚本\控制台\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\莱姆戴森球计划\脚本\控制台\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "莱姆戴森球计划控制台更新" && git tag dyson-v1.0.X && git push && git push origin dyson-v1.0.X
-```
-
-**版本历史**
-
-| 版本号 | 日期 | 更新内容 |
-|--------|------|----------|
-| dyson-v1.0.6 | 2026-05-08 | 修复逃生按钮挂载后仍常驻的问题；控制台可见英文状态、单位和调试标签改为中文；压缩底部工程里程碑在低高度视口下的显示 |
-| dyson-v1.0.5 | 2026-05-08 | 修复 v1.0.4 逃生按钮改动引入的 iframe load 时序竞态，避免只显示退出按钮但控制台黑屏 |
-| dyson-v1.0.4 | 2026-05-08 | 新增 M9 UI 卡死逃生按钮：宿主页面独立退出控件和 Escape 热键，不依赖 Vue 渲染即可卸载全屏控制台 |
-| dyson-v1.0.3 | 2026-05-07 | 修复 M9 自检面板运行时缺少 `SAVE_SCHEMA_VERSION` 引用导致调试面板无法渲染的问题 |
-| dyson-v1.0.2 | 2026-05-07 | 新增 M9 只读稳定性自检：调试面板“自检”页签覆盖 schema、时间戳、离线结算边界、资源/库存同步、建筑/生产/队列/科技/物流/探索/戴森计数和记录引用检查 |
-| dyson-v1.0.1 | 2026-05-07 | 新增 M8 调试与世界书路由面板：chat 存档 JSON 导出/导入、世界书扫描文本预览、莱姆注入预览、schema 迁移导入校验、顶部和告警 Dock 调试入口 |
-| dyson-v1.0.0 | 2026-05-07 | 初始发布：全屏莱姆中枢、现实时间结算、建造/生产/物流/研究/里程碑/星图勘测，变量由前端脚本控制 |
-
----
-
 ### 澜景市地图编辑器（map-v）
 
 **CDN 链接**
@@ -302,7 +231,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@map-v1.0.2/dist
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\澜景市地图编辑器\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\澜景市地图编辑器\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "澜景市地图编辑器更新" && git tag map-v1.0.X && git push && git push origin map-v1.0.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\澜景市地图编辑器" "dist\澜景市地图编辑器" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "澜景市地图编辑器更新" && git tag map-v1.0.X && git push && git push origin map-v1.0.X
 ```
 
 **版本历史**
@@ -312,28 +241,6 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\澜景�
 | map-v1.0.2 | 2026-05-08 | 新增地图画布拖拽平移、滚轮缩放和缩放比例显示；保存、改层级、移动后自动重新分类并聚焦到新位置 |
 | map-v1.0.1 | 2026-05-08 | 修正世界书条目分类映射，新增向下分层地图视图、地图编辑面板和 minimap |
 | map-v1.0.0 | 2026-05-08 | 初始发布：世界书地图树状编辑器 |
-
----
-
-### 澜景市前端脚本（lanjing-v）
-
-**CDN 链接**
-
-```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@lanjing-v0.0.1/dist/澜景市/index.js'
-```
-
-**一键更新**
-
-```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\澜景市\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\澜景市\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "澜景市前端脚本 v0.0.1" && git tag lanjing-v0.0.1 && git push && git push origin lanjing-v0.0.1
-```
-
-**版本历史**
-
-| 版本号 | 日期 | 更新内容 |
-|--------|------|----------|
-| lanjing-v0.0.1 | 2026-05-15 | Part2 初始交接版：完成规则脚本骨架、主存档 Schema、Action dispatcher、时间/移动/经济/关系/日历/地标/天气引擎、世界书注入、AI 标签解析、小手机内置同步接口和最低限度规则面板；P1/P3 内容后续合并适配 |
 
 ---
 
@@ -353,7 +260,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@online-v0.2.2/d
 **前端更新流程**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\酒馆联机脚本\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\酒馆联机脚本\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "酒馆联机脚本更新" && git tag online-v0.2.X && git push && git push origin online-v0.2.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\酒馆联机脚本" "dist\酒馆联机脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "酒馆联机脚本更新" && git tag online-v0.2.X && git push && git push origin online-v0.2.X
 ```
 
 **后端更新流程**（修改后端代码后）
@@ -387,7 +294,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@ide-v1.0.16/dis
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\秋青子写卡预设\伪IDE\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\秋青子写卡预设\伪IDE\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "秋青子写卡IDE更新" && git tag ide-v1.0.X && git push && git push origin ide-v1.0.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\秋青子写卡预设" "dist\秋青子写卡预设" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "秋青子写卡IDE更新" && git tag ide-v1.0.X && git push && git push origin ide-v1.0.X
 ```
 
 **版本历史**
@@ -436,10 +343,13 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@ws-v2.1.1/dist/
 **更新流程**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build
-xcopy /Y "dist\创意工坊\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\创意工坊\"
-cd C:\Users\三明月\Desktop\tavern_dist
-git add . && git commit -m "创意工坊脚本更新" && git tag ws-v2.X.X && git push && git push origin ws-v2.X.X
+cd C:\Users\三明月\Desktop\三明月
+pnpm build
+git add "src\创意工坊" "dist\创意工坊" "新建文件夹\发布脚本到GitHub教程.md"
+git commit -m "创意工坊脚本更新"
+git tag ws-v2.X.X
+git push
+git push origin ws-v2.X.X
 ```
 
 **后端更新流程**（修改后端代码后）
@@ -477,7 +387,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@xw-v1.1.3/dist/
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\修仙世界状态栏\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\修仙世界状态栏\" && xcopy /Y "dist\修仙世界重置版\脚本\CE脚本\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\修仙世界重置版\脚本\CE脚本\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "修仙世界脚本更新" && git tag xw-v1.1.X && git push && git push origin xw-v1.1.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\修仙世界状态栏" "src\修仙世界重置版\脚本\CE脚本" "dist\修仙世界状态栏" "dist\修仙世界重置版\脚本\CE脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "修仙世界脚本更新" && git tag xw-v1.1.X && git push && git push origin xw-v1.1.X
 ```
 
 ---
@@ -487,19 +397,20 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\修仙�
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v1.5.6/dist/潮汐预设脚本/index.js'
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.0.0/dist/潮汐预设脚本/index.js'
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\潮汐预设脚本\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\潮汐预设脚本\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "潮汐预设脚本更新" && git tag cp-v1.5.6 && git push && git push origin cp-v1.5.6
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && New-Item -ItemType Directory -Force "dist\presets" && Copy-Item "我的预设\明月秋青by oneself.json" "dist\presets\" -Force && git add "src\潮汐预设脚本" "dist\潮汐预设脚本" "dist\presets\明月秋青by oneself.json" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "潮汐预设脚本 v2.0.0" && git tag cp-v2.0.0 && git tag preset-v1.2.12 && git push && git push origin cp-v2.0.0 && git push origin preset-v1.2.12
 ```
 
 **版本历史**
 
 | 版本号 | 日期 | 更新内容 |
 |--------|------|----------|
+| cp-v2.0.0 | 2026-06-04 | 大版本更新：新增亮色模式、顶部字体大小 1/2/3 快捷档位；预设仓库新增“明月秋青 by oneself”，标签 Gemini/Claude/DSV4PRO，并显示更新日期 2026.6.4；仓库预设资源版本号升至 `preset-v1.2.12` |
 | cp-v1.5.6 | 2026-05-19 | 预设仓库更新：明月秋青 Synapse Memory Yield 预设更新，CDN 预设版本号升至 preset-v1.2.11 |
 | cp-v1.5.4 | 2026-05-19 | 预设仓库更新：删除"明月秋青 Bad End"，新增"明月秋青 Synapse Memory Yield"（Claude/Gemini/最懂你的预设），CDN 预设版本号升至 preset-v1.2.9 |
 
@@ -516,7 +427,7 @@ import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@phone-v0.2.2/di
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\小手机\index.js" "C:\Users\三明月\Desktop\tavern_dist\dist\小手机\" && cd C:\Users\三明月\Desktop\tavern_dist && git add . && git commit -m "小手机脚本更新" && git tag phone-v0.2.X && git push && git push origin phone-v0.2.X
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\小手机" "dist\小手机" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "小手机脚本更新" && git tag phone-v0.2.X && git push && git push origin phone-v0.2.X
 ```
 
 **版本历史**
@@ -536,28 +447,38 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && xcopy /Y "dist\小手�
 
 ### 预设JSON文件（preset-v）
 
-预设文件放在 `tavern_dist/dist/presets/` 目录下，CDN 路径使用 `@latest`。
+预设文件发布到当前仓库的 `dist/presets/` 目录，CDN 路径使用 `preset-v` 版本号，避免 CDN 缓存导致玩家下载到旧文件。
 
 **更新流程**
 
 ```powershell
-Copy-Item 'C:\Users\三明月\Desktop\三明月\我的预设\*' 'C:\Users\三明月\Desktop\tavern_dist\dist\presets\' -Force
-cd C:\Users\三明月\Desktop\tavern_dist
-git add . && git commit -m "更新预设文件" && git tag preset-v1.X.X && git push && git push origin preset-v1.X.X
+cd C:\Users\三明月\Desktop\三明月
+New-Item -ItemType Directory -Force "dist\presets"
+Copy-Item "我的预设\要发布的预设.json" "dist\presets\" -Force
+git add "dist\presets\要发布的预设.json"
+git commit -m "更新预设文件"
+git tag preset-v1.X.X
+git push
+git push origin preset-v1.X.X
 ```
 
 ---
 
 ### 角色卡PNG文件（char-v）
 
-角色卡PNG放在 `tavern_dist/dist/characters/` 目录下。
+角色卡PNG发布到当前仓库的 `dist/characters/` 目录下。
 
 **更新流程**
 
 ```powershell
-Copy-Item 'C:\Users\三明月\Desktop\三明月\dist\characters\*' 'C:\Users\三明月\Desktop\tavern_dist\dist\characters\' -Force
-cd C:\Users\三明月\Desktop\tavern_dist
-git add . && git commit -m "更新角色卡文件" && git tag char-v1.0.X && git push && git push origin char-v1.0.X
+cd C:\Users\三明月\Desktop\三明月
+New-Item -ItemType Directory -Force "dist\characters"
+Copy-Item "我的角色卡\*.png" "dist\characters\" -Force
+git add "dist\characters"
+git commit -m "更新角色卡文件"
+git tag char-v1.0.X
+git push
+git push origin char-v1.0.X
 ```
 
 ---
@@ -565,9 +486,14 @@ git add . && git commit -m "更新角色卡文件" && git tag char-v1.0.X && git
 ### 点赞致谢数据（reactions-v）
 
 ```powershell
-Copy-Item 'C:\Users\三明月\Desktop\三明月\预设点赞致谢\reactions_*.json' 'C:\Users\三明月\Desktop\tavern_dist\dist\reactions\reactions.json' -Force
-cd C:\Users\三明月\Desktop\tavern_dist
-git add . && git commit -m "更新点赞致谢数据" && git tag reactions-v1.0.X && git push && git push origin reactions-v1.0.X
+cd C:\Users\三明月\Desktop\三明月
+New-Item -ItemType Directory -Force "dist\reactions"
+Copy-Item "预设点赞致谢\reactions_*.json" "dist\reactions\reactions.json" -Force
+git add "dist\reactions\reactions.json"
+git commit -m "更新点赞致谢数据"
+git tag reactions-v1.0.X
+git push
+git push origin reactions-v1.0.X
 ```
 
 ---
@@ -576,7 +502,7 @@ git add . && git commit -m "更新点赞致谢数据" && git tag reactions-v1.0.
 
 ```bash
 # 查看所有标签（按时间倒序）
-cd C:\Users\三明月\Desktop\tavern_dist && git tag --sort=-creatordate
+cd C:\Users\三明月\Desktop\三明月 && git tag --sort=-creatordate
 
 # 只看某个项目的标签
 git tag -l "ws-v*" --sort=-creatordate     # 创意工坊
@@ -588,9 +514,7 @@ git tag -l "phone-v*" --sort=-creatordate  # 小手机
 git tag -l "reactions-v*" --sort=-creatordate # 点赞致谢
 git tag -l "online-v*" --sort=-creatordate   # 酒馆联机
 git tag -l "8bit-v*" --sort=-creatordate     # 8bit的幻想
-git tag -l "rift-v*" --sort=-creatordate     # 裂隙纪元前端版
 git tag -l "wsy-v*" --sort=-creatordate      # 卫疏影
-git tag -l "lanjing-v*" --sort=-creatordate  # 澜景市前端脚本
 ```
 
 ---
@@ -605,18 +529,15 @@ git tag -l "lanjing-v*" --sort=-creatordate  # 澜景市前端脚本
 | 创意工坊管理后台 | https://sanmingyue.zeabur.app/admin |
 | jsdelivr 官网 | https://www.jsdelivr.com/ |
 | **秋青子写卡IDE CDN** | `@ide-v1.0.16/dist/秋青子写卡预设/伪IDE/index.js` |
-| **莱姆戴森球计划 CDN** | `@dyson-v1.0.6/dist/莱姆戴森球计划/脚本/控制台/index.js` |
 | **澜景市地图编辑器 CDN** | `@map-v1.0.2/dist/澜景市地图编辑器/index.js` |
-| **澜景市前端脚本 CDN** | `@lanjing-v0.0.1/dist/澜景市/index.js` |
 | **8bit的幻想 CDN** | `@8bit-v1.0.8/dist/8bit的幻想/脚本/控制台/index.js` |
-| **裂隙纪元前端版 CDN** | `@rift-v0.0.6/dist/裂隙纪元前端版/前端脚本/控制台/index.js` |
 | 创意工坊脚本 CDN | `@ws-v2.1.1/dist/创意工坊/index.js` |
 | 修仙世界状态栏 CDN | `@xw-v1.1.3/dist/修仙世界状态栏/index.js` |
 | 修仙世界CE脚本 CDN | `@xw-v1.1.3/dist/修仙世界重置版/脚本/CE脚本/index.js` |
-| 潮汐预设脚本 CDN | `@cp-v1.5.6/dist/潮汐预设脚本/index.js` |
+| 潮汐预设脚本 CDN | `@cp-v2.0.0/dist/潮汐预设脚本/index.js` |
 | 小手机脚本 CDN | `@phone-v0.2.2/dist/小手机/index.js` |
 | 点赞致谢数据 CDN | `@reactions-v1.0.0/dist/reactions/reactions.json` |
-| 预设JSON CDN 目录 | `@latest/dist/presets/` |
+| 预设JSON CDN 目录 | `@preset-v1.2.12/dist/presets/` |
 | **酒馆联机脚本 CDN** | `@online-v0.2.2/dist/酒馆联机脚本/index.js` |
 | **卫疏影开局脚本 CDN** | `@wsy-v0.0.1/dist/卫疏影/index.js` |
 | **明月秋青智脑脚本 CDN** | `@zhino-v4.0.0/dist/明月秋青脚本/index.js` |

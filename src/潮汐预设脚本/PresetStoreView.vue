@@ -8,7 +8,10 @@
       <div v-for="item in catalog" :key="item.filename" class="chaoxi-store-card">
         <div class="chaoxi-store-card-top">
           <span class="chaoxi-store-card-name">{{ item.name }}</span>
-          <span class="chaoxi-store-card-author">{{ item.author }}</span>
+          <span class="chaoxi-store-card-meta">
+            <span class="chaoxi-store-card-author">{{ item.author }}</span>
+            <span v-if="item.updateDate" class="chaoxi-store-card-date">更新 {{ item.updateDate }}</span>
+          </span>
         </div>
         <p class="chaoxi-store-card-desc">{{ item.description }}</p>
         <div class="chaoxi-store-card-tags">
@@ -60,7 +63,9 @@ async function onImport(item: PresetCatalogItem) {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`下载失败: ${resp.status} ${resp.statusText}`);
     const content = await resp.text();
-    const success = await importRawPreset(item.filename, content);
+    // importRawPreset 会自动加 .json 后缀，需要去掉文件名中已有的 .json
+    const importName = item.filename.replace(/\.json$/i, '');
+    const success = await importRawPreset(importName, content);
     if (success) {
       imported.add(item.filename);
       toastr.success(`预设「${item.name}」导入成功`);
@@ -87,9 +92,11 @@ async function onImport(item: PresetCatalogItem) {
 
 .chaoxi-store-card { padding:12px 14px;border-radius:10px;border:1px solid rgba(77,201,246,.1);background:rgba(77,201,246,.02);transition:all .15s; }
 .chaoxi-store-card:hover { border-color:rgba(77,201,246,.2);background:rgba(77,201,246,.05); }
-.chaoxi-store-card-top { display:flex;align-items:center;justify-content:space-between;margin-bottom:6px; }
+.chaoxi-store-card-top { display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px; }
 .chaoxi-store-card-name { font-size:13px;font-weight:600;color:rgba(255,255,255,.9); }
+.chaoxi-store-card-meta { display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0; }
 .chaoxi-store-card-author { font-size:10px;color:rgba(255,255,255,.3); }
+.chaoxi-store-card-date { font-size:10px;color:rgba(77,201,246,.62);white-space:nowrap; }
 .chaoxi-store-card-desc { font-size:12px;color:rgba(255,255,255,.55);margin:0 0 8px;line-height:1.5; }
 .chaoxi-store-card-tags { display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px; }
 .chaoxi-store-tag { font-size:10px;padding:2px 7px;border-radius:999px;background:rgba(77,201,246,.08);color:rgba(77,201,246,.6);border:1px solid rgba(77,201,246,.1); }

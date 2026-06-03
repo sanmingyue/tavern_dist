@@ -1,5 +1,5 @@
 <template>
-  <div class="chaoxi-root">
+  <div class="chaoxi-root" :class="[`theme-${themeMode}`, `font-scale-${fontScale}`]">
     <!-- 折叠态: 悬浮按钮 -->
     <Transition name="chaoxi-fab">
       <button
@@ -35,7 +35,7 @@
           :class="{ dragging: isPanelDragging }"
           @pointerdown="!isMobile && onPanelPointerDown($event)"
         >
-          <span class="chaoxi-panel-title">潮去汐来，她一直在</span>
+          <span class="chaoxi-panel-title" @click.stop="onTitleClick">潮去汐来，她一直在</span>
           <span class="chaoxi-panel-preset">{{ currentPresetName }}</span>
           <!-- 搜索框（PC在顶栏） -->
           <div v-if="!isMobile" class="chaoxi-topbar-search">
@@ -51,6 +51,23 @@
             />
             <button v-if="searchQuery" class="chaoxi-search-clear-sm" @click="searchQuery = ''" @pointerdown.stop>×</button>
           </div>
+          <div v-if="!isMobile" class="chaoxi-topbar-controls" @pointerdown.stop>
+            <div class="chaoxi-font-control" aria-label="字体大小">
+              <span class="chaoxi-control-label">字体大小</span>
+              <button
+                v-for="size in FONT_SIZES"
+                :key="size"
+                class="chaoxi-control-chip"
+                :class="{ active: fontScale === size }"
+                @click="setFontScale(size)"
+              >{{ size }}</button>
+            </div>
+            <button
+              class="chaoxi-theme-toggle"
+              :class="{ active: themeMode === 'light' }"
+              @click="toggleThemeMode"
+            >亮色</button>
+          </div>
           <button class="chaoxi-btn-icon" @click="isPanelOpen = false" @pointerdown.stop>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -65,6 +82,23 @@
           </svg>
           <input class="chaoxi-topbar-search-input" v-model="searchQuery" placeholder="搜索条目…" spellcheck="false" />
           <button v-if="searchQuery" class="chaoxi-search-clear-sm" @click="searchQuery = ''">×</button>
+          <div class="chaoxi-topbar-controls mobile-controls">
+            <div class="chaoxi-font-control" aria-label="字体大小">
+              <span class="chaoxi-control-label">字体大小</span>
+              <button
+                v-for="size in FONT_SIZES"
+                :key="size"
+                class="chaoxi-control-chip"
+                :class="{ active: fontScale === size }"
+                @click="setFontScale(size)"
+              >{{ size }}</button>
+            </div>
+            <button
+              class="chaoxi-theme-toggle"
+              :class="{ active: themeMode === 'light' }"
+              @click="toggleThemeMode"
+            >亮色</button>
+          </div>
         </div>
 
         <!-- 页面切换 -->
@@ -116,6 +150,10 @@
           <PresetStoreView
             v-if="currentPage === 'store'"
           />
+          <CreditsView
+            v-if="currentPage === 'credits'"
+            @back="currentPage = previousPage"
+          />
         </div>
 
         <!-- 手机底部关闭栏 -->
@@ -161,6 +199,7 @@ import PresetView from './PresetView.vue';
 import CustomView from './CustomView.vue';
 import PresetManagerView from './PresetManagerView.vue';
 import PresetStoreView from './PresetStoreView.vue';
+import CreditsView from './CreditsView.vue';
 
 // ─── 宿主窗口 ───
 const hostWindow = window.parent;
@@ -168,10 +207,50 @@ const windowWidth = ref(hostWindow.innerWidth);
 const windowHeight = ref(hostWindow.innerHeight);
 const safeViewHeight = ref(hostWindow.innerHeight);
 const isMobile = computed(() => windowWidth.value <= 768);
+const THEME_KEY = 'chaoxi-preset-theme';
+const FONT_SCALE_KEY = 'chaoxi-preset-font-scale';
+type ThemeMode = 'dark' | 'light';
+type FontScale = 1 | 2 | 3;
+const FONT_SIZES: FontScale[] = [1, 2, 3];
+
+function readThemeMode(): ThemeMode {
+  try {
+    return hostWindow.localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark';
+  } catch {
+    return 'dark';
+  }
+}
+
+function readFontScale(): FontScale {
+  try {
+    const value = Number(hostWindow.localStorage.getItem(FONT_SCALE_KEY));
+    return FONT_SIZES.includes(value as FontScale) ? (value as FontScale) : 1;
+  } catch {
+    return 1;
+  }
+}
+
+const themeMode = ref<ThemeMode>(readThemeMode());
+const fontScale = ref<FontScale>(readFontScale());
+
+function setThemeMode(mode: ThemeMode) {
+  themeMode.value = mode;
+  try { hostWindow.localStorage.setItem(THEME_KEY, mode); } catch { /* ignore */ }
+}
+
+function toggleThemeMode() {
+  setThemeMode(themeMode.value === 'light' ? 'dark' : 'light');
+}
+
+function setFontScale(size: FontScale) {
+  fontScale.value = size;
+  try { hostWindow.localStorage.setItem(FONT_SCALE_KEY, String(size)); } catch { /* ignore */ }
+}
 
 // ─── 面板状态 ───
 const isPanelOpen = ref(false);
-const currentPage = ref<'preset' | 'custom' | 'manager' | 'store'>('preset');
+const currentPage = ref<'preset' | 'custom' | 'manager' | 'store' | 'credits'>('preset');
+const previousPage = ref<'preset' | 'custom' | 'manager' | 'store'>('preset');
 const searchQuery = ref('');
 const currentPresetName = ref('');
 const customGroups = ref<CustomGroup[]>([]);
@@ -212,6 +291,14 @@ function onPresetSwitched() {
 onRefresh();
 const refreshTimer = setInterval(onRefresh, 5000);
 onUnmounted(() => clearInterval(refreshTimer));
+
+// ─── 标题点击进入致谢页面 ───
+function onTitleClick() {
+  if (currentPage.value !== 'credits') {
+    previousPage.value = currentPage.value as 'preset' | 'custom' | 'manager' | 'store';
+    currentPage.value = 'credits';
+  }
+}
 
 function onAddToGroup(groupId: string, names: string[]) {
   customViewRef.value?.addToGroup(groupId, names);
@@ -450,14 +537,45 @@ onUnmounted(() => {
 /* ═══ 变量 ═══ */
 .chaoxi-root {
   --cx-bg: #050810;
+  --cx-bg-soft: rgba(5, 8, 16, 0.8);
+  --cx-bg-panel: rgba(5, 8, 16, 0.4);
+  --cx-surface: rgba(255, 255, 255, 0.04);
+  --cx-surface-hover: rgba(77, 201, 246, 0.08);
   --cx-primary: #4dc9f6;
   --cx-primary-dim: rgba(77, 201, 246, 0.15);
   --cx-text: rgba(255, 255, 255, 0.88);
   --cx-text-dim: rgba(255, 255, 255, 0.4);
+  --cx-text-muted: rgba(255, 255, 255, 0.25);
   --cx-border: rgba(77, 201, 246, 0.15);
+  --cx-border-soft: rgba(77, 201, 246, 0.08);
+  --cx-font-step: 0px;
+  --cx-shadow: 0 0 30px rgba(77, 201, 246, 0.08), 0 10px 40px rgba(0, 0, 0, 0.5);
+  --cx-overlay: rgba(0, 0, 0, 0.55);
 
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
+}
+.chaoxi-root.theme-light {
+  --cx-bg: #f8fbff;
+  --cx-bg-soft: rgba(255, 255, 255, 0.92);
+  --cx-bg-panel: rgba(236, 246, 255, 0.78);
+  --cx-surface: rgba(12, 76, 112, 0.06);
+  --cx-surface-hover: rgba(14, 116, 144, 0.1);
+  --cx-primary: #087ea4;
+  --cx-primary-dim: rgba(8, 126, 164, 0.13);
+  --cx-text: rgba(15, 23, 42, 0.9);
+  --cx-text-dim: rgba(15, 23, 42, 0.56);
+  --cx-text-muted: rgba(15, 23, 42, 0.35);
+  --cx-border: rgba(8, 126, 164, 0.2);
+  --cx-border-soft: rgba(8, 126, 164, 0.11);
+  --cx-shadow: 0 12px 36px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(8, 126, 164, 0.05);
+  --cx-overlay: rgba(15, 23, 42, 0.22);
+}
+.chaoxi-root.font-scale-2 {
+  --cx-font-step: 1px;
+}
+.chaoxi-root.font-scale-3 {
+  --cx-font-step: 2px;
 }
 
 /* ═══ FAB ═══ */
@@ -497,7 +615,7 @@ onUnmounted(() => {
   border-radius: 12px;
   border: 1px solid var(--cx-border);
   background: var(--cx-bg);
-  box-shadow: 0 0 30px rgba(77, 201, 246, 0.08), 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--cx-shadow);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -517,7 +635,7 @@ onUnmounted(() => {
   align-items: center;
   padding: 8px 12px;
   border-bottom: 1px solid var(--cx-border);
-  background: rgba(5, 8, 16, 0.8);
+  background: var(--cx-bg-soft);
   gap: 8px;
   cursor: grab;
   user-select: none;
@@ -532,13 +650,13 @@ onUnmounted(() => {
   cursor: grabbing;
 }
 .chaoxi-panel-title {
-  font-size: 13px;
+  font-size: calc(13px + var(--cx-font-step));
   font-weight: 600;
   white-space: nowrap;
   color: var(--cx-primary);
 }
 .chaoxi-panel-preset {
-  font-size: 11px;
+  font-size: calc(11px + var(--cx-font-step));
   color: var(--cx-text-dim);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -548,12 +666,12 @@ onUnmounted(() => {
 
 /* ═══ 顶栏搜索 ═══ */
 .chaoxi-topbar-search {
-  flex: 1;
+  flex: 0 1 220px;
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--cx-surface);
+  border: 1px solid var(--cx-border-soft);
   border-radius: 6px;
   padding: 3px 8px;
   min-width: 0;
@@ -568,12 +686,12 @@ onUnmounted(() => {
   border: none;
   outline: none;
   color: var(--cx-text);
-  font-size: 12px;
+  font-size: calc(12px + var(--cx-font-step));
   padding: 0;
   min-width: 0;
 }
 .chaoxi-topbar-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--cx-text-muted);
 }
 .chaoxi-search-clear-sm {
   width: 16px;
@@ -593,6 +711,57 @@ onUnmounted(() => {
 .chaoxi-search-clear-sm:hover {
   color: var(--cx-text);
 }
+.chaoxi-topbar-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.chaoxi-font-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border: 1px solid var(--cx-border-soft);
+  border-radius: 6px;
+  background: var(--cx-surface);
+  color: var(--cx-text-dim);
+  white-space: nowrap;
+}
+.chaoxi-control-label {
+  padding: 0 4px;
+  font-size: calc(11px + var(--cx-font-step));
+}
+.chaoxi-control-chip,
+.chaoxi-theme-toggle {
+  min-width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cx-text-dim);
+  font-size: calc(11px + var(--cx-font-step));
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chaoxi-control-chip:hover,
+.chaoxi-theme-toggle:hover {
+  color: var(--cx-primary);
+  background: var(--cx-primary-dim);
+}
+.chaoxi-control-chip.active,
+.chaoxi-theme-toggle.active {
+  color: var(--cx-primary);
+  background: var(--cx-primary-dim);
+  font-weight: 700;
+}
+.chaoxi-theme-toggle {
+  padding: 0 8px;
+  border: 1px solid var(--cx-border-soft);
+  background: var(--cx-surface);
+  white-space: nowrap;
+}
 
 /* ═══ 手机搜索框 ═══ */
 .chaoxi-search-bar-mobile {
@@ -601,12 +770,18 @@ onUnmounted(() => {
   gap: 6px;
   padding: 6px 10px;
   border-bottom: 1px solid var(--cx-border);
-  background: rgba(5, 8, 16, 0.4);
+  background: var(--cx-bg-panel);
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 .chaoxi-search-bar-mobile .chaoxi-topbar-search-input {
-  font-size: 13px;
+  font-size: calc(13px + var(--cx-font-step));
   padding: 4px 0;
+  min-width: 90px;
+}
+.mobile-controls {
+  width: 100%;
+  justify-content: flex-end;
 }
 
 .chaoxi-btn-icon {
@@ -634,12 +809,12 @@ onUnmounted(() => {
   gap: 0;
   flex-shrink: 0;
   border-bottom: 1px solid var(--cx-border);
-  background: rgba(5, 8, 16, 0.6);
+  background: var(--cx-bg-panel);
 }
 .chaoxi-page-btn {
   flex: 1;
   padding: 7px 0;
-  font-size: 12px;
+  font-size: calc(12px + var(--cx-font-step));
   font-weight: 600;
   color: var(--cx-text-dim);
   background: transparent;
@@ -651,7 +826,7 @@ onUnmounted(() => {
 }
 .chaoxi-page-btn:hover {
   color: var(--cx-text);
-  background: rgba(77, 201, 246, 0.04);
+  background: var(--cx-surface-hover);
 }
 .chaoxi-page-btn.active {
   color: var(--cx-primary);
@@ -696,7 +871,7 @@ onUnmounted(() => {
 /* ═══ 手机适配 ═══ */
 .mobile .chaoxi-page-btn {
   padding: 10px 0;
-  font-size: 13px;
+  font-size: calc(13px + var(--cx-font-step));
 }
 
 /* ═══ 手机下拉关闭指示条 ═══ */
@@ -706,14 +881,14 @@ onUnmounted(() => {
   padding: 6px 0 2px;
   cursor: pointer;
   flex-shrink: 0;
-  background: rgba(5, 8, 16, 0.8);
+  background: var(--cx-bg-soft);
   touch-action: none;
 }
 .chaoxi-swipe-bar {
   width: 36px;
   height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--cx-text-muted);
   transition: background 0.15s;
 }
 .chaoxi-swipe-hint:active .chaoxi-swipe-bar {
@@ -726,7 +901,7 @@ onUnmounted(() => {
   padding: 8px 12px;
   padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
   border-top: 1px solid var(--cx-border);
-  background: rgba(5, 8, 16, 0.9);
+  background: var(--cx-bg-soft);
   display: flex;
   justify-content: center;
 }
@@ -739,7 +914,7 @@ onUnmounted(() => {
   border: 1px solid rgba(77, 201, 246, 0.2);
   background: rgba(77, 201, 246, 0.06);
   color: var(--cx-primary);
-  font-size: 13px;
+  font-size: calc(13px + var(--cx-font-step));
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
@@ -750,6 +925,137 @@ onUnmounted(() => {
 .chaoxi-mobile-close-btn:active {
   background: rgba(77, 201, 246, 0.15);
   border-color: rgba(77, 201, 246, 0.4);
+}
+
+/* ═══ 子页面主题与字号适配 ═══ */
+.chaoxi-panel :deep(.chaoxi-store-title),
+.chaoxi-panel :deep(.chaoxi-store-card-name),
+.chaoxi-panel :deep(.chaoxi-item-name),
+.chaoxi-panel :deep(.chaoxi-dialog-header),
+.chaoxi-panel :deep(.chaoxi-modal-title),
+.chaoxi-panel :deep(.chaoxi-copy-dialog-header),
+.chaoxi-panel :deep(.chaoxi-detail-title),
+.chaoxi-panel :deep(.chaoxi-preset-card-name) {
+  color: var(--cx-text);
+}
+.chaoxi-panel :deep(.chaoxi-store-subtitle),
+.chaoxi-panel :deep(.chaoxi-store-card-author),
+.chaoxi-panel :deep(.chaoxi-store-card-desc),
+.chaoxi-panel :deep(.chaoxi-empty),
+.chaoxi-panel :deep(.chaoxi-batch-total),
+.chaoxi-panel :deep(.chaoxi-manager-label),
+.chaoxi-panel :deep(.chaoxi-manager-count),
+.chaoxi-panel :deep(.chaoxi-side-nav-title),
+.chaoxi-panel :deep(.chaoxi-side-nav-item),
+.chaoxi-panel :deep(.chaoxi-group-tab-m),
+.chaoxi-panel :deep(.chaoxi-group-tab),
+.chaoxi-panel :deep(.chaoxi-btn-tool),
+.chaoxi-panel :deep(.chaoxi-btn-add),
+.chaoxi-panel :deep(.chaoxi-detail-item-name),
+.chaoxi-panel :deep(.chaoxi-regex-name),
+.chaoxi-panel :deep(.chaoxi-param-label),
+.chaoxi-panel :deep(.chaoxi-modal-message),
+.chaoxi-panel :deep(.chaoxi-dialog-item),
+.chaoxi-panel :deep(.chaoxi-copy-dialog-item),
+.chaoxi-panel :deep(.chaoxi-group-assign-item) {
+  color: var(--cx-text-dim);
+}
+.chaoxi-panel :deep(.chaoxi-store-header),
+.chaoxi-panel :deep(.chaoxi-manager-toolbar),
+.chaoxi-panel :deep(.chaoxi-batch-toolbar),
+.chaoxi-panel :deep(.chaoxi-side-nav),
+.chaoxi-panel :deep(.chaoxi-detail-header),
+.chaoxi-panel :deep(.chaoxi-group-tabs) {
+  background: var(--cx-bg-panel);
+  border-color: var(--cx-border-soft);
+}
+.chaoxi-panel :deep(.chaoxi-store-card),
+.chaoxi-panel :deep(.chaoxi-preset-card),
+.chaoxi-panel :deep(.chaoxi-item-group),
+.chaoxi-panel :deep(.chaoxi-detail-item),
+.chaoxi-panel :deep(.chaoxi-regex-item) {
+  border-color: var(--cx-border-soft);
+}
+.chaoxi-panel :deep(.chaoxi-store-card:hover),
+.chaoxi-panel :deep(.chaoxi-preset-card:hover),
+.chaoxi-panel :deep(.chaoxi-side-nav-item:hover),
+.chaoxi-panel :deep(.chaoxi-group-tab:hover),
+.chaoxi-panel :deep(.chaoxi-group-tab-m:hover),
+.chaoxi-panel :deep(.chaoxi-detail-item:hover),
+.chaoxi-panel :deep(.chaoxi-regex-row:hover),
+.chaoxi-panel :deep(.chaoxi-dialog-item:hover),
+.chaoxi-panel :deep(.chaoxi-copy-dialog-item:hover),
+.chaoxi-panel :deep(.chaoxi-menu-item:hover) {
+  background: var(--cx-surface-hover);
+  color: var(--cx-text);
+}
+.chaoxi-panel :deep(.chaoxi-group-selector),
+.chaoxi-panel :deep(.chaoxi-dialog),
+.chaoxi-panel :deep(.chaoxi-copy-dialog),
+.chaoxi-panel :deep(.chaoxi-modal) {
+  background: var(--cx-bg);
+  border-color: var(--cx-border);
+  color: var(--cx-text);
+  box-shadow: var(--cx-shadow);
+}
+.chaoxi-panel :deep(.chaoxi-dialog-overlay),
+.chaoxi-panel :deep(.chaoxi-modal-overlay) {
+  background: var(--cx-overlay);
+}
+.chaoxi-panel :deep(input),
+.chaoxi-panel :deep(textarea),
+.chaoxi-panel :deep(select) {
+  color: var(--cx-text);
+}
+.chaoxi-panel :deep(.chaoxi-rename-input),
+.chaoxi-panel :deep(.chaoxi-textarea),
+.chaoxi-panel :deep(.chaoxi-note-input),
+.chaoxi-panel :deep(.chaoxi-regex-code),
+.chaoxi-panel :deep(.chaoxi-param-input),
+.chaoxi-panel :deep(.chaoxi-param-select),
+.chaoxi-panel :deep(.chaoxi-modal-input),
+.chaoxi-panel :deep(.chaoxi-dialog-search-input) {
+  background: var(--cx-surface);
+  border-color: var(--cx-border);
+  color: var(--cx-text);
+}
+.chaoxi-panel :deep(.chaoxi-batch-count),
+.chaoxi-panel :deep(.chaoxi-store-tag),
+.chaoxi-panel :deep(.chaoxi-side-nav-item.active),
+.chaoxi-panel :deep(.chaoxi-group-tab.active),
+.chaoxi-panel :deep(.chaoxi-group-tab-m.active),
+.chaoxi-panel :deep(.chaoxi-detail-tab.active) {
+  color: var(--cx-primary);
+}
+.chaoxi-panel :deep(.chaoxi-store-title),
+.chaoxi-panel :deep(.chaoxi-store-card-name),
+.chaoxi-panel :deep(.chaoxi-detail-title),
+.chaoxi-panel :deep(.chaoxi-modal-title),
+.chaoxi-panel :deep(.chaoxi-dialog-header) {
+  font-size: calc(13px + var(--cx-font-step));
+}
+.chaoxi-panel :deep(.chaoxi-item-name),
+.chaoxi-panel :deep(.chaoxi-store-card-desc),
+.chaoxi-panel :deep(.chaoxi-group-selector-item),
+.chaoxi-panel :deep(.chaoxi-dialog-item),
+.chaoxi-panel :deep(.chaoxi-modal-message),
+.chaoxi-panel :deep(.chaoxi-preset-card-name),
+.chaoxi-panel :deep(.chaoxi-detail-item-name),
+.chaoxi-panel :deep(.chaoxi-regex-name),
+.chaoxi-panel :deep(.chaoxi-param-label) {
+  font-size: calc(12px + var(--cx-font-step));
+}
+.chaoxi-panel :deep(.chaoxi-btn-tool),
+.chaoxi-panel :deep(.chaoxi-btn-add),
+.chaoxi-panel :deep(.chaoxi-batch-btn),
+.chaoxi-panel :deep(.chaoxi-store-import-btn),
+.chaoxi-panel :deep(.chaoxi-manager-btn),
+.chaoxi-panel :deep(.chaoxi-modal-btn) {
+  font-size: calc(11px + var(--cx-font-step));
+}
+.chaoxi-panel :deep(.chaoxi-textarea),
+.chaoxi-panel :deep(.chaoxi-regex-code) {
+  font-size: calc(12px + var(--cx-font-step));
 }
 
 /* ═══ 过渡动画 ═══ */
