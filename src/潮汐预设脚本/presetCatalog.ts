@@ -1,5 +1,5 @@
 // CDN 基础路径：预设文件使用独立版本号，避免 CDN 缓存导致玩家下到旧预设
-export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.3/dist/presets';
+export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.4/dist/presets';
 
 export interface PresetCatalogItem {
   /** 显示名称 */
@@ -23,7 +23,7 @@ export const PRESET_CATALOG: PresetCatalogItem[] = [
     description: '明月秋青自用版预设。兼顾角色活人感、正文质量与多模型适配，适合按个人习惯继续微调。',
     tags: ['Gemini', 'Claude', 'DSV4PRO'],
     author: '三明月',
-    updateDate: '2026.6.4',
+    updateDate: '2026.6.5',
   },
   {
     name: '明月秋青 Synapse Memory Yield',
