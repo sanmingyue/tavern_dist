@@ -36,8 +36,8 @@
 | 项目 | 版本号前缀 | 示例 | 说明 |
 |------|-----------|------|------|
 | 修仙世界脚本 | `xw-v` | `xw-v1.1.3` | 状态栏 + CE脚本 |
-| 潮汐预设脚本 | `cp-v` | `cp-v2.0.5` | 预设悬浮窗 + 预设仓库 |
-| 预设JSON文件 | `preset-v` | `preset-v2.0.4` | CDN分发的预设文件 |
+| 潮汐预设脚本 | `cp-v` | `cp-v2.0.6` | 预设悬浮窗 + 预设仓库 |
+| 预设JSON文件 | `preset-v` | `preset-v2.0.5` | CDN分发的预设文件 |
 | 角色卡PNG文件 | `char-v` | `char-v1.0.0` | CDN分发的角色卡PNG |
 | 点赞致谢数据 | `reactions-v` | `reactions-v1.0.0` | CDN分发的点赞JSON数据 |
 | 小手机脚本 | `phone-v` | `phone-v0.2.2` | 虚拟手机模拟器 |
@@ -397,19 +397,20 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\修仙世�
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.0.5/dist/潮汐预设脚本/index.js'
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.0.6/dist/潮汐预设脚本/index.js'
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && New-Item -ItemType Directory -Force "dist\presets" && Copy-Item "我的预设\明月秋青by oneself.json" "dist\presets\" -Force && git add "src\潮汐预设脚本\presetCatalog.ts" "dist\潮汐预设脚本\index.js" "dist\潮汐预设脚本\index.js.map" "dist\presets" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "潮汐预设脚本 v2.0.5" && git tag cp-v2.0.5 && git tag preset-v2.0.4 && git push && git push origin cp-v2.0.5 && git push origin preset-v2.0.4
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && New-Item -ItemType Directory -Force "dist\presets" && Copy-Item "我的预设\明月秋青by oneself.json" "dist\presets\" -Force && git add "src\潮汐预设脚本\presetCatalog.ts" "dist\潮汐预设脚本\index.js" "dist\潮汐预设脚本\index.js.map" "dist\presets" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "潮汐预设脚本 v2.0.6" && git tag cp-v2.0.6 && git tag preset-v2.0.5 && git push && git push origin cp-v2.0.6 && git push origin preset-v2.0.5
 ```
 
 **版本历史**
 
 | 版本号 | 日期 | 更新内容 |
 |--------|------|----------|
+| cp-v2.0.6 | 2026-06-05 | 预设仓库资源版本号升至 `preset-v2.0.5`，修复“明月秋青 by oneself”变量初始化对齐问题 |
 | cp-v2.0.5 | 2026-06-05 | 预设仓库资源版本号升至 `preset-v2.0.4`，重新发布“明月秋青 by oneself”预设修复，展示更新日期改为 2026.6.5 |
 | cp-v2.0.4 | 2026-06-04 | 预设仓库资源版本号升至 `preset-v2.0.3`，重新发布“明月秋青 by oneself”预设修复 |
 | cp-v2.0.3 | 2026-06-04 | 预设仓库资源版本号升至 `preset-v2.0.2`，重新发布“明月秋青 Synapse Memory Yield”预设修复 |
@@ -541,10 +542,10 @@ git tag -l "wsy-v*" --sort=-creatordate      # 卫疏影
 | 创意工坊脚本 CDN | `@ws-v2.1.1/dist/创意工坊/index.js` |
 | 修仙世界状态栏 CDN | `@xw-v1.1.3/dist/修仙世界状态栏/index.js` |
 | 修仙世界CE脚本 CDN | `@xw-v1.1.3/dist/修仙世界重置版/脚本/CE脚本/index.js` |
-| 潮汐预设脚本 CDN | `@cp-v2.0.5/dist/潮汐预设脚本/index.js` |
+| 潮汐预设脚本 CDN | `@cp-v2.0.6/dist/潮汐预设脚本/index.js` |
 | 小手机脚本 CDN | `@phone-v0.2.2/dist/小手机/index.js` |
 | 点赞致谢数据 CDN | `@reactions-v1.0.0/dist/reactions/reactions.json` |
-| 预设JSON CDN 目录 | `@preset-v2.0.4/dist/presets/` |
+| 预设JSON CDN 目录 | `@preset-v2.0.5/dist/presets/` |
 | **酒馆联机脚本 CDN** | `@online-v0.2.2/dist/酒馆联机脚本/index.js` |
 | **卫疏影开局脚本 CDN** | `@wsy-v0.0.1/dist/卫疏影/index.js` |
 | **明月秋青智脑脚本 CDN** | `@zhino-v4.0.0/dist/明月秋青脚本/index.js` |
