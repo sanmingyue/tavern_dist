@@ -10,11 +10,15 @@ const artifactTerms = [
   { label: '用户手写', pattern: /用户手写/u },
   { label: '内部任务词', pattern: /当前任务/u },
   { label: '一键角色卡写卡器', pattern: /一键角色卡写卡器/u },
-  { label: '模板词', pattern: /模板|提示词|工程词|占位符|placeholder/iu },
+  { label: '工程占位词', pattern: /模板|提示词|工程词|占位符|placeholder/iu },
   { label: '内部标签', pattern: /<\/?(?:thinking|content|role_result|worldview_result|stage_early|stage_middle|stage_close|stage_common)\b/iu },
   { label: '内置任务标签', pattern: /one_click_card_writer_task|selected_template_knowledge|task_scope|task_reference/iu },
   { label: '前端流程词', pattern: /前端会|工具会|生成器|代码会/u },
 ];
+
+export interface GenerationRetryOptions {
+  avoidTerms?: string[];
+}
 
 async function callAdaptedPreset(userInput: string, taskInstruction: string, knowledge: string): Promise<string> {
   const orderedPrompts = buildAdaptedOrderedPrompts({ userInput, taskInstruction, knowledge });
@@ -42,8 +46,19 @@ async function callAdaptedPreset(userInput: string, taskInstruction: string, kno
 
 function assertCleanContent(label: string, content: string): void {
   if (!content.trim()) throw new Error(`${label}为空，需重新生成`);
-  const hit = artifactTerms.find(term => term.pattern.test(content));
-  if (hit) throw new Error(`${label}包含工程词或占位内容：${hit.label}，需重新生成`);
+  const hit = artifactTerms
+    .map(term => ({ term, match: content.match(term.pattern)?.[0] }))
+    .find(result => result.match);
+  if (hit) throw new Error(`${label}包含工程词或占位内容：${hit.term.label}（${hit.match}），需重新生成`);
+}
+
+function retryInstruction(options: GenerationRetryOptions = {}): string[] {
+  const terms = Array.from(new Set((options.avoidTerms ?? []).map(term => term.trim()).filter(Boolean)));
+  if (terms.length === 0) return [];
+  return [
+    `上次生成因为成品中出现这些工程/占位表达而失败：${terms.join('、')}。`,
+    '本次必须把相关意思改写成角色或世界观内部的自然表述，不得再次出现这些表达，也不要解释规避过程。',
+  ];
 }
 
 function requiredTag(value: string, tag: string, label: string, options: { allowEmpty?: boolean } = {}): string {
@@ -63,7 +78,7 @@ function parseStagePersonas(multistagePersona: string): StagePersonas {
   };
 }
 
-export async function generateWorldview(seed: string): Promise<WorldviewResult> {
+export async function generateWorldview(seed: string, options: GenerationRetryOptions = {}): Promise<WorldviewResult> {
   const userInput = [
     '【世界观模块】',
     '请根据下面的用户素材生成可直接写入世界书的世界观设定。',
@@ -75,6 +90,7 @@ export async function generateWorldview(seed: string): Promise<WorldviewResult> 
     '你正在适配秋青子写卡预设，不得另建预设结构。',
     '允许在不推翻用户明确设定的前提下做合理化补充：补足命名、因果、边界和规则。',
     '不要和用户对话，不要询问下一步。',
+    ...retryInstruction(options),
     '输出必须放在 <content><worldview_result>...</worldview_result></content> 中。',
     'worldview_result 内使用中文 YAML，不要写解释。',
   ].join('\n');
@@ -87,7 +103,12 @@ export async function generateWorldview(seed: string): Promise<WorldviewResult> 
   return { content, raw };
 }
 
-export async function generateRole(draft: RoleDraft, worldContent: string, index: number): Promise<RoleResult> {
+export async function generateRole(
+  draft: RoleDraft,
+  worldContent: string,
+  index: number,
+  options: GenerationRetryOptions = {},
+): Promise<RoleResult> {
   const fallbackName = draft.name.trim() || `角色${index + 1}`;
   const userInput = [
     `【${draft.label}】`,
@@ -107,6 +128,7 @@ export async function generateRole(draft: RoleDraft, worldContent: string, index
     '默认用好感度划分三个阶段：初识期 0~30，熟悉期 31~70，亲近期 71~100。若用户素材给出其他阶段，以用户为准。',
     '可写入字段内禁止出现内部流程说明、占位说明、标签说明或创作说明。',
     '不要和用户对话，不要询问下一步。',
+    ...retryInstruction(options),
     '输出必须放在 <content><role_result>...</role_result></content> 中，并包含以下子标签：',
     '<role_name>角色正式名</role_name>',
     '<aliases>英文逗号分隔的角色名、昵称、外号</aliases>',
