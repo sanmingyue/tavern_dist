@@ -31,6 +31,12 @@ function normalizeTrimStrings(value: PresetRegexAsset['trimStrings']): string {
   return value ?? '';
 }
 
+function wrapFrontendCodeBlock(html: string): string {
+  const trimmed = html.trim();
+  if (/^```/u.test(trimmed)) return trimmed;
+  return ['```html', trimmed, '```'].join('\n');
+}
+
 function convertPresetRegex(asset: PresetRegexAsset): TavernRegex {
   const placement = asset.placement ?? [];
   return {
@@ -65,7 +71,7 @@ function buildStatusDisplayRegex(html: string): TavernRegex {
     enabled: true,
     scope: 'character',
     find_regex: '/<StatusPlaceHolderImpl\\/>/g',
-    replace_string: html,
+    replace_string: wrapFrontendCodeBlock(html),
     trim_strings: '',
     source: {
       user_input: false,
