@@ -18,6 +18,14 @@ export interface PresetCatalogItem {
 
 export const PRESET_CATALOG: PresetCatalogItem[] = [
   {
+    name: '明月秋青 Maya',
+    filename: '明月秋青Maya.json',
+    description: '最强的Gemini预设',
+    tags: ['Gemini'],
+    author: '三明月',
+    updateDate: '2026.6.9',
+  },
+  {
     name: '明月秋青 by oneself',
     filename: '明月秋青by oneself.json',
     description: '明月秋青自用版预设。兼顾角色活人感、正文质量与多模型适配，适合按个人习惯继续微调。',
@@ -31,14 +39,6 @@ export const PRESET_CATALOG: PresetCatalogItem[] = [
     description: '最懂你的预设。活人感与人设挖掘深度极强，适合追求极致角色表现的用户。',
     tags: ['5.19更新', 'Claude', 'Gemini', '最懂你的预设'],
     author: '三明月',
-  },
-  {
-    name: '明月秋青 Maya',
-    filename: '明月秋青Maya.json',
-    description: '最强的Gemini预设',
-    tags: ['Gemini'],
-    author: '三明月',
-    updateDate: '2026.6.9',
   },
   {
     name: '分成两半的灰魂 · v2.0',
