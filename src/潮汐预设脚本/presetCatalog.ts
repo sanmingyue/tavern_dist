@@ -1,5 +1,5 @@
 // CDN 基础路径：预设文件使用独立版本号，避免 CDN 缓存导致玩家下到旧预设
-export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.5/dist/presets';
+export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.6/dist/presets';
 
 export interface PresetCatalogItem {
   /** 显示名称 */
@@ -31,6 +31,14 @@ export const PRESET_CATALOG: PresetCatalogItem[] = [
     description: '最懂你的预设。活人感与人设挖掘深度极强，适合追求极致角色表现的用户。',
     tags: ['5.19更新', 'Claude', 'Gemini', '最懂你的预设'],
     author: '三明月',
+  },
+  {
+    name: '明月秋青 Maya',
+    filename: '明月秋青Maya.json',
+    description: '最强的Gemini预设',
+    tags: ['Gemini'],
+    author: '三明月',
+    updateDate: '2026.6.9',
   },
   {
     name: '分成两半的灰魂 · v2.0',
