@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.2</strong>
+            <strong>NAI 生图 v0.0.3</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>

@@ -26,6 +26,8 @@ const RENDER_CLASS = 'nai-image-render';
 const REGENERATE_CLASS = 'nai-image-regenerate';
 const SAVE_CLASS = 'nai-image-save';
 const processingMessageIds = new Set<number>();
+const renderTimers = new Map<number, ReturnType<typeof setTimeout>>();
+const renderVersions = new Map<number, number>();
 let hasShownAnlasWarning = false;
 
 type NaiMessageImageState = {
@@ -291,10 +293,20 @@ function processLatestMessage(trigger: 'auto' | 'button', pinia: ReturnType<type
 }
 
 function queueRenderMessageImage(messageId: number): void {
-  setTimeout(() => void renderMessageImage(messageId), 0);
+  const oldTimer = renderTimers.get(messageId);
+  if (oldTimer) clearTimeout(oldTimer);
+
+  const timer = setTimeout(() => {
+    renderTimers.delete(messageId);
+    void renderMessageImage(messageId);
+  }, 20);
+  renderTimers.set(messageId, timer);
 }
 
 async function renderMessageImage(messageId: number): Promise<void> {
+  const renderVersion = (renderVersions.get(messageId) ?? 0) + 1;
+  renderVersions.set(messageId, renderVersion);
+
   const message = getChatMessages(messageId, { role: 'assistant' })[0];
   if (!message) return;
 
@@ -302,8 +314,10 @@ async function renderMessageImage(messageId: number): Promise<void> {
   const $message = retrieveDisplayedMessage(messageId);
   if ($message.length === 0) return;
 
-  $message.find(`.${RENDER_CLASS}`).remove();
-  if (!state) return;
+  if (!state) {
+    $message.find(`.${RENDER_CLASS}`).remove();
+    return;
+  }
 
   const $box = $('<div></div>').addClass(RENDER_CLASS).attr('data-message-id', String(messageId));
   const $status = $('<div></div>').addClass('nai-image-status').appendTo($box);
@@ -364,6 +378,8 @@ async function renderMessageImage(messageId: number): Promise<void> {
       .appendTo($actions);
   }
 
+  if (renderVersions.get(messageId) !== renderVersion) return;
+  $message.find(`.${RENDER_CLASS}`).remove();
   $message.append($box);
 }
 

@@ -52,7 +52,7 @@
 | **明月秋青智脑脚本** | **`zhino-v`**  | **`zhino-v4.0.0`**  | **智脑系统：大总结+梦呓+倒果为因+NSFW隔离+情绪积累+后台角色行动推演** |
 | **青春的果实状态栏** | **`fruit-v`**  | **`fruit-v5.0.0`**  | **青春的果实角色卡 MVU 状态栏悬浮窗**                                 |
 | **onion状态栏**      | **`onion-v`**  | **`onion-v0.0.1`**  | **一脸嫌弃给你看胖次的onion IF线状态栏**                              |
-| **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.2`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
+| **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.3`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
 
 > 每个项目的版本号独立递增，互不影响。
 
@@ -170,19 +170,20 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && New-Item -ItemType Dire
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@nai-v0.0.2/dist/nai生图脚本/index.js';
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@nai-v0.0.3/dist/nai生图脚本/index.js';
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\nai生图脚本" "dist\nai生图脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "NAI 生图脚本 v0.0.2" && git tag nai-v0.0.2 && git push && git push origin nai-v0.0.2
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\nai生图脚本" "dist\nai生图脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "NAI 生图脚本 v0.0.3" && git tag nai-v0.0.3 && git push && git push origin nai-v0.0.3
 ```
 
 **版本历史**
 
 | 版本号     | 日期       | 更新内容                                                                                                                                                                                  |
 | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| nai-v0.0.3 | 2026-06-10 | 修复生成完成后酒馆连续触发楼层更新事件时，同一楼层的 NAI 图片块会在当前页面重复插入多份的问题；现在同楼层渲染会合并，并只允许最后一次异步渲染结果落地 |
 | nai-v0.0.2 | 2026-06-10 | 移除前端订阅接口“测试账号”入口，避免订阅接口在酒馆浏览器环境中因代理、跨域或扩展拦截造成误报；接口页保留真实生图测试，并确认新 AI 楼层自动捕获、按楼层渲染图片与重新生成按钮 |
 | nai-v0.0.1 | 2026-06-10 | 正式发布：NovelAI API 生图面板、AI 楼层 `<nai-image>` 自动捕获与首次自动生成、浏览器 7 天图片缓存、重新生成/保存图片、会员免费范围提醒、作者串与 NAI 参数设置、独立 OpenAI 兼容提示词助手 |
 
@@ -580,5 +581,5 @@ git tag -l "wsy-v*" --sort=-creatordate      # 卫疏影
 | **卫疏影开局脚本 CDN**      | `@wsy-v0.0.1/dist/卫疏影/index.js`                             |
 | **明月秋青智脑脚本 CDN**    | `@zhino-v4.0.0/dist/明月秋青脚本/index.js`                     |
 | **onion状态栏 CDN**         | `@onion-v0.0.6/dist/一脸嫌弃给你看胖次的onion/状态栏/index.js` |
-| **NAI 生图脚本 CDN**        | `@nai-v0.0.2/dist/nai生图脚本/index.js`                        |
+| **NAI 生图脚本 CDN**        | `@nai-v0.0.3/dist/nai生图脚本/index.js`                        |
 | 角色卡PNG CDN 目录          | `@char-v1.0.0/dist/characters/`                                |
