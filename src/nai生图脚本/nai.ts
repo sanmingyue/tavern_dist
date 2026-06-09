@@ -296,30 +296,6 @@ export function getCostWarnings(settings: NaiSettings, block?: Partial<NaiBlockC
   return warnings;
 }
 
-export async function testSubscription(settings: NaiSettings): Promise<Record<string, unknown>> {
-  if (!settings.token.trim()) {
-    throw new NaiApiError({
-      title: '缺少 API Token',
-      message: '还没有填写 NovelAI Persistent API Token。',
-      solution: '在“接口”页填写 token 后再测试。建议从 NovelAI 官网重新生成长期 API Token。',
-      detail: '',
-    });
-  }
-
-  const response = await fetch(settings.subscriptionEndpoint, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${settings.token.trim()}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new NaiApiError(await translateResponseError(response));
-  }
-
-  return (await response.json()) as Record<string, unknown>;
-}
-
 export async function requestNaiImage(settings: NaiSettings, payload: NaiImageRequest): Promise<NaiGeneratedImage> {
   const images = await requestNaiImages(settings, payload);
   return images[0];

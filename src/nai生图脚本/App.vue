@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.1</strong>
+            <strong>NAI 生图 v0.0.2</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>
@@ -101,20 +101,8 @@
                   @change="store.updateSettings({ endpoint: ($event.target as HTMLInputElement).value.trim() })"
                 />
               </label>
-              <label class="field">
-                <span>订阅测试接口</span>
-                <input
-                  :value="store.settings.subscriptionEndpoint"
-                  @change="
-                    store.updateSettings({ subscriptionEndpoint: ($event.target as HTMLInputElement).value.trim() })
-                  "
-                />
-              </label>
               <div class="button-row">
-                <button class="primary-button" :disabled="testingAccount" @click="testAccount">
-                  {{ testingAccount ? '测试中' : '测试账号' }}
-                </button>
-                <button class="secondary-button" :disabled="testingImage" @click="testImageEndpoint">
+                <button class="primary-button" :disabled="testingImage" @click="testImageEndpoint">
                   {{ testingImage ? '生图中' : '测试生图' }}
                 </button>
               </div>
@@ -631,7 +619,6 @@ import {
   getCostWarnings,
   renderDownloadName,
   requestNaiImage,
-  testSubscription,
   translateUnknownError,
 } from './nai';
 import { clearAllCachedImages, countCachedImages, deleteExpiredCachedImages } from './cache';
@@ -663,7 +650,6 @@ const windowSize = reactive(getViewportSize());
 const isMobile = computed(() => windowSize.width <= 760);
 const isPanelOpen = ref(false);
 const activeTab = ref<'api' | 'run' | 'settings' | 'assistant' | 'log'>('api');
-const testingAccount = ref(false);
 const testingImage = ref(false);
 const testPreview = ref('');
 const cacheBusy = ref(false);
@@ -902,27 +888,6 @@ function formatTime(iso: string): string {
     return new Date(iso).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   } catch {
     return iso.slice(11, 19);
-  }
-}
-
-async function testAccount(): Promise<void> {
-  testingAccount.value = true;
-  try {
-    const data = await testSubscription(store.settings);
-    store.setLastLog({
-      level: 'success',
-      title: '账号测试成功',
-      message: `订阅状态：${data.active ? '可用' : '不可用'}，等级：${String(data.tier ?? '未知')}`,
-      solution: '账号可以访问 NovelAI 订阅接口。下一步可测试生图接口。',
-      detail: JSON.stringify(data, null, 2),
-    });
-    toastr.success('NovelAI 账号测试成功。');
-  } catch (error) {
-    const translated = translateUnknownError(error);
-    store.setLastLog({ level: 'error', ...translated });
-    toastr.error(translated.message, translated.title);
-  } finally {
-    testingAccount.value = false;
   }
 }
 

@@ -83,7 +83,6 @@ const NaiSettingsSchema = z
 
     token: z.string().default(''),
     endpoint: z.string().default('https://image.novelai.net/ai/generate-image'),
-    subscriptionEndpoint: z.string().default('https://api.novelai.net/user/subscription'),
 
     storageMode: z.enum(['cache', 'download']).default('cache'),
     autoDownload: z.boolean().default(false),
