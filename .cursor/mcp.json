@@ -5,6 +5,7 @@
       "args": [
         "chrome-devtools-mcp@latest",
         "--autoConnect"
+<<<<<<< HEAD
       ],
       "alwaysAllow": [
         "list_pages",
@@ -12,6 +13,8 @@
         "evaluate_script",
         "take_snapshot",
         "select_page"
+=======
+>>>>>>> fdfcbc5386747889d0b011123d4dde6612c67d1b
       ]
     }
   }
