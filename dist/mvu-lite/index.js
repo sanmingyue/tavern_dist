@@ -1,4 +1,4 @@
-const LITE_BLOCK_TAGS = ['UpdateVariable', '轻量变量更新', 'LiteMVU', 'MVULite'];
+const LITE_BLOCK_TAGS = ['UpdateVariable'];
 
 function clamp(value, min, max) {
   let result = value;
