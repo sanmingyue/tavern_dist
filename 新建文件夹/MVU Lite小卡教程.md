@@ -20,7 +20,7 @@ MVU Lite 是给新作者使用的轻量 MVU 写法。它不是 MVU ZOD 的简化
 
 ```js
 import 'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate@beta/artifact/bundle.js';
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.4/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.5/dist/mvu-lite/index.js';
 
 const 变量规则 = `
 
@@ -116,7 +116,8 @@ $(() => {
 数字
 文字
 选项
-布尔
+是/否
+开/关
 ```
 
 数字变量可以写：
@@ -137,13 +138,19 @@ $(() => {
 角色.当前所想：文字；最多40字；一句话，贴近当前心理。
 ```
 
-布尔变量可以写：
+是/否变量可以写：
 
 ```txt
-角色.是否知道秘密：布尔；只能填写是或否；开局通常为否；只有剧情中秘密被明确说出、展示或被角色亲自发现时，才改为是。
+角色.是否知道秘密：是/否；开局为否；只有剧情中秘密被明确说出、展示或被角色亲自发现时，才改为是。
 ```
 
-布尔变量适合记录“是否发生过”的状态，例如是否见过面、是否交换联系方式、是否知道某个秘密。不要用它记录程度变化，程度变化应该用数字或选项。
+是/否变量适合记录一个状态是否成立，例如是否见过面、是否交换联系方式、是否知道某个秘密。它不一定只能写“是否”，也可以按语义写成开/关：
+
+```txt
+角色.通讯器：开/关；开局为关；只有通讯器被启动或关闭时更新。
+```
+
+如果要记录程度变化，例如好感强弱、警惕高低、情绪变化，应该用数字或选项。
 
 只读变量可以写：
 
@@ -262,7 +269,7 @@ AI 最终应输出成这样：
 
 ```js
 import 'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate@beta/artifact/bundle.js';
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.4/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.5/dist/mvu-lite/index.js';
 
 const 变量规则 = `
 
@@ -300,7 +307,7 @@ MVU Lite 第一版故意只做基础能力：
 当前测试版：
 
 ```js
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.4/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.5/dist/mvu-lite/index.js';
 ```
 
 如果只想固定跟随 main 分支测试，也可以临时使用：
