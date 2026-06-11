@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.3</strong>
+            <strong>NAI 生图 v0.0.4</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>
@@ -101,6 +101,33 @@
                   @change="store.updateSettings({ endpoint: ($event.target as HTMLInputElement).value.trim() })"
                 />
               </label>
+              <div class="choice-grid auth-grid">
+                <button
+                  v-for="mode in authModes"
+                  :key="mode.value"
+                  :class="{ active: store.settings.authMode === mode.value }"
+                  @click="store.updateSettings({ authMode: mode.value })"
+                >
+                  <strong>{{ mode.label }}</strong>
+                  <span>{{ mode.desc }}</span>
+                </button>
+              </div>
+              <div v-if="store.settings.authMode === 'custom'" class="two-col">
+                <label class="field">
+                  <span>鉴权头</span>
+                  <input
+                    :value="store.settings.customAuthHeader"
+                    @change="store.updateSettings({ customAuthHeader: ($event.target as HTMLInputElement).value })"
+                  />
+                </label>
+                <label class="field">
+                  <span>鉴权值</span>
+                  <input
+                    :value="store.settings.customAuthValue"
+                    @change="store.updateSettings({ customAuthValue: ($event.target as HTMLInputElement).value })"
+                  />
+                </label>
+              </div>
               <div class="button-row">
                 <button class="primary-button" :disabled="testingImage" @click="testImageEndpoint">
                   {{ testingImage ? '生图中' : '测试生图' }}
@@ -139,6 +166,35 @@
                   @change="store.updateSettings({ autoOnMessage: ($event.target as HTMLInputElement).checked })"
                 />
               </label>
+            </div>
+
+            <div class="section-band">
+              <div class="section-title">手动楼层</div>
+              <div class="two-col">
+                <label class="field">
+                  <span>楼层号</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    v-model.number="manualMessageId"
+                  />
+                </label>
+                <label class="field">
+                  <span>当前最新楼层</span>
+                  <input :value="getLastMessageId()" disabled />
+                </label>
+              </div>
+              <label class="field">
+                <span>提示词 YAML</span>
+                <textarea v-model="manualRaw" rows="8" />
+              </label>
+              <div class="button-row">
+                <button class="secondary-button" @click="manualMessageId = getLastMessageId()">填入最新楼层</button>
+                <button class="primary-button" :disabled="manualGenerating || !manualRaw.trim()" @click="generateManualFloor">
+                  {{ manualGenerating ? '生成中' : '生成到楼层' }}
+                </button>
+              </div>
             </div>
 
             <div class="section-band">
@@ -460,7 +516,7 @@
             </div>
 
             <div class="section-band wide">
-              <div class="section-title">作者串</div>
+              <div class="section-title">前置作者串</div>
               <textarea
                 :value="store.settings.authorPrompt"
                 rows="4"
@@ -468,6 +524,18 @@
               />
               <div class="inline-note">
                 这里放固定作者串、画风串和质量词。发送给 NAI 时会自动拼到本楼正向提示词前面。
+              </div>
+            </div>
+
+            <div class="section-band wide">
+              <div class="section-title">后置作者串</div>
+              <textarea
+                :value="store.settings.postPrompt"
+                rows="4"
+                @change="store.updateSettings({ postPrompt: ($event.target as HTMLTextAreaElement).value })"
+              />
+              <div class="inline-note">
+                这里放需要固定追加在本楼正向提示词后面的作者串、收尾风格或补充质量词。
               </div>
             </div>
 
@@ -596,6 +664,152 @@
             </div>
           </section>
 
+          <section v-else-if="activeTab === 'comic'" class="page-stack comic-page">
+            <div class="settings-grid">
+              <div class="section-band">
+                <div class="section-title">模型接口</div>
+                <div class="segmented wide-segmented">
+                  <button
+                    v-for="mode in comicApiModes"
+                    :key="mode.value"
+                    :class="{ active: store.settings.comicApiMode === mode.value }"
+                    @click="applyComicApiMode(mode.value)"
+                  >
+                    {{ mode.label }}
+                  </button>
+                </div>
+                <label class="field">
+                  <span>API Key</span>
+                  <input
+                    type="password"
+                    autocomplete="off"
+                    :value="store.settings.comicApiKey"
+                    @input="store.updateSettings({ comicApiKey: ($event.target as HTMLInputElement).value })"
+                  />
+                  <small>当前状态：{{ store.maskedComicApiKey() }}</small>
+                </label>
+                <label class="field">
+                  <span>Base URL</span>
+                  <input
+                    :value="store.settings.comicBaseUrl"
+                    @change="store.updateSettings({ comicBaseUrl: ($event.target as HTMLInputElement).value.trim() })"
+                  />
+                </label>
+                <div class="button-row">
+                  <button class="primary-button" :disabled="comicLoadingModels" @click="loadComicModels">
+                    {{ comicLoadingModels ? '拉取中' : '拉取模型' }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="section-band">
+                <div class="section-title">生成设置</div>
+                <label class="field">
+                  <span>模型</span>
+                  <select
+                    :value="store.settings.comicModel"
+                    @change="store.updateSettings({ comicModel: ($event.target as HTMLSelectElement).value })"
+                  >
+                    <option value="">未选择</option>
+                    <option v-for="model in store.settings.comicModels" :key="model" :value="model">
+                      {{ model }}
+                    </option>
+                    <option
+                      v-if="store.settings.comicModel && !store.settings.comicModels.includes(store.settings.comicModel)"
+                      :value="store.settings.comicModel"
+                    >
+                      {{ store.settings.comicModel }}
+                    </option>
+                  </select>
+                </label>
+                <div class="two-col">
+                  <label class="field">
+                    <span>温度</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="2"
+                      step="0.1"
+                      :value="store.settings.comicTemperature"
+                      @change="updateNumber('comicTemperature', $event)"
+                    />
+                  </label>
+                  <label class="field">
+                    <span>每楼张数</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      step="1"
+                      :value="store.settings.comicImagesPerFloor"
+                      @change="updateNumber('comicImagesPerFloor', $event)"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-band">
+              <div class="section-title">楼层范围</div>
+              <div class="two-col">
+                <label class="field">
+                  <span>起始楼层</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    :value="store.settings.comicStartMessageId"
+                    @change="updateNumber('comicStartMessageId', $event)"
+                  />
+                </label>
+                <label class="field">
+                  <span>结束楼层</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    :value="store.settings.comicEndMessageId"
+                    @change="updateNumber('comicEndMessageId', $event)"
+                  />
+                </label>
+              </div>
+              <label class="switch-row compact">
+                <span>
+                  <strong>包含玩家楼层</strong>
+                  <small>把玩家输入放进漫画上下文</small>
+                </span>
+                <input
+                  type="checkbox"
+                  :checked="store.settings.comicIncludeUser"
+                  @change="store.updateSettings({ comicIncludeUser: ($event.target as HTMLInputElement).checked })"
+                />
+              </label>
+              <label class="switch-row compact">
+                <span>
+                  <strong>包含 AI 楼层</strong>
+                  <small>把 AI 正文放进漫画上下文</small>
+                </span>
+                <input
+                  type="checkbox"
+                  :checked="store.settings.comicIncludeAssistant"
+                  @change="store.updateSettings({ comicIncludeAssistant: ($event.target as HTMLInputElement).checked })"
+                />
+              </label>
+              <div class="button-row">
+                <button class="secondary-button" :disabled="comicGenerating" @click="syncComicRange">
+                  同步当前范围
+                </button>
+                <button class="primary-button" :disabled="comicGenerating" @click="generateComicCurrentFloor">
+                  {{ comicGenerating ? '生成中' : '生成结束楼层' }}
+                </button>
+                <button class="secondary-button" :disabled="comicGenerating" @click="generateComicRange">
+                  批量生成范围
+                </button>
+              </div>
+              <div v-if="comicProgress" class="success-box">{{ comicProgress }}</div>
+            </div>
+          </section>
+
           <section v-else class="page-stack">
             <LatestLog expanded />
           </section>
@@ -614,17 +828,35 @@
 import { computed, defineComponent, h, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { fetchAssistantModels, requestAssistantReply } from './assistant';
 import {
+  fetchComicModels,
+  getDefaultComicBaseUrl,
+  getDefaultComicModel,
+  requestComicImageBlock,
+} from './comic';
+import {
+  IMAGE_BLOCK_PATTERN,
   buildNaiPayload,
   downloadImage,
   getCostWarnings,
+  parseImageBlockRaw,
   renderDownloadName,
   requestNaiImage,
+  requestNaiImages,
   translateUnknownError,
+  type NaiBlockConfig,
 } from './nai';
-import { clearAllCachedImages, countCachedImages, deleteExpiredCachedImages } from './cache';
-import { useNaiStore, type NaiPaidMode, type NaiSettings, type NaiStorageMode } from './store';
+import { clearAllCachedImages, countCachedImages, deleteExpiredCachedImages, putCachedImage } from './cache';
+import {
+  useNaiStore,
+  type ComicApiMode,
+  type NaiAuthMode,
+  type NaiPaidMode,
+  type NaiSettings,
+  type NaiStorageMode,
+} from './store';
 
 const store = useNaiStore();
+const SCRIPT_STATE_KEY = 'nai_image_script';
 type NumericSettingKey = Extract<
   keyof NaiSettings,
   | 'width'
@@ -637,7 +869,29 @@ type NumericSettingKey = Extract<
   | 'fixedSeed'
   | 'imageTtlDays'
   | 'assistantTemperature'
+  | 'comicTemperature'
+  | 'comicMaxTokens'
+  | 'comicStartMessageId'
+  | 'comicEndMessageId'
+  | 'comicImagesPerFloor'
 >;
+
+type NaiMessageImageState = {
+  version: 3;
+  fingerprint: string;
+  raw: string;
+  config: Partial<NaiBlockConfig>;
+  status: 'captured' | 'generating' | 'ready' | 'blocked_anlas' | 'error';
+  model?: string;
+  seed?: number;
+  width?: number;
+  height?: number;
+  generated_at?: string;
+  cache?: Awaited<ReturnType<typeof putCachedImage>>;
+  caches?: Awaited<ReturnType<typeof putCachedImage>>[];
+  last_error?: string;
+  anlas_warnings?: string[];
+};
 
 defineExpose({
   openPanel: () => {
@@ -649,7 +903,7 @@ const hostWindow = window.parent;
 const windowSize = reactive(getViewportSize());
 const isMobile = computed(() => windowSize.width <= 760);
 const isPanelOpen = ref(false);
-const activeTab = ref<'api' | 'run' | 'settings' | 'assistant' | 'log'>('api');
+const activeTab = ref<'api' | 'run' | 'settings' | 'assistant' | 'comic' | 'log'>('api');
 const testingImage = ref(false);
 const testPreview = ref('');
 const cacheBusy = ref(false);
@@ -657,13 +911,33 @@ const cacheCount = ref<number | null>(null);
 const assistantLoadingModels = ref(false);
 const assistantSending = ref(false);
 const assistantDraft = ref('');
+const manualMessageId = ref(0);
+const manualRaw = ref(`positive: "1girl, cinematic composition, detailed background"
+negative_prompt: "lowres, bad anatomy, bad hands, text, watermark"`);
+const manualGenerating = ref(false);
+const comicLoadingModels = ref(false);
+const comicGenerating = ref(false);
+const comicProgress = ref('');
 
 const tabs = [
   { key: 'api' as const, label: '接口' },
   { key: 'run' as const, label: '生成' },
   { key: 'settings' as const, label: 'NAI设置' },
   { key: 'assistant' as const, label: '提示词助手' },
+  { key: 'comic' as const, label: '看漫画' },
   { key: 'log' as const, label: '日志' },
+];
+
+const authModes: Array<{ value: NaiAuthMode; label: string; desc: string }> = [
+  { value: 'bearer', label: 'Bearer', desc: '官方 NAI 和多数兼容站' },
+  { value: 'x-api-key', label: 'x-api-key', desc: '部分转接站使用' },
+  { value: 'none', label: '无鉴权', desc: '公益站已内置额度时使用' },
+  { value: 'custom', label: '自定义', desc: '手动填写请求头和值' },
+];
+
+const comicApiModes: Array<{ value: ComicApiMode; label: string }> = [
+  { value: 'openai', label: 'OpenAI兼容' },
+  { value: 'deepseek', label: 'DeepSeek' },
 ];
 
 const storageModes: Array<{ value: NaiStorageMode; label: string; desc: string }> = [
@@ -726,6 +1000,275 @@ function updateNumber(key: NumericSettingKey, event: Event): void {
 
 function applySize(width: number, height: number): void {
   store.updateSettings({ width, height });
+}
+
+function applyComicApiMode(mode: ComicApiMode): void {
+  store.updateSettings({
+    comicApiMode: mode,
+    comicBaseUrl: getDefaultComicBaseUrl(mode),
+    comicModel: getDefaultComicModel(mode),
+    comicModels: [],
+  });
+}
+
+function syncComicRange(): void {
+  const lastId = getLastMessageId();
+  if (lastId < 0) return;
+  store.updateSettings({
+    comicStartMessageId: Math.min(store.settings.comicStartMessageId, lastId),
+    comicEndMessageId: lastId,
+  });
+  manualMessageId.value = lastId;
+}
+
+function getAnyMessage(messageId: number): ChatMessage | null {
+  return (getChatMessages(messageId, { role: 'all' })[0] as ChatMessage | undefined) ?? null;
+}
+
+function normalizeRawImageInput(input: string): string {
+  const match = input.match(IMAGE_BLOCK_PATTERN);
+  return (match ? match[1] : input).trim();
+}
+
+function makeFingerprint(raw: string, model: string, source: string): string {
+  return JSON.stringify({ raw, model, source });
+}
+
+async function setFloorImageState(message: ChatMessage, state: NaiMessageImageState): Promise<void> {
+  const data = _.isPlainObject(message.data) ? { ...(message.data as Record<string, unknown>) } : {};
+  data[SCRIPT_STATE_KEY] = state;
+  await setChatMessages([{ message_id: message.message_id, data }]);
+}
+
+async function generateFloorFromRaw(
+  messageId: number,
+  rawInput: string,
+  source: string,
+  imagesPerFloor?: number,
+): Promise<void> {
+  const message = getAnyMessage(messageId);
+  if (!message) throw new Error(`没有找到第 ${messageId} 楼。`);
+
+  const raw = normalizeRawImageInput(rawInput);
+  const config = parseImageBlockRaw(raw);
+  const configForPayload: Partial<NaiBlockConfig> = {
+    ...config,
+    n_samples: imagesPerFloor ?? config.n_samples,
+  };
+  const warnings = getCostWarnings(store.settings, configForPayload);
+  const baseState: NaiMessageImageState = {
+    version: 3,
+    fingerprint: makeFingerprint(raw, config.model ?? store.settings.model, source),
+    raw,
+    config: configForPayload,
+    status: 'captured',
+  };
+
+  if (warnings.length > 0 && store.settings.paidMode === 'block') {
+    await setFloorImageState(message, {
+      ...baseState,
+      status: 'blocked_anlas',
+      anlas_warnings: warnings,
+    });
+    store.setLastLog({
+      level: 'warning',
+      title: '已阻止可能消耗 Anlas 的请求',
+      message: warnings.join('\n'),
+      solution: '把参数改回会员免费范围，或在面板中把策略改为“提醒后允许”或“直接允许”。',
+      detail: raw,
+    });
+    return;
+  }
+
+  await setFloorImageState(message, {
+    ...baseState,
+    status: 'generating',
+    anlas_warnings: warnings,
+  });
+
+  const payload = buildNaiPayload(store.settings, configForPayload);
+  const images = await requestNaiImages(store.settings, payload);
+  const downloadNames = images.map((image, index) => {
+    const ext = image.mimeType.includes('webp') ? 'webp' : 'png';
+    return renderIndexedDownloadName(store.settings.downloadNameTemplate, {
+      messageId,
+      seed: image.seed,
+      ext,
+      index,
+      total: images.length,
+    });
+  });
+  const caches = await Promise.all(
+    images.map((image, index) => putCachedImage(image, downloadNames[index], store.settings.imageTtlDays)),
+  );
+
+  if (store.settings.autoDownload || store.settings.storageMode === 'download') {
+    images.forEach((image, index) => downloadImage(image, downloadNames[index]));
+  }
+
+  await setFloorImageState(message, {
+    ...baseState,
+    status: 'ready',
+    model: payload.model,
+    seed: images[0]?.seed,
+    width: Number(payload.parameters.width),
+    height: Number(payload.parameters.height),
+    generated_at: new Date().toISOString(),
+    cache: caches[0],
+    caches,
+    anlas_warnings: warnings,
+  });
+
+  store.setLastLog({
+    level: 'success',
+    title: `${source}生图成功`,
+    message: `第 ${messageId} 楼已生成 ${images.length} 张图片，首张 seed=${images[0]?.seed ?? '未知'}。`,
+    solution:
+      warnings.length > 0 ? `本次参数可能消耗 Anlas：\n${warnings.join('\n')}` : '当前参数处于会员免费生图范围内。',
+    detail: JSON.stringify(
+      {
+        source,
+        model: payload.model,
+        width: payload.parameters.width,
+        height: payload.parameters.height,
+        steps: payload.parameters.steps,
+        nSamples: payload.parameters.n_samples,
+        cacheIds: caches.map(cache => cache.id),
+      },
+      null,
+      2,
+    ),
+  });
+}
+
+async function generateManualFloor(): Promise<void> {
+  if (manualGenerating.value) return;
+  manualGenerating.value = true;
+  try {
+    await generateFloorFromRaw(manualMessageId.value, manualRaw.value, '手动');
+    toastr.success(`第 ${manualMessageId.value} 楼手动生图完成。`);
+  } catch (error) {
+    const translated = translateUnknownError(error);
+    store.setLastLog({ level: 'error', ...translated });
+    toastr.error(translated.message, translated.title);
+  } finally {
+    manualGenerating.value = false;
+  }
+}
+
+async function loadComicModels(): Promise<void> {
+  comicLoadingModels.value = true;
+  try {
+    const models = await fetchComicModels(store.settings);
+    const selectedModel = models.includes(store.settings.comicModel)
+      ? store.settings.comicModel
+      : store.settings.comicModel || models[0] || getDefaultComicModel(store.settings.comicApiMode);
+    store.updateSettings({
+      comicModels: models,
+      comicModel: selectedModel,
+    });
+    store.setLastLog({
+      level: 'success',
+      title: '漫画模型已拉取',
+      message: `已拉取 ${models.length} 个模型，当前模型：${selectedModel || '未选择'}。`,
+      solution: '现在可以按楼层生成分镜提示词并生图。',
+      detail: models.join('\n'),
+    });
+    toastr.success('漫画模型拉取成功。');
+  } catch (error) {
+    const translated = translateUnknownError(error);
+    store.setLastLog({
+      level: 'error',
+      title: '漫画模型连接失败',
+      message: translated.message,
+      solution: '检查 API Key、Base URL、模型名和接口跨域设置。',
+      detail: translated.detail,
+    });
+    toastr.error(translated.message, '漫画模型连接失败');
+  } finally {
+    comicLoadingModels.value = false;
+  }
+}
+
+function buildComicContext(targetMessageId: number): string {
+  const start = Math.min(store.settings.comicStartMessageId, targetMessageId);
+  const messages = getChatMessages(`${start}-${targetMessageId}`, { role: 'all', hide_state: 'unhidden' }) as ChatMessage[];
+  return messages
+    .filter(message => {
+      if (message.message_id > targetMessageId) return false;
+      if (message.role === 'user') return store.settings.comicIncludeUser;
+      if (message.role === 'assistant') return store.settings.comicIncludeAssistant;
+      return false;
+    })
+    .map(message => `#${message.message_id} ${message.role} ${message.name}\n${stripImageBlock(message.message)}`)
+    .join('\n\n');
+}
+
+function stripImageBlock(text: string): string {
+  return text.replace(IMAGE_BLOCK_PATTERN, '').trim();
+}
+
+async function generateComicFloor(messageId: number): Promise<void> {
+  const target = getAnyMessage(messageId);
+  if (!target) throw new Error(`没有找到第 ${messageId} 楼。`);
+  const context = buildComicContext(messageId);
+  if (!context.trim()) throw new Error('漫画上下文为空，请检查起止楼层和角色筛选。');
+  const result = await requestComicImageBlock(store.settings, context, target);
+  await generateFloorFromRaw(messageId, result.raw, '漫画', store.settings.comicImagesPerFloor);
+}
+
+async function generateComicCurrentFloor(): Promise<void> {
+  if (comicGenerating.value) return;
+  comicGenerating.value = true;
+  try {
+    const messageId = store.settings.comicEndMessageId || getLastMessageId();
+    comicProgress.value = `正在处理第 ${messageId} 楼`;
+    await generateComicFloor(messageId);
+    comicProgress.value = `第 ${messageId} 楼完成`;
+    toastr.success(`第 ${messageId} 楼漫画生图完成。`);
+  } catch (error) {
+    const translated = translateUnknownError(error);
+    store.setLastLog({ level: 'error', ...translated });
+    toastr.error(translated.message, translated.title);
+  } finally {
+    comicGenerating.value = false;
+  }
+}
+
+async function generateComicRange(): Promise<void> {
+  if (comicGenerating.value) return;
+  comicGenerating.value = true;
+  try {
+    const start = Math.min(store.settings.comicStartMessageId, store.settings.comicEndMessageId);
+    const end = Math.max(store.settings.comicStartMessageId, store.settings.comicEndMessageId || getLastMessageId());
+    const targets = (getChatMessages(`${start}-${end}`, { role: 'all', hide_state: 'unhidden' }) as ChatMessage[]).filter(
+      message => (message.role === 'user' && store.settings.comicIncludeUser) || (message.role === 'assistant' && store.settings.comicIncludeAssistant),
+    );
+    if (targets.length === 0) throw new Error('范围内没有可处理楼层。');
+
+    for (const [index, target] of targets.entries()) {
+      comicProgress.value = `正在处理 ${index + 1}/${targets.length}：第 ${target.message_id} 楼`;
+      await generateComicFloor(target.message_id);
+    }
+
+    comicProgress.value = `完成 ${targets.length} 个楼层`;
+    toastr.success('漫画范围生图完成。');
+  } catch (error) {
+    const translated = translateUnknownError(error);
+    store.setLastLog({ level: 'error', ...translated });
+    toastr.error(translated.message, translated.title);
+  } finally {
+    comicGenerating.value = false;
+  }
+}
+
+function renderIndexedDownloadName(
+  template: string,
+  data: { messageId: number; seed: number; ext: string; index: number; total: number },
+): string {
+  const rendered = renderDownloadName(template, data).replaceAll('{{index}}', String(data.index + 1));
+  if (data.total <= 1 || template.includes('{{index}}')) return rendered;
+  return rendered.replace(new RegExp(`\\.${data.ext}$`, 'i'), `-${data.index + 1}.${data.ext}`);
 }
 
 async function refreshCacheCount(): Promise<void> {
@@ -1187,6 +1730,7 @@ function onResizeWindow(): void {
 }
 
 onMounted(() => {
+  syncComicRange();
   hostWindow.addEventListener('resize', onResizeWindow);
   hostWindow.visualViewport?.addEventListener('resize', onResizeWindow);
 });
@@ -1601,6 +2145,10 @@ input:disabled {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
+.auth-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 10px;
+}
 .choice-grid button {
   min-height: 76px;
   border: 1px solid var(--border);
@@ -1627,6 +2175,13 @@ input:disabled {
 }
 .choice-grid button.active strong {
   color: var(--accent-strong);
+}
+.wide-segmented {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.wide-segmented button {
+  flex: 1;
 }
 .warning-box,
 .success-box,
@@ -1798,6 +2353,7 @@ input:disabled {
   }
   .settings-grid,
   .assistant-page .settings-grid,
+  .comic-page .settings-grid,
   .two-col,
   .choice-grid {
     grid-template-columns: 1fr;

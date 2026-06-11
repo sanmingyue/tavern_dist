@@ -47,7 +47,7 @@ export class NaiApiError extends Error {
   }
 }
 
-export const IMAGE_BLOCK_PATTERN = /<nai-image\b[^>]*>([\s\S]*?)<\/nai-image>/i;
+export const IMAGE_BLOCK_PATTERN = /<\s*nai[\s_-]*image\b[^>]*>([\s\S]*?)<\s*\/\s*nai[\s_-]*image\s*>/i;
 
 const CharacterPromptSchema = z
   .object({
@@ -71,6 +71,9 @@ const BlockConfigSchema = z
     author_prompt: z.string().optional(),
     style_prompt: z.string().optional(),
     prefix_prompt: z.string().optional(),
+    post_prompt: z.string().optional(),
+    suffix_prompt: z.string().optional(),
+    after_prompt: z.string().optional(),
     negative_prompt: z.string().optional(),
     uc: z.string().optional(),
     model: z.string().optional(),
@@ -81,6 +84,7 @@ const BlockConfigSchema = z
     cfg_rescale: z.coerce.number().min(0).optional(),
     sampler: z.string().optional(),
     noise_schedule: z.string().optional(),
+    n_samples: z.coerce.number().int().min(1).max(10).optional(),
     seed: z.union([z.coerce.number().int().min(0).max(4294967295), z.literal(-1), z.literal('random')]).optional(),
     use_coords: z.coerce.boolean().optional(),
     characters: z.array(CharacterPromptSchema).optional(),
@@ -95,11 +99,25 @@ export function parseImageBlock(
   if (!match) return null;
 
   const raw = match[1].trim();
+  const config = parseImageBlockRaw(raw);
+
+  return {
+    raw,
+    cleanedMessage: message.replace(IMAGE_BLOCK_PATTERN, '').trimEnd(),
+    config,
+  };
+}
+
+export function parseImageBlockRaw(raw: string): NaiBlockConfig {
   let parsed: unknown;
 
   try {
     parsed = parseString(raw);
-  } catch {
+  } catch (error) {
+    if (looksLikeStructuredImageBlock(raw)) {
+      const detail = error instanceof Error && error.message ? `：${error.message}` : '';
+      throw new Error(`<nai-image> YAML 格式错误${detail}`);
+    }
     parsed = { prompt: raw };
   }
 
@@ -111,11 +129,17 @@ export function parseImageBlock(
     throw new Error('<nai-image> 中没有 prompt、positive 或 input。');
   }
 
-  return {
-    raw,
-    cleanedMessage: message.replace(IMAGE_BLOCK_PATTERN, '').trimEnd(),
-    config: { ...config, prompt: prompt.trim() },
-  };
+  return { ...config, prompt: prompt.trim() };
+}
+
+function looksLikeStructuredImageBlock(raw: string): boolean {
+  const text = raw.trim();
+  if (!text) return false;
+  if (/^[{[]/.test(text)) return true;
+  if (/^\s*(prompt|positive|input|negative_prompt|uc|characters|character_prompts|width|height|steps|scale|sampler|seed|n_samples)\s*:/im.test(text)) {
+    return true;
+  }
+  return /\n\s*-\s*(name|prompt|positive|position|x|y)\s*:/i.test(text);
 }
 
 export function randomSeed(): number {
@@ -142,7 +166,8 @@ export function buildNaiPayload(settings: NaiSettings, block?: Partial<NaiBlockC
     block?.prefix_prompt ??
     settings.authorPrompt
   ).trim();
-  const prompt = joinPromptParts([authorPrompt, scenePrompt]);
+  const postPrompt = (block?.post_prompt ?? block?.suffix_prompt ?? block?.after_prompt ?? settings.postPrompt).trim();
+  const prompt = joinPromptParts([authorPrompt, scenePrompt, postPrompt]);
   const negativePrompt = (block?.negative_prompt ?? block?.uc ?? settings.negativePrompt).trim();
   const characters = normalizeCharacterPrompts(block);
   const charCaptions = characters.map(character => toCharacterCaption(character, false));
@@ -168,7 +193,7 @@ export function buildNaiPayload(settings: NaiSettings, block?: Partial<NaiBlockC
       scale: block?.scale ?? settings.scale,
       sampler: block?.sampler ?? settings.sampler,
       steps: block?.steps ?? settings.steps,
-      n_samples: settings.nSamples,
+      n_samples: block?.n_samples ?? settings.nSamples,
       ucPreset: settings.ucPreset,
       qualityToggle: settings.qualityToggle,
       dynamic_thresholding: settings.dynamicThresholding,
@@ -276,7 +301,7 @@ export function getCostWarnings(settings: NaiSettings, block?: Partial<NaiBlockC
   const width = block?.width ?? settings.width;
   const height = block?.height ?? settings.height;
   const steps = block?.steps ?? settings.steps;
-  const nSamples = settings.nSamples;
+  const nSamples = block?.n_samples ?? settings.nSamples;
   const warnings: string[] = [];
   const maxFreePixels = 1024 * 1024;
 
@@ -302,11 +327,11 @@ export async function requestNaiImage(settings: NaiSettings, payload: NaiImageRe
 }
 
 export async function requestNaiImages(settings: NaiSettings, payload: NaiImageRequest): Promise<NaiGeneratedImage[]> {
-  if (!settings.token.trim()) {
+  if (needsNaiToken(settings) && !settings.token.trim()) {
     throw new NaiApiError({
       title: '缺少 API Token',
-      message: '还没有填写 NovelAI Persistent API Token。',
-      solution: '在“接口”页填写 token 后再生成。不要把 token 写进世界书或角色卡。',
+      message: '还没有填写当前生图接口需要的 API Token。',
+      solution: '在“接口”页填写 token，或把鉴权方式改为公益站要求的模式。不要把 token 写进世界书或角色卡。',
       detail: '',
     });
   }
@@ -314,7 +339,7 @@ export async function requestNaiImages(settings: NaiSettings, payload: NaiImageR
   const response = await fetch(settings.endpoint, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${settings.token.trim()}`,
+      ...buildNaiHeaders(settings),
       'Content-Type': 'application/json',
       'x-correlation-id': makeCorrelationId(),
     },
@@ -338,6 +363,24 @@ export async function requestNaiImages(settings: NaiSettings, payload: NaiImageR
       seed: readSeedFromFilename(image.filename, Number.isFinite(fallbackSeed) ? fallbackSeed + index : fallbackSeed),
     })),
   );
+}
+
+function needsNaiToken(settings: NaiSettings): boolean {
+  if (settings.authMode === 'none') return false;
+  if (settings.authMode === 'custom') return settings.customAuthValue.includes('{{token}}');
+  return true;
+}
+
+function buildNaiHeaders(settings: NaiSettings): Record<string, string> {
+  const token = settings.token.trim();
+  if (settings.authMode === 'none') return {};
+  if (settings.authMode === 'x-api-key') return token ? { 'x-api-key': token } : {};
+  if (settings.authMode === 'custom') {
+    const header = settings.customAuthHeader.trim();
+    const value = settings.customAuthValue.replaceAll('{{token}}', token).trim();
+    return header && value ? { [header]: value } : {};
+  }
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 export function translateUnknownError(error: unknown): NaiTranslatedError {

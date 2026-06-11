@@ -5,6 +5,8 @@ export type NaiStorageMode = 'cache' | 'download';
 export type NaiPaidMode = 'block' | 'warn' | 'allow';
 export type NaiTheme = 'warm' | 'cool';
 export type NaiAssistantMessageRole = 'user' | 'assistant';
+export type NaiAuthMode = 'bearer' | 'x-api-key' | 'none' | 'custom';
+export type ComicApiMode = 'openai' | 'deepseek';
 
 export interface NaiLog {
   level: NaiLogLevel;
@@ -46,14 +48,14 @@ export const DEFAULT_ASSISTANT_SYSTEM_PROMPT = `<Task>
 - 角色名示例：Castorice (honkai: star rail)。可用空格或下划线连接角色名与作品名。
 - 含特殊符号或变音符号的名字要转成 NovelAI 更容易识别的 ASCII 写法，例如 Gotoh Hitori (Bocchi the Rock!)。
 - 权重只用于核心词。{tag} 约等于增强， [tag] 约等于减弱，n::tag:: 表示数字权重。数字权重必须用 :: 收尾，避免影响后续所有词。
-- 作者串、画师串、质量词通常放在脚本面板的“作者串”里，不要重复写进每楼 positive，除非用户明确要求。
+- 作者串、画师串、质量词通常放在脚本面板的“前置作者串”和“后置作者串”里，不要重复写进每楼 positive，除非用户明确要求。
 
 输出要求：
 - 用户只想讨论时，用中文解释思路，并给出可复制的英文正向、反向提示词。
 - 用户需要直接放进脚本时，输出 <nai-image> YAML 块。
 - 用户需要世界书规则时，使用“你”指代生成正文的模型，不要写“AI应该”。
 - <nai-image> 内只写 YAML，不写解释。
-- positive 只写本楼正文生成的正向提示词，不包含作者串。
+- positive 只写本楼正文生成的正向提示词，不包含前置作者串和后置作者串。
 - negative_prompt 写本楼反向提示词；如果没有特殊反向，可以给出通用反向或省略。
 
 完整输出保护：
@@ -64,7 +66,7 @@ export const DEFAULT_ASSISTANT_SYSTEM_PROMPT = `<Task>
 
 输出 <nai-image> 时遵守这个结构：
 <nai-image>
-positive: "本楼正文生成的正向提示词，不包含固定作者串"
+positive: "本楼正文生成的正向提示词，不包含前置作者串和后置作者串"
 negative_prompt: "本楼反向提示词"
 characters:
   - name: "角色名，可省略"
@@ -72,7 +74,7 @@ characters:
     position: left
 </nai-image>
 
-固定作者串由脚本面板单独管理，除非用户明确要求，否则不要把固定作者串写进 positive。`;
+前置作者串和后置作者串由脚本面板单独管理，除非用户明确要求，否则不要把固定作者串写进 positive。`;
 
 const NaiSettingsSchema = z
   .object({
@@ -83,6 +85,9 @@ const NaiSettingsSchema = z
 
     token: z.string().default(''),
     endpoint: z.string().default('https://image.novelai.net/ai/generate-image'),
+    authMode: z.enum(['bearer', 'x-api-key', 'none', 'custom']).default('bearer'),
+    customAuthHeader: z.string().default('Authorization'),
+    customAuthValue: z.string().default('Bearer {{token}}'),
 
     storageMode: z.enum(['cache', 'download']).default('cache'),
     autoDownload: z.boolean().default(false),
@@ -93,6 +98,7 @@ const NaiSettingsSchema = z
 
     model: z.string().default('nai-diffusion-4-5-full'),
     authorPrompt: z.string().default('best quality, amazing quality, very aesthetic, absurdres'),
+    postPrompt: z.string().default(''),
     width: z.coerce.number().int().positive().default(832),
     height: z.coerce.number().int().positive().default(1216),
     steps: z.coerce.number().positive().default(28),
@@ -124,6 +130,19 @@ const NaiSettingsSchema = z
     assistantModels: z.array(z.string()).default([]),
     assistantTemperature: z.coerce.number().min(0).max(2).default(0.7),
     assistantMaxTokens: z.coerce.number().int().min(512).max(65535).default(4096),
+
+    comicApiMode: z.enum(['openai', 'deepseek']).default('openai'),
+    comicApiKey: z.string().default(''),
+    comicBaseUrl: z.string().default('https://api.openai.com/v1'),
+    comicModel: z.string().default(''),
+    comicModels: z.array(z.string()).default([]),
+    comicTemperature: z.coerce.number().min(0).max(2).default(0.35),
+    comicMaxTokens: z.coerce.number().int().min(512).max(65535).default(4096),
+    comicStartMessageId: z.coerce.number().int().min(0).default(0),
+    comicEndMessageId: z.coerce.number().int().min(0).default(0),
+    comicImagesPerFloor: z.coerce.number().int().min(1).max(10).default(1),
+    comicIncludeUser: z.boolean().default(true),
+    comicIncludeAssistant: z.boolean().default(true),
   })
   .prefault({});
 
@@ -183,6 +202,10 @@ function normalizeSettings(raw: unknown): Record<string, unknown> {
     settings.storageMode = 'cache';
   }
   settings.authorPrompt ??= settings.author_prompt ?? settings.style_prompt ?? settings.prefix_prompt;
+  settings.postPrompt ??= settings.post_prompt ?? settings.suffix_prompt ?? settings.after_prompt;
+  settings.authMode ??= settings.auth_mode;
+  settings.customAuthHeader ??= settings.custom_auth_header;
+  settings.customAuthValue ??= settings.custom_auth_value;
   return settings;
 }
 
@@ -245,6 +268,13 @@ export const useNaiStore = defineStore('nai-image', () => {
     return `${token.slice(0, 6)}...${token.slice(-4)}`;
   }
 
+  function maskedComicApiKey(): string {
+    const token = scriptData.value.settings.comicApiKey.trim();
+    if (!token) return '未填写';
+    if (token.length <= 12) return '已填写';
+    return `${token.slice(0, 6)}...${token.slice(-4)}`;
+  }
+
   return {
     scriptData,
     settings,
@@ -258,5 +288,6 @@ export const useNaiStore = defineStore('nai-image', () => {
     writeDefaultSettings,
     maskedToken,
     maskedAssistantApiKey,
+    maskedComicApiKey,
   };
 });
