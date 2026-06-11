@@ -9,9 +9,11 @@ import {
   type NaiCachedImageMeta,
 } from './cache';
 import {
+  IMAGE_BLOCK_PATTERN,
   buildNaiPayload,
   downloadImage,
   getCostWarnings,
+  parseImageBlockRaw,
   parseImageBlock,
   renderDownloadName,
   requestNaiImages,
@@ -25,6 +27,12 @@ const SCRIPT_STATE_KEY = 'nai_image_script';
 const RENDER_CLASS = 'nai-image-render';
 const REGENERATE_CLASS = 'nai-image-regenerate';
 const SAVE_CLASS = 'nai-image-save';
+const EDIT_CLASS = 'nai-image-edit';
+const EDITOR_CLASS = 'nai-image-editor';
+const FLEXIBLE_IMAGE_OPEN_PATTERN = /<\s*nai[\s_-]*image\b[^>]*>/i;
+const FLEXIBLE_IMAGE_CLOSE_PATTERN = /<\s*\/\s*nai[\s_-]*image\s*>/i;
+const BROKEN_IMAGE_OPEN_PATTERN = /<\s*nai[\s_-]*image\b/i;
+const IMAGE_YAML_START_PATTERN = /^\s*(prompt|positive|input)\s*:/i;
 const processingMessageIds = new Set<number>();
 const renderTimers = new Map<number, ReturnType<typeof setTimeout>>();
 const renderVersions = new Map<number, number>();
@@ -61,6 +69,17 @@ function createCapturedState(raw: string, config: NaiBlockConfig, model: string)
   };
 }
 
+function createParseErrorState(raw: string, model: string, errorMessage: string): NaiMessageImageState {
+  return {
+    version: 3,
+    fingerprint: buildFingerprint(raw, model),
+    raw,
+    config: {},
+    status: 'error',
+    last_error: errorMessage,
+  };
+}
+
 function getImageState(message: ChatMessage): NaiMessageImageState | null {
   const state = _.get(message.data, SCRIPT_STATE_KEY);
   if (!_.isPlainObject(state)) return null;
@@ -72,6 +91,10 @@ function getImageState(message: ChatMessage): NaiMessageImageState | null {
     return { ...imageState, version: 3, caches: [imageState.cache] };
   }
   return imageState;
+}
+
+function getAnyMessage(messageId: number): ChatMessage | null {
+  return getChatMessages(messageId, { role: 'all' })[0] ?? null;
 }
 
 async function setMessageState(
@@ -241,10 +264,31 @@ async function captureAndGenerateMessage(
   try {
     parsed = parseImageBlock(message.message);
   } catch (error) {
+    const candidate = extractImageBlockCandidate(message.message);
+    if (candidate) {
+      await saveParseErrorForMessage(message, candidate, error, settings.model, store);
+      return;
+    }
     const translated = translateUnknownError(error);
     store.setLastLog({ level: 'error', ...translated });
     toastr.error(translated.message, translated.title);
     return;
+  }
+
+  if (!parsed) {
+    const candidate = extractImageBlockCandidate(message.message);
+    if (candidate) {
+      try {
+        parsed = {
+          raw: candidate.raw,
+          cleanedMessage: candidate.cleanedMessage,
+          config: parseImageBlockRaw(candidate.raw),
+        };
+      } catch (error) {
+        await saveParseErrorForMessage(message, candidate, error, settings.model, store);
+        return;
+      }
+    }
   }
 
   if (!parsed) {
@@ -292,6 +336,101 @@ function processLatestMessage(trigger: 'auto' | 'button', pinia: ReturnType<type
   void captureAndGenerateMessage(messageId, trigger, pinia);
 }
 
+function normalizeEditorRawInput(input: string): string {
+  return (extractImageBlockCandidate(input)?.raw ?? input).trim();
+}
+
+async function saveParseErrorForMessage(
+  message: ChatMessage,
+  candidate: { raw: string; cleanedMessage: string },
+  error: unknown,
+  model: string,
+  store: ReturnType<typeof useNaiStore>,
+): Promise<void> {
+  const translated = translateUnknownError(error);
+  const errorState = createParseErrorState(candidate.raw, model, translated.message);
+  await setMessageState(message, errorState, candidate.cleanedMessage);
+  store.setLastLog({
+    level: 'error',
+    title: '生图块格式错误',
+    message: translated.message,
+    solution: '已把原始生图块保存到楼层下方，可点击“修复提示词”修改后重新生成。',
+    detail: candidate.raw,
+  });
+  toastr.error('生图块格式错误，可在楼层下方修复。', 'NAI 生图');
+}
+
+function extractImageBlockCandidate(message: string): { raw: string; cleanedMessage: string } | null {
+  const match = message.match(IMAGE_BLOCK_PATTERN);
+  if (match) {
+    return {
+      raw: match[1].trim(),
+      cleanedMessage: message.replace(IMAGE_BLOCK_PATTERN, '').trimEnd(),
+    };
+  }
+
+  const tagged = extractFlexibleTaggedBlock(message);
+  if (tagged) return tagged;
+
+  const tail = extractYamlTailBlock(message);
+  if (tail) return tail;
+
+  return null;
+}
+
+function extractFlexibleTaggedBlock(message: string): { raw: string; cleanedMessage: string } | null {
+  const openIndex = message.search(FLEXIBLE_IMAGE_OPEN_PATTERN);
+  if (openIndex >= 0) {
+    const openMatch = message.slice(openIndex).match(FLEXIBLE_IMAGE_OPEN_PATTERN);
+    if (!openMatch) return null;
+    const rawStart = openIndex + openMatch[0].length;
+    const rest = message.slice(rawStart);
+    const closeMatch = rest.match(FLEXIBLE_IMAGE_CLOSE_PATTERN);
+    if (closeMatch?.index !== undefined) {
+      const raw = rest.slice(0, closeMatch.index).trim();
+      const rawEnd = rawStart + closeMatch.index + closeMatch[0].length;
+      return {
+        raw,
+        cleanedMessage: `${message.slice(0, openIndex)}${message.slice(rawEnd)}`.trimEnd(),
+      };
+    }
+
+    return {
+      raw: rest.trim(),
+      cleanedMessage: message.slice(0, openIndex).trimEnd(),
+    };
+  }
+
+  const brokenOpenIndex = message.search(BROKEN_IMAGE_OPEN_PATTERN);
+  if (brokenOpenIndex < 0) return null;
+  const afterBrokenOpen = message.slice(brokenOpenIndex).replace(BROKEN_IMAGE_OPEN_PATTERN, '').replace(/^.*?>/, '');
+  return {
+    raw: afterBrokenOpen.replace(FLEXIBLE_IMAGE_CLOSE_PATTERN, '').trim(),
+    cleanedMessage: message.slice(0, brokenOpenIndex).trimEnd(),
+  };
+}
+
+function extractYamlTailBlock(message: string): { raw: string; cleanedMessage: string } | null {
+  const lines = message.split(/\r?\n/);
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    if (!IMAGE_YAML_START_PATTERN.test(lines[index])) continue;
+
+    const raw = lines.slice(index).join('\n').replace(FLEXIBLE_IMAGE_CLOSE_PATTERN, '').trim();
+    if (!raw || !hasLikelyImageYamlContent(raw)) return null;
+
+    return {
+      raw,
+      cleanedMessage: lines.slice(0, index).join('\n').trimEnd(),
+    };
+  }
+  return null;
+}
+
+function hasLikelyImageYamlContent(raw: string): boolean {
+  if (!IMAGE_YAML_START_PATTERN.test(raw)) return false;
+  return /^\s*(negative_prompt|uc|characters|character_prompts|width|height|steps|scale|sampler|seed|n_samples)\s*:/im.test(raw);
+}
+
 function queueRenderMessageImage(messageId: number): void {
   const oldTimer = renderTimers.get(messageId);
   if (oldTimer) clearTimeout(oldTimer);
@@ -307,7 +446,7 @@ async function renderMessageImage(messageId: number): Promise<void> {
   const renderVersion = (renderVersions.get(messageId) ?? 0) + 1;
   renderVersions.set(messageId, renderVersion);
 
-  const message = getChatMessages(messageId, { role: 'assistant' })[0];
+  const message = getAnyMessage(messageId);
   if (!message) return;
 
   const state = getImageState(message);
@@ -362,11 +501,19 @@ async function renderMessageImage(messageId: number): Promise<void> {
   }
 
   const $actions = $('<div></div>').addClass('nai-image-actions').appendTo($box);
+  const canRegenerate = hasPromptConfig(state.config);
   $('<button type="button"></button>')
     .addClass(REGENERATE_CLASS)
     .attr('data-message-id', String(messageId))
+    .prop('disabled', processingMessageIds.has(messageId) || !canRegenerate)
+    .text(processingMessageIds.has(messageId) ? '生成中' : canRegenerate ? '重新生成' : '先修复提示词')
+    .appendTo($actions);
+
+  $('<button type="button"></button>')
+    .addClass(EDIT_CLASS)
+    .attr('data-message-id', String(messageId))
     .prop('disabled', processingMessageIds.has(messageId))
-    .text(processingMessageIds.has(messageId) ? '生成中' : '重新生成')
+    .text(state.status === 'error' && records.length === 0 ? '修复提示词' : '编辑提示词')
     .appendTo($actions);
 
   for (const [index, item] of records.entries()) {
@@ -386,7 +533,7 @@ async function renderMessageImage(messageId: number): Promise<void> {
 function renderVisibleImages(): void {
   const lastMessageId = getLastMessageId();
   if (lastMessageId < 0) return;
-  for (const message of getChatMessages(`0-${lastMessageId}`, { role: 'assistant' })) {
+  for (const message of getChatMessages(`0-${lastMessageId}`, { role: 'all' })) {
     queueRenderMessageImage(message.message_id);
   }
 }
@@ -395,19 +542,88 @@ async function handleRegenerateClick(event: JQuery.ClickEvent, pinia: ReturnType
   const messageId = Number($(event.currentTarget).attr('data-message-id'));
   if (!Number.isInteger(messageId)) return;
 
-  const message = getChatMessages(messageId, { role: 'assistant' })[0];
+  const message = getAnyMessage(messageId);
+  if (!message) return;
+  const state = getImageState(message);
+  if (!state) return;
+  if (!hasPromptConfig(state.config)) {
+    toastr.warning('请先修复提示词格式。');
+    return;
+  }
+
+  await generateForMessage(message, state, pinia);
+}
+
+function handleEditClick(event: JQuery.ClickEvent, pinia: ReturnType<typeof createPinia>): void {
+  const messageId = Number($(event.currentTarget).attr('data-message-id'));
+  if (!Number.isInteger(messageId)) return;
+
+  const message = getAnyMessage(messageId);
   if (!message) return;
   const state = getImageState(message);
   if (!state) return;
 
-  await generateForMessage(message, state, pinia);
+  const $message = retrieveDisplayedMessage(messageId);
+  const $box = $message.find(`.${RENDER_CLASS}`).last();
+  if ($box.length === 0) return;
+
+  $box.find(`.${EDITOR_CLASS}`).remove();
+  const $editor = $('<div></div>').addClass(EDITOR_CLASS).appendTo($box);
+  const $textarea = $('<textarea></textarea>').val(state.raw).appendTo($editor);
+  const $actions = $('<div></div>').addClass('nai-image-editor-actions').appendTo($editor);
+
+  $('<button type="button"></button>')
+    .text('保存并生成')
+    .on('click', () => {
+      void saveEditedPrompt(messageId, String($textarea.val() ?? ''), pinia);
+    })
+    .appendTo($actions);
+
+  $('<button type="button"></button>')
+    .text('取消')
+    .on('click', () => $editor.remove())
+    .appendTo($actions);
+}
+
+async function saveEditedPrompt(
+  messageId: number,
+  rawInput: string,
+  pinia: ReturnType<typeof createPinia>,
+): Promise<void> {
+  const store = useNaiStore(pinia);
+  const message = getAnyMessage(messageId);
+  if (!message) return;
+
+  const raw = normalizeEditorRawInput(rawInput);
+  try {
+    const config = parseImageBlockRaw(raw);
+    const state = createCapturedState(raw, config, store.settings.model);
+    await setMessageState(message, state);
+    const updatedMessage = getAnyMessage(messageId) ?? {
+      ...message,
+      data: _.merge({}, message.data, { [SCRIPT_STATE_KEY]: state }),
+    };
+    await generateForMessage(updatedMessage, state, pinia);
+  } catch (error) {
+    const translated = translateUnknownError(error);
+    const errorState = createParseErrorState(raw, store.settings.model, translated.message);
+    await setMessageState(message, errorState);
+    store.setLastLog({
+      level: 'error',
+      title: '提示词格式仍有错误',
+      message: translated.message,
+      solution: '请检查 YAML 缩进、引号、冒号，以及是否包含 prompt、positive 或 input。',
+      detail: raw,
+    });
+    toastr.error(translated.message, '提示词格式仍有错误');
+  }
 }
 
 async function handleSaveClick(event: JQuery.ClickEvent): Promise<void> {
   const messageId = Number($(event.currentTarget).attr('data-message-id'));
   if (!Number.isInteger(messageId)) return;
 
-  const message = getChatMessages(messageId, { role: 'assistant' })[0];
+  const message = getAnyMessage(messageId);
   if (!message) return;
   const state = getImageState(message);
   const cacheId = $(event.currentTarget).attr('data-cache-id') ?? state?.cache?.id;
@@ -428,6 +644,10 @@ async function handleSaveClick(event: JQuery.ClickEvent): Promise<void> {
 function getStateCaches(state: NaiMessageImageState): NaiCachedImageMeta[] {
   if (state.caches?.length) return state.caches;
   return state.cache ? [state.cache] : [];
+}
+
+function hasPromptConfig(config: Partial<NaiBlockConfig>): boolean {
+  return Boolean((config.prompt ?? config.positive ?? config.input)?.trim());
 }
 
 function formatCacheStatus(records: Array<{ record: { seed: number; expiresAt: string } }>): string {
@@ -523,6 +743,40 @@ function installRenderStyle(): JQuery<HTMLStyleElement> {
   cursor: wait;
   opacity: 0.6;
 }
+.${EDITOR_CLASS} {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.${EDITOR_CLASS} textarea {
+  min-height: 150px;
+  width: min(100%, 720px);
+  box-sizing: border-box;
+  border: 1px solid rgba(96, 125, 139, 0.35);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.12);
+  color: inherit;
+  font: 12px/1.5 Consolas, 'Microsoft YaHei Mono', monospace;
+  letter-spacing: 0;
+  padding: 8px 10px;
+  resize: vertical;
+}
+.nai-image-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.nai-image-editor-actions button {
+  border: 1px solid rgba(47, 111, 159, 0.45);
+  border-radius: 7px;
+  background: rgba(47, 111, 159, 0.12);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  letter-spacing: 0;
+  padding: 6px 10px;
+}
       `.trim(),
     )
     .appendTo('head');
@@ -566,6 +820,9 @@ $(() => {
 
   $('body').on('click.nai-image-script', `.${REGENERATE_CLASS}`, event => {
     void handleRegenerateClick(event, pinia);
+  });
+  $('body').on('click.nai-image-script', `.${EDIT_CLASS}`, event => {
+    handleEditClick(event, pinia);
   });
   $('body').on('click.nai-image-script', `.${SAVE_CLASS}`, event => {
     void handleSaveClick(event);
