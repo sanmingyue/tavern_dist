@@ -112,7 +112,7 @@ function parseRuleLine(line) {
   if (/(文字|文本|string)/i.test(joined)) {
     rule.type = 'text';
   }
-  if (/(布尔|真假|是非|boolean)/i.test(joined)) {
+  if (/(是\/否|是否|开\/关|开关)/.test(joined)) {
     rule.type = 'boolean';
   }
 
@@ -253,11 +253,11 @@ export function 解析轻量变量更新(message, options = {}) {
 export const parseLiteUpdates = 解析轻量变量更新;
 
 function parseBoolean(value) {
-  const text = stripOuterQuotes(value).toLowerCase();
-  if (/^(true|yes|on|1|是|真|有|开启|打开|启用)$/.test(text)) {
+  const text = stripOuterQuotes(value);
+  if (/^(是|开|开启|打开)$/.test(text)) {
     return true;
   }
-  if (/^(false|no|off|0|否|假|无|关闭|关掉|禁用)$/.test(text)) {
+  if (/^(否|关|关闭|关掉)$/.test(text)) {
     return false;
   }
   return undefined;
@@ -309,7 +309,7 @@ function applyRule(update, rule, statData, onReject) {
   } else if (rule.type === 'boolean') {
     value = parseBoolean(update.rawValue);
     if (typeof value !== 'boolean') {
-      onReject?.(update, rule, '布尔值解析失败');
+      onReject?.(update, rule, '是/否或开/关解析失败');
       return undefined;
     }
   } else {
