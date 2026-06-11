@@ -1,4 +1,4 @@
-# MVU Lite 小卡教程
+﻿# MVU Lite 小卡教程
 
 MVU Lite 是给新作者使用的轻量 MVU 写法。它不是 MVU ZOD 的简化版，而是挂在 MVU beta 上的一层中文解析器。
 
@@ -20,7 +20,7 @@ MVU Lite 是给新作者使用的轻量 MVU 写法。它不是 MVU ZOD 的简化
 
 ```js
 import 'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate@beta/artifact/bundle.js';
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.2/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.4/dist/mvu-lite/index.js';
 
 const 变量规则 = `
 
@@ -140,8 +140,10 @@ $(() => {
 布尔变量可以写：
 
 ```txt
-角色.是否知道秘密：布尔；只有剧情明确揭露秘密时改为是。
+角色.是否知道秘密：布尔；只能填写是或否；开局通常为否；只有剧情中秘密被明确说出、展示或被角色亲自发现时，才改为是。
 ```
+
+布尔变量适合记录“是否发生过”的状态，例如是否见过面、是否交换联系方式、是否知道某个秘密。不要用它记录程度变化，程度变化应该用数字或选项。
 
 只读变量可以写：
 
@@ -161,7 +163,7 @@ $(() => {
 
 内容固定照抄：
 
-为了兼容常见正则和预设捕获，Lite 默认使用通用标签 `<UpdateVariable>`。解析器也兼容旧测试标签 `<轻量变量更新>`，但正式写卡建议统一用 `<UpdateVariable>`。
+为了兼容常见正则和预设捕获，Lite 固定使用通用标签 `<UpdateVariable>`。
 
 ```yaml
 ---
@@ -260,7 +262,7 @@ AI 最终应输出成这样：
 
 ```js
 import 'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate@beta/artifact/bundle.js';
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.2/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.4/dist/mvu-lite/index.js';
 
 const 变量规则 = `
 
@@ -298,7 +300,7 @@ MVU Lite 第一版故意只做基础能力：
 当前测试版：
 
 ```js
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.2/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.4/dist/mvu-lite/index.js';
 ```
 
 如果只想固定跟随 main 分支测试，也可以临时使用：
@@ -308,4 +310,5 @@ import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/ta
 ```
 
 正式发给玩家时建议使用带 tag 的版本号链接。
+
 
