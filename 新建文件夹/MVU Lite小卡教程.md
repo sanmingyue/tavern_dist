@@ -18,7 +18,7 @@ MVU Lite 是给新作者使用的轻量 MVU 写法。它不是 MVU ZOD 的简化
 
 ```js
 import 'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate@beta/artifact/bundle.js';
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.1/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.2/dist/mvu-lite/index.js';
 
 const 变量规则 = `
 
@@ -159,6 +159,8 @@ $(() => {
 
 内容固定照抄：
 
+为了兼容常见正则和预设捕获，Lite 默认使用通用标签 `<UpdateVariable>`。解析器也兼容旧测试标签 `<轻量变量更新>`，但正式写卡建议统一用 `<UpdateVariable>`。
+
 ```yaml
 ---
 变量输出格式:
@@ -170,22 +172,22 @@ $(() => {
     - 数字变量必须遵守范围和单次变化上限。
     - 选项变量只能改为变量规则里列出的选项。
   format: |-
-    <轻量变量更新>
+    <UpdateVariable>
     变量路径：改为新值；原因：原因
     变量路径：增加数字；原因：原因
     变量路径：减少数字；原因：原因
-    </轻量变量更新>
+    </UpdateVariable>
 ```
 
 AI 最终应输出成这样：
 
 ```txt
-<轻量变量更新>
+<UpdateVariable>
 始.好感度：增加3；原因：始对{{user}}的戒备略微下降。
 始.情绪：改为动摇；原因：她开始怀疑自己的判断。
 始.当前所想：改为他好像不是敌人，但还不能完全相信。
 世界.当前时间：改为08月16日 09:20；原因：对话和探索经过了一段时间。
-</轻量变量更新>
+</UpdateVariable>
 ```
 
 脚本会在 MVU 写入前检查这些更新：
@@ -195,7 +197,7 @@ AI 最终应输出成这样：
 - `始.情绪：改为崩溃` 如果不在选项里，会被忽略。
 - 未写入变量规则的路径会被忽略。
 
-默认情况下，脚本会在变量写入前清理 `<轻量变量更新>...</轻量变量更新>`，避免污染正文。
+默认情况下，脚本会在变量写入前清理 `<UpdateVariable>...</UpdateVariable>`，避免污染正文。
 
 ---
 
@@ -245,18 +247,18 @@ AI 最终应输出成这样：
     - 数字变量必须遵守范围和单次变化上限。
     - 选项变量只能改为变量规则里列出的选项。
   format: |-
-    <轻量变量更新>
+    <UpdateVariable>
     变量路径：改为新值；原因：原因
     变量路径：增加数字；原因：原因
     变量路径：减少数字；原因：原因
-    </轻量变量更新>
+    </UpdateVariable>
 ```
 
 ### 脚本
 
 ```js
 import 'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate@beta/artifact/bundle.js';
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.1/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.2/dist/mvu-lite/index.js';
 
 const 变量规则 = `
 
@@ -294,7 +296,7 @@ MVU Lite 第一版故意只做基础能力：
 当前测试版：
 
 ```js
-import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.1/dist/mvu-lite/index.js';
+import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@mvu-lite-v0.0.2/dist/mvu-lite/index.js';
 ```
 
 如果只想固定跟随 main 分支测试，也可以临时使用：
@@ -304,3 +306,4 @@ import { 注册轻量MVU } from 'https://testingcf.jsdelivr.net/gh/sanmingyue/ta
 ```
 
 正式发给玩家时建议使用带 tag 的版本号链接。
+
