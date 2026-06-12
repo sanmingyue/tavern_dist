@@ -535,10 +535,6 @@ function toggleCore(index: number) {
     <div class="zhino-char-scroll">
       <!-- 顶部按钮栏 -->
       <div class="zhino-char-topbar">
-        <div class="zhino-view-toggle">
-          <button class="zhino-view-btn" :class="{ active: viewMode === 'memory' }" @click="viewMode = 'memory'">记忆</button>
-          <button class="zhino-view-btn" :class="{ active: viewMode === 'profileV2' }" @click="viewMode = 'profileV2'">人设V2</button>
-        </div>
         <button class="zhino-memory-ctrl-btn" @click="openMemoryControl" title="记忆控制">
           记忆控制
         </button>
@@ -580,8 +576,8 @@ function toggleCore(index: number) {
         </div>
       </div>
 
-      <!-- 动态人设V2视图 -->
-      <template v-if="viewMode === 'profileV2' && selectedCharacter">
+      <!-- 动态人设（状态快照） - 已整合到角色详情中 -->
+      <template v-if="false && selectedCharacter">
         <div class="zhino-section">
           <div class="zhino-section-header">
             <div class="zhino-section-title">{{ selectedCharacter }} - 动态人设V2</div>
@@ -626,15 +622,15 @@ function toggleCore(index: number) {
         </div>
       </template>
 
-      <!-- 动态人设V2视图：角色未选中 -->
-      <template v-if="viewMode === 'profileV2' && !selectedCharacter">
+      <!-- (已移除) -->
+      <template v-if="false && !selectedCharacter">
         <div class="zhino-section">
           <div class="zhino-empty-hint">请先选择一个角色查看动态人设V2</div>
         </div>
       </template>
 
-      <!-- 角色详情（记忆视图） -->
-      <template v-if="viewMode === 'memory' && selectedCharacter">
+      <!-- 角色详情 -->
+      <template v-if="selectedCharacter">
         <div class="zhino-section">
           <div class="zhino-section-header">
             <div class="zhino-section-title">{{ selectedCharacter }} 详情</div>
