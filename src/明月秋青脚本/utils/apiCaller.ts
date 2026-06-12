@@ -219,3 +219,147 @@ function stripThinking(text: string): string {
   }
   return text;
 }
+
+
+// ======== 小总结独立API ==========
+
+/**
+ * 小总结专用 API 调用
+ * 如果启用了独立API (smallSummaryApiEnabled)，走独立的 URL/Key/Model
+ * 否则 fallback 到 callGenerateRaw（通用API或酒馆API）
+ */
+export async function callSmallSummaryApi(params: Parameters<typeof callGenerateRaw>[0]): Promise<string> {
+  const store = useMainStore();
+  const settings = store.settings;
+
+  // 未启用独立API → fallback
+  if (!settings.smallSummaryApiEnabled || !settings.smallSummaryApiUrl || !settings.smallSummaryApiKey || !settings.smallSummaryApiModel) {
+    return callGenerateRaw(params);
+  }
+
+  // 走独立API（OpenAI兼容格式，DS也兼容）
+  const messages = buildOpenAIMessagesFromParams(params);
+  const apiUrl = normalizeSmallSummaryUrl(settings.smallSummaryApiUrl.trim());
+  const modelName = settings.smallSummaryApiModel;
+
+  const startTime = settings.apiMonitorEnabled ? Date.now() : 0;
+  const analysisName = params._monitorLabel || '小总结';
+
+  console.info(`[智脑-小总结API] 独立API请求 -> ${apiUrl}, model=${modelName}`);
+
+  let response: Response;
+  try {
+    response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${settings.smallSummaryApiKey}`,
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages,
+        temperature: 0.5,
+        max_tokens: 2048,
+      }),
+      signal: params._abortSignal,
+    });
+  } catch (err: any) {
+    if (err?.name === 'AbortError') throw err;
+    console.error('[智脑-小总结API] fetch 失败:', err.message || err);
+    throw new Error(`小总结API网络请求失败: ${err.message || err}`);
+  }
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '(无法读取响应)');
+    throw new Error(`小总结API请求失败 (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json().catch(() => null);
+  if (!data) {
+    throw new Error('小总结API返回了空响应或非JSON格式');
+  }
+
+  const rawContent = data?.choices?.[0]?.message?.content;
+  if (!rawContent) {
+    throw new Error('小总结API返回格式异常，未找到 choices[0].message.content');
+  }
+
+  const content = stripThinking(rawContent);
+  console.info(`[智脑-小总结API] 返回 ${content.length} 字符`);
+
+  // 监听器记录
+  if (settings.apiMonitorEnabled) {
+    const durationMs = Date.now() - startTime;
+    store.pushApiMonitorLog({
+      timestamp: new Date().toISOString(),
+      analysisName,
+      model: modelName,
+      messages,
+      response: rawContent,
+      durationMs,
+    });
+  }
+
+  return content;
+}
+
+/** 从 GenerateRawParams 构建 OpenAI messages */
+function buildOpenAIMessagesFromParams(params: Parameters<typeof callGenerateRaw>[0]): Array<{ role: string; content: string }> {
+  const messages: Array<{ role: string; content: string }> = [];
+  for (const item of params.ordered_prompts) {
+    if (item === 'user_input') {
+      messages.push({ role: 'user', content: params.user_input });
+    } else {
+      messages.push({ role: item.role, content: item.content });
+    }
+  }
+  return messages;
+}
+
+/** 规范化小总结API URL */
+function normalizeSmallSummaryUrl(url: string): string {
+  if (url.endsWith('/chat/completions')) return url;
+  const trimmed = url.replace(/\/+$/, '');
+  if (trimmed.endsWith('/v1')) return `${trimmed}/chat/completions`;
+  return `${trimmed}/v1/chat/completions`;
+}
+
+// ========== 模型列表获取 ==========
+
+/**
+ * 获取指定 API 的可用模型列表
+ * 兼容 OpenAI / DepSeek / 中转站等 /v1/models 接口
+ */
+export async function fetchAvailableModels(apiUrl: string, apiKey: string): Promise<string[]> {
+  let modelsUrl = apiUrl.trim().replace(/\/+$/, '');
+  if (modelsUrl.endsWith('/chat/completions')) {
+    modelsUrl = modelsUrl.replace('/chat/completions', '/models');
+  } else if (modelsUrl.endsWith('/v1')) {
+    modelsUrl = modelsUrl + '/models';
+  } else if (!modelsUrl.endsWith('/models')) {
+    modelsUrl = modelsUrl + '/v1/models';
+  }
+
+  console.info(`[智脑] 获取模型列表: ${modelsUrl}`);
+
+  const response = await fetch(modelsUrl, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => '');
+    throw new Error(`获取模型列表失败 (${response.status}): ${errText.slice(0, 200)}`);
+  }
+
+  const data = await response.json();
+  if (Array.isArray(data?.data)) {
+    return data.data.map((m: any) => m.id || m.name || '').filter(Boolean).sort();
+  }
+  if (Array.isArray(data)) {
+    return data.map((m: any) => (typeof m === 'string' ? m : m.id || m.name || '')).filter(Boolean).sort();
+  }
+  throw new Error('模型列表返回格式不支持');
+}

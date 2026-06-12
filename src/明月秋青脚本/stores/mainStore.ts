@@ -393,6 +393,12 @@ const ScriptSettingsSchema = z
         rerankEnabled: z.boolean().prefault(false),
         rerankModel: z.string().prefault('BAAI/bge-reranker-v2-m3'),
         rerankCandidateMultiplier: z.coerce.number().prefault(3),
+        // 小总结独立API（廉价模型，如DS）
+        smallSummaryApiEnabled: z.boolean().prefault(false),
+        smallSummaryApiUrl: z.string().prefault(''),
+        smallSummaryApiKey: z.string().prefault(''),
+        smallSummaryApiModel: z.string().prefault(''),
+        smallSummaryApiFormat: z.string().prefault('openai'), // 'openai' | 'deepseek'
       })
       .prefault({}),
   })

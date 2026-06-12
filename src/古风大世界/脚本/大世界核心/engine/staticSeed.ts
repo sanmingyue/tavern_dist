@@ -14,6 +14,8 @@ export function applyStaticSeedPack(
   options: StaticSeedApplyOptions = {},
 ): StaticSeedApplyReport {
   const include = withDefaultOptions(options);
+  const migrationMarker = `static_seed:${pack.packId}:${pack.version}`;
+  const markerAlreadyApplied = save.maintenance.migrationsApplied.includes(migrationMarker);
   const report: StaticSeedApplyReport = {
     packId: pack.packId,
     appliedAt: nowIso(),
@@ -93,7 +95,7 @@ export function applyStaticSeedPack(
     }
   }
 
-  if (include.includeRelations) {
+  if (include.includeRelations && (!markerAlreadyApplied || include.overwriteExisting)) {
     for (const relation of pack.initialRelations.npc) {
       adjustNpcRelation(save, relation);
       report.relations += 1;
@@ -106,9 +108,11 @@ export function applyStaticSeedPack(
       adjustWorldReputation(save, relation);
       report.relations += 1;
     }
+  } else if (include.includeRelations && markerAlreadyApplied) {
+    report.skipped.push(`relations:${migrationMarker}`);
   }
 
-  save.maintenance.migrationsApplied = [...new Set([...save.maintenance.migrationsApplied, `static_seed:${pack.packId}:${pack.version}`])];
+  save.maintenance.migrationsApplied = [...new Set([...save.maintenance.migrationsApplied, migrationMarker])];
   pushSaveLog(save, 'STATIC_SEED_APPLY', buildSeedReportSummary(report), true);
   return report;
 }
@@ -139,4 +143,3 @@ function withDefaultOptions(options: StaticSeedApplyOptions): Required<StaticSee
     overwriteExisting: options.overwriteExisting ?? false,
   };
 }
-
