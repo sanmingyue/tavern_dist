@@ -591,10 +591,10 @@ function isEditing(evt: TimelineEvent): boolean {
       </div>
       <div class="zhino-meta-btns">
         <button class="zhino-recall-settings-btn" @click="showBatchPanel = !showBatchPanel">
-          📦 批量总结
+          批量总结
         </button>
         <button class="zhino-recall-settings-btn" @click="showRecallSettings = !showRecallSettings">
-          ⚙ 召回设置
+          召回设置
         </button>
       </div>
     </div>
@@ -700,7 +700,7 @@ function isEditing(evt: TimelineEvent): boolean {
 
       <!-- 语义向量召回 -->
       <div class="zhino-recall-sep"></div>
-      <div class="zhino-recall-section-title">🧠 智能语义召回</div>
+      <div class="zhino-recall-section-title">智能语义召回</div>
       <div class="zhino-recall-hint">
         大总结后自动生成事件+核心记忆语义向量，注入时混合检索（语义相似度+词汇匹配）进行远期召回。
         <br/>生成向量时自动添加角色上下文注释，提高跨场景语义命中率。

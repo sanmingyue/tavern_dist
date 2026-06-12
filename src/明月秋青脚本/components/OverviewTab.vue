@@ -444,6 +444,22 @@ const schedulerStatus = computed(() => ({
         <div class="zhino-stat-value">{{ store.capturedContents.length }}</div>
         <div class="zhino-stat-label">捕获记录</div>
       </div>
+      <div class="zhino-stat-card">
+        <div class="zhino-stat-value">{{ store.chatData.worldProgressRecords?.length || 0 }}</div>
+        <div class="zhino-stat-label">世界推进</div>
+      </div>
+      <div class="zhino-stat-card">
+        <div class="zhino-stat-value">{{ store.chatData.plotOutline?.status === 'active' ? '活跃' : store.chatData.plotOutline?.status || '无' }}</div>
+        <div class="zhino-stat-label">剧情导演</div>
+      </div>
+      <div class="zhino-stat-card">
+        <div class="zhino-stat-value">{{ store.chatData.dynamicProfilesV2?.length || 0 }}</div>
+        <div class="zhino-stat-label">人设V2</div>
+      </div>
+      <div class="zhino-stat-card">
+        <div class="zhino-stat-value">{{ store.chatData.itemMemories?.length || 0 }}</div>
+        <div class="zhino-stat-label">物品库</div>
+      </div>
     </div>
 
     <!-- 已激活角色 -->
@@ -468,7 +484,7 @@ const schedulerStatus = computed(() => ({
       </div>
     </div>
 
-    <!-- 大总结编辑 -->
+    <!-- 大总结状态 -->
     <div v-if="latestSummary" class="zhino-section">
       <div class="zhino-section-header">
         <div class="zhino-section-title">大总结 v{{ latestSummary.version }}{{ store.getCoveredFloorsDisplay() }}</div>
@@ -493,8 +509,14 @@ const schedulerStatus = computed(() => ({
         </div>
       </div>
       <div class="zhino-info-row">
-        <span class="zhino-info-label">生成时间：</span>
+        <span class="zhino-info-label">生成时间:</span>
         <span class="zhino-info-value">{{ latestSummary.generatedAt?.slice(0, 16) }}</span>
+      </div>
+      <div class="zhino-info-row">
+        <span class="zhino-info-label">角色数:</span>
+        <span class="zhino-info-value">{{ latestSummary.characterMemories?.length || 0 }}</span>
+        <span class="zhino-info-label" style="margin-left:12px">事件数:</span>
+        <span class="zhino-info-value">{{ latestSummary.timeline?.length || 0 }}</span>
       </div>
     </div>
 
@@ -601,18 +623,18 @@ const schedulerStatus = computed(() => ({
 
 .zhino-stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 .zhino-stat-card {
   background: rgba(167, 139, 250, 0.06);
   border: 1px solid rgba(167, 139, 250, 0.12);
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px 6px;
   text-align: center;
 }
 .zhino-stat-value {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: rgba(167, 139, 250, 0.9);
 }

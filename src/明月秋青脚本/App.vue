@@ -53,7 +53,7 @@
         <!-- 内容区域 -->
         <div class="zhino-panel-content">
           <OverviewTab v-if="currentTab === 'overview'" />
-          <StoryBeginTab v-else-if="currentTab === 'story_begin'" />
+          <WorldTab v-else-if="currentTab === 'world'" />
           <RelationshipTab v-else-if="currentTab === 'relationship'" />
           <CharacterTab v-else-if="currentTab === 'character'" />
           <DreamtalkTab v-else-if="currentTab === 'dreamtalk'" />
@@ -92,7 +92,7 @@ import CharacterTab from './components/CharacterTab.vue';
 import DreamtalkTab from './components/DreamtalkTab.vue';
 import SettingsTab from './components/SettingsTab.vue';
 import SummaryTab from './components/SummaryTab.vue';
-import StoryBeginTab from './components/StoryBeginTab.vue';
+import WorldTab from './components/WorldTab.vue';
 import SummaryGuidanceModal from './components/SummaryGuidanceModal.vue';
 
 const store = useMainStore();
@@ -131,15 +131,15 @@ const isMobile = computed(() => windowWidth.value <= 768);
 
 // ─── Tab 定义 ───
 const tabs = [
-  { key: 'overview' as const, label: '总览', icon: '' },
-  { key: 'story_begin' as const, label: '故事伊始', icon: '' },
-  { key: 'relationship' as const, label: '关系网', icon: '' },
-  { key: 'timeline' as const, label: '时光轴', icon: '' },
-  { key: 'character' as const, label: '角色库', icon: '' },
-  { key: 'dreamtalk' as const, label: '梦呓', icon: '' },
-  { key: 'settings' as const, label: '设置', icon: '' },
+  { key: 'overview' as const, label: '总览' },
+  { key: 'world' as const, label: '世界' },
+  { key: 'relationship' as const, label: '关系网' },
+  { key: 'timeline' as const, label: '时光轴' },
+  { key: 'character' as const, label: '角色库' },
+  { key: 'dreamtalk' as const, label: '梦呓' },
+  { key: 'settings' as const, label: '设置' },
 ];
-const currentTab = ref<'overview' | 'story_begin' | 'relationship' | 'character' | 'dreamtalk' | 'timeline' | 'settings'>('overview');
+const currentTab = ref<'overview' | 'world' | 'relationship' | 'character' | 'dreamtalk' | 'timeline' | 'settings'>('overview');
 
 // ─── 面板状态 ───
 const isPanelOpen = ref(false);

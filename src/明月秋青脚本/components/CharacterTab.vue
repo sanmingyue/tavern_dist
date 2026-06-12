@@ -3,11 +3,14 @@ import { useMainStore } from '../stores/mainStore';
 import type { CharacterMemory, DynamicProfile } from '../stores/mainStore';
 import type { NsfwCharacterMemory } from '../core/nsfwIsolation';
 import type { ActorBehaviorTree } from '../core/ecosystem';
+import type { DynamicProfileV2 } from '../core/dynamicProfileV2';
 import { embedCharacterMemories } from '../core/embedding';
 
 const store = useMainStore();
 
 const selectedCharacter = ref('');
+// 视图切换：记忆 vs 人设V2
+const viewMode = ref<'memory' | 'profileV2'>('memory');
 // 合并角色弹窗状态
 const showMergePopup = ref(false);
 const mergeSourceName = ref('');  // 被合并的角色（副角色）
@@ -254,6 +257,50 @@ const selectedProfile = computed((): DynamicProfile | undefined => {
   return store.dynamicProfiles.find(p => p.characterName === selectedCharacter.value);
 });
 
+// 当前选中角色的动态人设V2
+const selectedProfileV2 = computed((): DynamicProfileV2 | undefined => {
+  if (!selectedCharacter.value) return undefined;
+  return (store.chatData.dynamicProfilesV2 || []).find(
+    (p: DynamicProfileV2) => p.characterName === selectedCharacter.value,
+  );
+});
+
+// 动态人设V2编辑
+const editingFactualState = ref('');
+const editingDynamicProfileV2 = ref('');
+const isEditingV2 = ref(false);
+
+function startEditV2() {
+  const p = selectedProfileV2.value;
+  editingFactualState.value = p?.factualState?.replace(/<\/?factual_state>/g, '').trim() || '';
+  editingDynamicProfileV2.value = p?.dynamicProfile?.replace(/<\/?dynamic_profile>/g, '').trim() || '';
+  isEditingV2.value = true;
+}
+
+function saveEditV2() {
+  if (!selectedCharacter.value) return;
+  const profiles = store.chatData.dynamicProfilesV2 || [];
+  const idx = profiles.findIndex((p: DynamicProfileV2) => p.characterName === selectedCharacter.value);
+  const newProfile: DynamicProfileV2 = {
+    characterName: selectedCharacter.value,
+    factualState: editingFactualState.value.trim() ? `<factual_state>\n${editingFactualState.value.trim()}\n</factual_state>` : '',
+    dynamicProfile: editingDynamicProfileV2.value.trim() ? `<dynamic_profile>\n${editingDynamicProfileV2.value.trim()}\n</dynamic_profile>` : '',
+    lastUpdatedAt: new Date().toISOString(),
+  };
+  if (idx >= 0) {
+    profiles[idx] = newProfile;
+  } else {
+    profiles.push(newProfile);
+  }
+  store.chatData.dynamicProfilesV2 = [...profiles];
+  store.forcePersist();
+  isEditingV2.value = false;
+}
+
+function cancelEditV2() {
+  isEditingV2.value = false;
+}
+
 // 记忆条目的排序展示列表
 const memoryDisplayItems = computed(() => {
   const mem = selectedMemory.value;
@@ -488,6 +535,10 @@ function toggleCore(index: number) {
     <div class="zhino-char-scroll">
       <!-- 顶部按钮栏 -->
       <div class="zhino-char-topbar">
+        <div class="zhino-view-toggle">
+          <button class="zhino-view-btn" :class="{ active: viewMode === 'memory' }" @click="viewMode = 'memory'">记忆</button>
+          <button class="zhino-view-btn" :class="{ active: viewMode === 'profileV2' }" @click="viewMode = 'profileV2'">人设V2</button>
+        </div>
         <button class="zhino-memory-ctrl-btn" @click="openMemoryControl" title="记忆控制">
           记忆控制
         </button>
@@ -529,8 +580,61 @@ function toggleCore(index: number) {
         </div>
       </div>
 
-      <!-- 角色详情 -->
-      <template v-if="selectedCharacter">
+      <!-- 动态人设V2视图 -->
+      <template v-if="viewMode === 'profileV2' && selectedCharacter">
+        <div class="zhino-section">
+          <div class="zhino-section-header">
+            <div class="zhino-section-title">{{ selectedCharacter }} - 动态人设V2</div>
+            <div class="zhino-btn-group">
+              <template v-if="!isEditingV2">
+                <button class="zhino-btn-sm" @click="startEditV2">编辑</button>
+              </template>
+              <template v-else>
+                <button class="zhino-btn-sm zhino-btn-save" @click="saveEditV2">保存</button>
+                <button class="zhino-btn-sm" @click="cancelEditV2">取消</button>
+              </template>
+            </div>
+          </div>
+
+          <template v-if="!isEditingV2">
+            <div v-if="selectedProfileV2" class="zhino-v2-display">
+              <div v-if="selectedProfileV2.factualState" class="zhino-v2-block">
+                <div class="zhino-detail-label">事实状态层</div>
+                <pre class="zhino-v2-pre">{{ selectedProfileV2.factualState.replace(/<\/?factual_state[^>]*>/g, '').trim() }}</pre>
+              </div>
+              <div v-if="selectedProfileV2.dynamicProfile" class="zhino-v2-block">
+                <div class="zhino-detail-label">表现层</div>
+                <pre class="zhino-v2-pre">{{ selectedProfileV2.dynamicProfile.replace(/<\/?dynamic_profile[^>]*>/g, '').trim() }}</pre>
+              </div>
+              <div class="zhino-v2-meta">
+                更新于 {{ selectedProfileV2.lastUpdatedAt?.slice(0, 16) }}
+              </div>
+            </div>
+            <div v-else class="zhino-empty-hint">
+              该角色暂无V2动态人设数据。大总结后自动生成。
+            </div>
+          </template>
+
+          <template v-else>
+            <div class="zhino-v2-edit">
+              <div class="zhino-detail-label">事实状态层 (服装/位置/持有物品/已知信息等)</div>
+              <textarea v-model="editingFactualState" class="zhino-textarea" rows="6" placeholder="服装：白色长裙&#10;位置：庭院&#10;身体状态：轻微疲倦&#10;持有物品：无&#10;已知信息：..." />
+              <div class="zhino-detail-label" style="margin-top:10px">表现层 (行为倾向/说话方式/禁止假设等)</div>
+              <textarea v-model="editingDynamicProfileV2" class="zhino-textarea" rows="6" placeholder="行为倾向：会主动找话题 = 想延长相处时间 | 不要理解为黏人&#10;禁止假设：&#10;- 不要假设她已经..." />
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <!-- 动态人设V2视图：角色未选中 -->
+      <template v-if="viewMode === 'profileV2' && !selectedCharacter">
+        <div class="zhino-section">
+          <div class="zhino-empty-hint">请先选择一个角色查看动态人设V2</div>
+        </div>
+      </template>
+
+      <!-- 角色详情（记忆视图） -->
+      <template v-if="viewMode === 'memory' && selectedCharacter">
         <div class="zhino-section">
           <div class="zhino-section-header">
             <div class="zhino-section-title">{{ selectedCharacter }} 详情</div>
@@ -890,6 +994,60 @@ function toggleCore(index: number) {
 
 /* 编辑角色按钮 */
 .zhino-edit-role-btn {
+/* 视图切换 */
+.zhino-view-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.zhino-view-btn {
+  padding: 3px 12px;
+  font-size: 11px;
+  border: none;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.zhino-view-btn:hover { color: rgba(255, 255, 255, 0.8); }
+.zhino-view-btn.active {
+  background: rgba(167, 139, 250, 0.15);
+  color: rgba(167, 139, 250, 0.9);
+}
+
+/* 动态人设V2 */
+.zhino-v2-display {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.zhino-v2-block {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.zhino-v2-pre {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  margin: 4px 0 0 0;
+  font-family: inherit;
+}
+.zhino-v2-meta {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+}
+.zhino-v2-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
   margin-left: 0 !important;
 }
 

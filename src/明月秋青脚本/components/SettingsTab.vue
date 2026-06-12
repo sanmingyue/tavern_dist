@@ -296,6 +296,15 @@ function restoreCharacter(name: string) {
 
       <label class="zhino-toggle-row">
         <div class="zhino-toggle-info">
+          <span class="zhino-toggle-label">事实信息强调</span>
+          <span class="zhino-toggle-desc">每轮自动注入时间/地点/物品等客观事实，防止AI犯错</span>
+        </div>
+        <input type="checkbox" :checked="store.settings.factEmphasisEnabled"
+          @change="store.updateSettings({ factEmphasisEnabled: ($event.target as HTMLInputElement).checked })" />
+      </label>
+
+      <label class="zhino-toggle-row">
+        <div class="zhino-toggle-info">
           <span class="zhino-toggle-label">后台角色行动推演</span>
           <span class="zhino-toggle-desc">不在场角色自动推演后台行动（每N楼调用一次AI）</span>
         </div>
@@ -325,6 +334,50 @@ function restoreCharacter(name: string) {
           placeholder="例：疏影,赤练仙子"
           @input="store.updateEcosystemManualChars(($event.target as HTMLInputElement).value)"
         />
+      </div>
+
+      <label class="zhino-toggle-row">
+        <div class="zhino-toggle-info">
+          <span class="zhino-toggle-label">世界推进</span>
+          <span class="zhino-toggle-desc">按时间切片推演不在场角色行动（替代后台推演的叙事模式）</span>
+        </div>
+        <input type="checkbox" :checked="store.settings.worldProgressEnabled"
+          @change="store.updateSettings({ worldProgressEnabled: ($event.target as HTMLInputElement).checked })" />
+      </label>
+
+      <div v-if="store.settings.worldProgressEnabled" class="zhino-inline-setting" style="margin-top:6px;padding-left:4px">
+        <span class="zhino-setting-desc">世界推进间隔：每隔</span>
+        <input
+          type="number"
+          class="zhino-input-num"
+          :value="store.settings.worldProgressInterval"
+          min="1"
+          max="10"
+          @change="store.updateSettings({ worldProgressInterval: Number(($event.target as HTMLInputElement).value) })"
+        />
+        <span class="zhino-setting-desc">AI楼触发</span>
+      </div>
+
+      <label class="zhino-toggle-row">
+        <div class="zhino-toggle-info">
+          <span class="zhino-toggle-label">剧情导演</span>
+          <span class="zhino-toggle-desc">设定剧情大纲后自动引导剧情方向，定期校对偏离度</span>
+        </div>
+        <input type="checkbox" :checked="store.settings.plotDirectorEnabled"
+          @change="store.updateSettings({ plotDirectorEnabled: ($event.target as HTMLInputElement).checked })" />
+      </label>
+
+      <div v-if="store.settings.plotDirectorEnabled" class="zhino-inline-setting" style="margin-top:6px;padding-left:4px">
+        <span class="zhino-setting-desc">校对间隔：每隔</span>
+        <input
+          type="number"
+          class="zhino-input-num"
+          :value="store.settings.plotCheckInterval"
+          min="3"
+          max="20"
+          @change="store.updateSettings({ plotCheckInterval: Number(($event.target as HTMLInputElement).value) })"
+        />
+        <span class="zhino-setting-desc">AI楼校对一次</span>
       </div>
     </div>
 
@@ -627,13 +680,13 @@ function restoreCharacter(name: string) {
             <span>耗时: {{ store.apiMonitorLogs[monitorSelectedIndex]?.durationMs }}ms</span>
           </div>
           <div class="zhino-monitor-section">
-            <div class="zhino-monitor-label">📥 输入 (发送给 AI 的消息)</div>
+            <div class="zhino-monitor-label">输入 (发送给 AI 的消息)</div>
             <pre class="zhino-monitor-pre">{{
               monitorInputText(store.apiMonitorLogs[monitorSelectedIndex])
             }}</pre>
           </div>
           <div class="zhino-monitor-section">
-            <div class="zhino-monitor-label">📤 输出 (AI 返回)</div>
+            <div class="zhino-monitor-label">输出 (AI 返回)</div>
             <pre class="zhino-monitor-pre">{{
               store.apiMonitorLogs[monitorSelectedIndex]?.response || '(空)'
             }}</pre>

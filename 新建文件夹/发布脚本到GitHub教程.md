@@ -49,7 +49,7 @@
 | **酒馆联机脚本**     | **`online-v`** | **`online-v0.2.2`** | **多人 AIRP 联机房间（SSE实时通信 + Zeabur后端）**                    |
 | **8bit的幻想控制台** | **`8bit-v`**   | **`8bit-v1.0.8`**   | **8bit 世界 AIRP 前端控制台正式入口**                                 |
 | **卫疏影开局脚本**   | **`wsy-v`**    | **`wsy-v0.0.1`**    | **卫疏影角色卡开局导入脚本**                                          |
-| **明月秋青智脑脚本** | **`zhino-v`**  | **`zhino-v4.0.0`**  | **智脑系统：大总结+梦呓+倒果为因+NSFW隔离+情绪积累+后台角色行动推演** |
+| **明月秋青智脑脚本** | **`zhino-v`**  | **`zhino-v8.0`**  | **智脑系统：大总结+梦呓+世界推进+剧情导演+动态人设V2+事实强调+物品记忆+NSFW隔离** |
 | **青春的果实状态栏** | **`fruit-v`**  | **`fruit-v5.0.0`**  | **青春的果实角色卡 MVU 状态栏悬浮窗**                                 |
 | **onion状态栏**      | **`onion-v`**  | **`onion-v0.0.1`**  | **一脸嫌弃给你看胖次的onion IF线状态栏**                              |
 | **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.9`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
@@ -98,19 +98,20 @@ C:\Users\三明月\Desktop\workshop-server\  ← 创意工坊后端（独立仓�
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@zhino-v4.0.0/dist/明月秋青脚本/index.js';
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@zhino-v8.0.0/dist/明月秋青脚本/index.js';
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\明月秋青脚本" "dist\明月秋青脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "明月秋青智脑脚本 v4.0.0" && git tag zhino-v4.0.0 && git push && git push origin zhino-v4.0.0
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\明月秋青脚本" "dist\明月秋青脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "明月秋青智脑脚本 v8.0.0" && git tag zhino-v8.0.0 && git push && git push origin zhino-v8.0.0
 ```
 
 **版本历史**
 
 | 版本号       | 日期       | 更新内容                                                                                                                                                                                                                    |
 | ------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| zhino-v8.0.0 | 2026-06-12 | UI大重构：Tab改为总览/世界/关系网/时光轴/角色库/梦呓/设置；世界Tab新增世界推进记录+剧情导演大纲对话+物品记忆库+小总结；角色库新增动态人设V2双视图；设置补全世界推进/剧情导演/事实强调开关；总览仪表盘8卡片；去除UI emoji |
 | zhino-v4.0.0 | 2026-06-03 | B3.3 大版本发布：后台角色行动推演系统、大总结 Delta 增量存储、串行调度 v2、角色库 NSFW 记忆和逻辑树展示、梦呓多角色修复、数据导入 safeParse 校验、倒计时和楼层隐藏修复                                                      |
 | zhino-v1.0.0 | 2026-05-25 | 正式发布：智脑系统v1.0，包含大总结（含NSFW第四SECTION）、梦呓分析（含NSFW分流）、倒果为因（剧情走向预测+节奏控制）、NSFW隔离层（自动检测预设变量）、情绪积累系统（走预设流程读世界书）、撤回/恢复机制、历史楼层补录fallback |
 
