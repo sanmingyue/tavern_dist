@@ -1,4 +1,4 @@
-<script setup lang="ts">
+n<script setup lang="ts">
 import { useMainStore } from '../stores/mainStore';
 import { analyzePersona } from '../core/persona';
 import { fetchAvailableModels } from '../utils/apiCaller';
