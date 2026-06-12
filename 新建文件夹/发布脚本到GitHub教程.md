@@ -52,7 +52,7 @@
 | **明月秋青智脑脚本** | **`zhino-v`**  | **`zhino-v4.0.0`**  | **智脑系统：大总结+梦呓+倒果为因+NSFW隔离+情绪积累+后台角色行动推演** |
 | **青春的果实状态栏** | **`fruit-v`**  | **`fruit-v5.0.0`**  | **青春的果实角色卡 MVU 状态栏悬浮窗**                                 |
 | **onion状态栏**      | **`onion-v`**  | **`onion-v0.0.1`**  | **一脸嫌弃给你看胖次的onion IF线状态栏**                              |
-| **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.6`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
+| **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.7`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
 
 > 每个项目的版本号独立递增，互不影响。
 
@@ -170,19 +170,20 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && New-Item -ItemType Dire
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@nai-v0.0.6/dist/nai生图脚本/index.js';
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@nai-v0.0.7/dist/nai生图脚本/index.js';
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\nai生图脚本" "dist\nai生图脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "NAI 生图脚本 v0.0.6" && git tag nai-v0.0.6 && git push && git push origin nai-v0.0.6
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\nai生图脚本" "dist\nai生图脚本" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "NAI 生图脚本 v0.0.7" && git tag nai-v0.0.7 && git push && git push origin nai-v0.0.7
 ```
 
 **版本历史**
 
 | 版本号     | 日期       | 更新内容                                                                                                                                                                                  |
 | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| nai-v0.0.7 | 2026-06-12 | 修复“看漫画”范围扫描漏 AI 楼层的问题；多张改为单图串行队列，生成过程中逐张追加楼层图片，避免后返回的图片覆盖先生成的图片 |
 | nai-v0.0.6 | 2026-06-12 | 修复“看漫画”批量生成把图片挂到玩家楼层的问题；批量目标固定为 AI 楼层，玩家楼层只作为上下文参与 |
 | nai-v0.0.5 | 2026-06-12 | 修复点击“生成”页导致面板消失；修复漫画/手动挂图到玩家楼层时不立即显示；漫画范围生成新增总楼层与总图片数汇总 |
 | nai-v0.0.4 | 2026-06-12 | 新增后置作者串、兼容转接站鉴权模式、楼层提示词编辑/修复、手动指定楼层生图，以及“看漫画”页：按楼层上下文请求 OpenAI 兼容或 DeepSeek 模型生成 NAI 提示词并挂图 |
@@ -584,5 +585,5 @@ git tag -l "wsy-v*" --sort=-creatordate      # 卫疏影
 | **卫疏影开局脚本 CDN**      | `@wsy-v0.0.1/dist/卫疏影/index.js`                             |
 | **明月秋青智脑脚本 CDN**    | `@zhino-v4.0.0/dist/明月秋青脚本/index.js`                     |
 | **onion状态栏 CDN**         | `@onion-v0.0.6/dist/一脸嫌弃给你看胖次的onion/状态栏/index.js` |
-| **NAI 生图脚本 CDN**        | `@nai-v0.0.6/dist/nai生图脚本/index.js`                        |
+| **NAI 生图脚本 CDN**        | `@nai-v0.0.7/dist/nai生图脚本/index.js`                        |
 | 角色卡PNG CDN 目录          | `@char-v1.0.0/dist/characters/`                                |

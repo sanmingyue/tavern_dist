@@ -10,9 +10,10 @@ import {
 } from './cache';
 import {
   IMAGE_BLOCK_PATTERN,
-  buildNaiPayload,
+  buildSingleNaiPayload,
   downloadImage,
   getCostWarnings,
+  getRequestedImageCount,
   parseImageBlockRaw,
   parseImageBlock,
   renderDownloadName,
@@ -175,37 +176,59 @@ async function generateForMessage(
     detail: state.raw,
   });
 
-  try {
-    const payload = buildNaiPayload(settings, state.config);
-    const images = await requestNaiImages(settings, payload);
-    const downloadNames = images.map((image, index) => {
-      const ext = image.mimeType.includes('webp') ? 'webp' : 'png';
-      return renderIndexedDownloadName(settings.downloadNameTemplate, {
-        messageId: message.message_id,
-        seed: image.seed,
-        ext,
-        index,
-        total: images.length,
-      });
-    });
-    const caches = await Promise.all(
-      images.map((image, index) => putCachedImage(image, downloadNames[index], settings.imageTtlDays)),
-    );
+  const requestedCount = getRequestedImageCount(settings, state.config);
+  const caches: NaiCachedImageMeta[] = [];
+  let lastPayload: NaiImageRequest | null = null;
 
-    if (settings.autoDownload || settings.storageMode === 'download') {
-      images.forEach((image, index) => downloadImage(image, downloadNames[index]));
+  try {
+    for (let requestIndex = 0; requestIndex < requestedCount; requestIndex += 1) {
+      const payload = buildSingleNaiPayload(settings, state.config, requestIndex);
+      lastPayload = payload;
+      const images = await requestNaiImages(settings, payload);
+
+      for (const image of images) {
+        const cacheIndex = caches.length;
+        const ext = image.mimeType.includes('webp') ? 'webp' : 'png';
+        const downloadName = renderIndexedDownloadName(settings.downloadNameTemplate, {
+          messageId: message.message_id,
+          seed: image.seed,
+          ext,
+          index: cacheIndex,
+          total: requestedCount,
+        });
+        const cache = await putCachedImage(image, downloadName, settings.imageTtlDays);
+        caches.push(cache);
+
+        if (settings.autoDownload || settings.storageMode === 'download') {
+          downloadImage(image, downloadName);
+        }
+
+        await setMessageState(message, {
+          ...state,
+          status: 'generating',
+          model: payload.model,
+          seed: caches[0]?.seed,
+          width: Number(payload.parameters.width),
+          height: Number(payload.parameters.height),
+          generated_at: new Date().toISOString(),
+          cache: caches[0],
+          caches: [...caches],
+          anlas_warnings: warnings,
+          last_error: undefined,
+        });
+      }
     }
 
     const readyState: NaiMessageImageState = {
       ...state,
       status: 'ready',
-      model: payload.model,
-      seed: images[0]?.seed,
-      width: Number(payload.parameters.width),
-      height: Number(payload.parameters.height),
+      model: lastPayload?.model,
+      seed: caches[0]?.seed,
+      width: Number(lastPayload?.parameters.width),
+      height: Number(lastPayload?.parameters.height),
       generated_at: new Date().toISOString(),
       cache: caches[0],
-      caches,
+      caches: [...caches],
       anlas_warnings: warnings,
       last_error: undefined,
     };
@@ -213,10 +236,10 @@ async function generateForMessage(
     store.setLastLog({
       level: 'success',
       title: '生图成功',
-      message: `第 ${message.message_id} 楼已生成 ${images.length} 张图片，首张 seed=${images[0]?.seed ?? '未知'}。`,
+      message: `第 ${message.message_id} 楼已生成 ${caches.length} 张图片，首张 seed=${caches[0]?.seed ?? '未知'}。`,
       solution:
         warnings.length > 0 ? `本次参数可能消耗 Anlas：\n${warnings.join('\n')}` : '当前参数处于会员免费生图范围内。',
-      detail: buildPayloadDetail(payload, settings.storageMode, caches),
+      detail: lastPayload ? buildPayloadDetail(lastPayload, settings.storageMode, caches, requestedCount) : '',
     });
     toastr.success(`第 ${message.message_id} 楼 NAI 生图完成。`);
   } catch (error) {
@@ -226,6 +249,12 @@ async function generateForMessage(
       status: 'error',
       last_error: translated.message,
       anlas_warnings: warnings,
+      cache: caches[0],
+      caches: [...caches],
+      model: lastPayload?.model,
+      seed: caches[0]?.seed,
+      width: Number(lastPayload?.parameters.width),
+      height: Number(lastPayload?.parameters.height),
     };
     await setMessageState(message, errorState);
     store.setLastLog({ level: 'error', ...translated });
@@ -667,14 +696,20 @@ function renderIndexedDownloadName(
   return rendered.replace(new RegExp(`\\.${data.ext}$`, 'i'), `-${data.index + 1}.${data.ext}`);
 }
 
-function buildPayloadDetail(payload: NaiImageRequest, storageMode: string, caches: NaiCachedImageMeta[]): string {
+function buildPayloadDetail(
+  payload: NaiImageRequest,
+  storageMode: string,
+  caches: NaiCachedImageMeta[],
+  requestedCount?: number,
+): string {
   return JSON.stringify(
     {
       model: payload.model,
       width: payload.parameters.width,
       height: payload.parameters.height,
       steps: payload.parameters.steps,
-      nSamples: payload.parameters.n_samples,
+      requestedImages: requestedCount ?? caches.length,
+      requestNSamples: payload.parameters.n_samples,
       sampler: payload.parameters.sampler,
       storageMode,
       cacheIds: caches.map(cache => cache.id),

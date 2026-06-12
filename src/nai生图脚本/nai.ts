@@ -37,6 +37,8 @@ type NaiCharacterCaption = {
   centers: Array<{ x: number; y: number }>;
 };
 
+const MAX_NAI_SEED = 4294967295;
+
 export class NaiApiError extends Error {
   translated: NaiTranslatedError;
 
@@ -226,6 +228,32 @@ export function buildNaiPayload(settings: NaiSettings, block?: Partial<NaiBlockC
   };
 }
 
+export function getRequestedImageCount(settings: NaiSettings, block?: Partial<NaiBlockConfig>): number {
+  return _.clamp(Number(block?.n_samples ?? settings.nSamples), 1, 10);
+}
+
+export function buildSingleNaiPayload(
+  settings: NaiSettings,
+  block?: Partial<NaiBlockConfig>,
+  index = 0,
+): NaiImageRequest {
+  const payload = buildNaiPayload(settings, { ...block, n_samples: 1 });
+  if (index <= 0) return payload;
+
+  const blockSeed = block?.seed;
+  const usesExplicitSeed = typeof blockSeed === 'number' && blockSeed >= 0;
+  const usesFixedSettingSeed = settings.seedMode === 'fixed' && (blockSeed === undefined || blockSeed === -1 || blockSeed === 'random');
+
+  if (usesExplicitSeed || usesFixedSettingSeed) {
+    const baseSeed = Number(payload.parameters.seed);
+    if (Number.isFinite(baseSeed)) {
+      payload.parameters.seed = (baseSeed + index) % (MAX_NAI_SEED + 1);
+    }
+  }
+
+  return payload;
+}
+
 function normalizeBlockConfig(config: NaiBlockConfig): NaiBlockConfig {
   const characters = config.characters ?? config.character_prompts;
   if (!characters) return config;
@@ -301,13 +329,9 @@ export function getCostWarnings(settings: NaiSettings, block?: Partial<NaiBlockC
   const width = block?.width ?? settings.width;
   const height = block?.height ?? settings.height;
   const steps = block?.steps ?? settings.steps;
-  const nSamples = block?.n_samples ?? settings.nSamples;
   const warnings: string[] = [];
   const maxFreePixels = 1024 * 1024;
 
-  if (nSamples > 1) {
-    warnings.push(`一次生成 ${nSamples} 张图，已超出会员单张免费范围。`);
-  }
   if (steps > 28) {
     warnings.push(`步数为 ${steps}，超过会员免费范围的 28 步上限。`);
   }
