@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.4</strong>
+            <strong>NAI 生图 v0.0.5</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>
@@ -182,7 +182,7 @@
                 </label>
                 <label class="field">
                   <span>当前最新楼层</span>
-                  <input :value="getLastMessageId()" disabled />
+                  <input :value="readLastMessageId()" disabled />
                 </label>
               </div>
               <label class="field">
@@ -190,7 +190,7 @@
                 <textarea v-model="manualRaw" rows="8" />
               </label>
               <div class="button-row">
-                <button class="secondary-button" @click="manualMessageId = getLastMessageId()">填入最新楼层</button>
+                <button class="secondary-button" @click="manualMessageId = readLastMessageId()">填入最新楼层</button>
                 <button class="primary-button" :disabled="manualGenerating || !manualRaw.trim()" @click="generateManualFloor">
                   {{ manualGenerating ? '生成中' : '生成到楼层' }}
                 </button>
@@ -800,10 +800,10 @@
                   同步当前范围
                 </button>
                 <button class="primary-button" :disabled="comicGenerating" @click="generateComicCurrentFloor">
-                  {{ comicGenerating ? '生成中' : '生成结束楼层' }}
+                  {{ comicGenerating ? '生成中' : '只生成结束楼层' }}
                 </button>
                 <button class="secondary-button" :disabled="comicGenerating" @click="generateComicRange">
-                  批量生成范围
+                  批量生成起止范围
                 </button>
               </div>
               <div v-if="comicProgress" class="success-box">{{ comicProgress }}</div>
@@ -968,6 +968,7 @@ const statusLine = computed(() => {
   return store.settings.enabled ? '待命' : '已关闭';
 });
 const hasShownAnlasWarning = ref(false);
+const FLOOR_RENDER_EVENT = 'nai-image-script-render-request';
 
 watch(
   costWarnings,
@@ -996,6 +997,10 @@ function updateNumber(key: NumericSettingKey, event: Event): void {
   const value = Number((event.target as HTMLInputElement).value);
   if (!Number.isFinite(value)) return;
   store.updateSettings({ [key]: value } as Partial<NaiSettings>);
+}
+
+function readLastMessageId(): number {
+  return getLastMessageId();
 }
 
 function applySize(width: number, height: number): void {
@@ -1038,6 +1043,7 @@ async function setFloorImageState(message: ChatMessage, state: NaiMessageImageSt
   const data = _.isPlainObject(message.data) ? { ...(message.data as Record<string, unknown>) } : {};
   data[SCRIPT_STATE_KEY] = state;
   await setChatMessages([{ message_id: message.message_id, data }]);
+  window.dispatchEvent(new CustomEvent(FLOOR_RENDER_EVENT, { detail: { messageId: message.message_id } }));
 }
 
 async function generateFloorFromRaw(
@@ -1045,7 +1051,7 @@ async function generateFloorFromRaw(
   rawInput: string,
   source: string,
   imagesPerFloor?: number,
-): Promise<void> {
+): Promise<number> {
   const message = getAnyMessage(messageId);
   if (!message) throw new Error(`没有找到第 ${messageId} 楼。`);
 
@@ -1077,7 +1083,7 @@ async function generateFloorFromRaw(
       solution: '把参数改回会员免费范围，或在面板中把策略改为“提醒后允许”或“直接允许”。',
       detail: raw,
     });
-    return;
+    return 0;
   }
 
   await setFloorImageState(message, {
@@ -1139,14 +1145,15 @@ async function generateFloorFromRaw(
       2,
     ),
   });
+  return images.length;
 }
 
 async function generateManualFloor(): Promise<void> {
   if (manualGenerating.value) return;
   manualGenerating.value = true;
   try {
-    await generateFloorFromRaw(manualMessageId.value, manualRaw.value, '手动');
-    toastr.success(`第 ${manualMessageId.value} 楼手动生图完成。`);
+    const count = await generateFloorFromRaw(manualMessageId.value, manualRaw.value, '手动');
+    toastr.success(`第 ${manualMessageId.value} 楼手动生图完成，共 ${count} 张。`);
   } catch (error) {
     const translated = translateUnknownError(error);
     store.setLastLog({ level: 'error', ...translated });
@@ -1208,13 +1215,13 @@ function stripImageBlock(text: string): string {
   return text.replace(IMAGE_BLOCK_PATTERN, '').trim();
 }
 
-async function generateComicFloor(messageId: number): Promise<void> {
+async function generateComicFloor(messageId: number): Promise<number> {
   const target = getAnyMessage(messageId);
   if (!target) throw new Error(`没有找到第 ${messageId} 楼。`);
   const context = buildComicContext(messageId);
   if (!context.trim()) throw new Error('漫画上下文为空，请检查起止楼层和角色筛选。');
   const result = await requestComicImageBlock(store.settings, context, target);
-  await generateFloorFromRaw(messageId, result.raw, '漫画', store.settings.comicImagesPerFloor);
+  return generateFloorFromRaw(messageId, result.raw, '漫画', store.settings.comicImagesPerFloor);
 }
 
 async function generateComicCurrentFloor(): Promise<void> {
@@ -1223,9 +1230,9 @@ async function generateComicCurrentFloor(): Promise<void> {
   try {
     const messageId = store.settings.comicEndMessageId || getLastMessageId();
     comicProgress.value = `正在处理第 ${messageId} 楼`;
-    await generateComicFloor(messageId);
-    comicProgress.value = `第 ${messageId} 楼完成`;
-    toastr.success(`第 ${messageId} 楼漫画生图完成。`);
+    const count = await generateComicFloor(messageId);
+    comicProgress.value = `第 ${messageId} 楼完成，共 ${count} 张`;
+    toastr.success(`第 ${messageId} 楼漫画生图完成，共 ${count} 张。`);
   } catch (error) {
     const translated = translateUnknownError(error);
     store.setLastLog({ level: 'error', ...translated });
@@ -1246,13 +1253,24 @@ async function generateComicRange(): Promise<void> {
     );
     if (targets.length === 0) throw new Error('范围内没有可处理楼层。');
 
+    let totalImages = 0;
+    const completed: Array<{ messageId: number; count: number }> = [];
     for (const [index, target] of targets.entries()) {
       comicProgress.value = `正在处理 ${index + 1}/${targets.length}：第 ${target.message_id} 楼`;
-      await generateComicFloor(target.message_id);
+      const count = await generateComicFloor(target.message_id);
+      totalImages += count;
+      completed.push({ messageId: target.message_id, count });
     }
 
-    comicProgress.value = `完成 ${targets.length} 个楼层`;
-    toastr.success('漫画范围生图完成。');
+    comicProgress.value = `完成 ${targets.length} 个楼层，共 ${totalImages} 张图片`;
+    store.setLastLog({
+      level: 'success',
+      title: '漫画范围生图完成',
+      message: `已处理 ${targets.length} 个楼层，共生成 ${totalImages} 张图片。`,
+      solution: '每个楼层的图片已经挂回对应楼层；如果某楼层暂时没有显示，切换聊天或刷新后也会从楼层 data 恢复。',
+      detail: JSON.stringify(completed, null, 2),
+    });
+    toastr.success(`漫画范围生图完成，共 ${totalImages} 张。`);
   } catch (error) {
     const translated = translateUnknownError(error);
     store.setLastLog({ level: 'error', ...translated });

@@ -33,6 +33,7 @@ const FLEXIBLE_IMAGE_OPEN_PATTERN = /<\s*nai[\s_-]*image\b[^>]*>/i;
 const FLEXIBLE_IMAGE_CLOSE_PATTERN = /<\s*\/\s*nai[\s_-]*image\s*>/i;
 const BROKEN_IMAGE_OPEN_PATTERN = /<\s*nai[\s_-]*image\b/i;
 const IMAGE_YAML_START_PATTERN = /^\s*(prompt|positive|input)\s*:/i;
+const FLOOR_RENDER_EVENT = 'nai-image-script-render-request';
 const processingMessageIds = new Set<number>();
 const renderTimers = new Map<number, ReturnType<typeof setTimeout>>();
 const renderVersions = new Map<number, number>();
@@ -814,9 +815,17 @@ $(() => {
   });
 
   eventOn(tavern_events.MESSAGE_UPDATED, messageId => queueRenderMessageImage(messageId));
+  eventOn(tavern_events.USER_MESSAGE_RENDERED, messageId => queueRenderMessageImage(messageId));
   eventOn(tavern_events.CHARACTER_MESSAGE_RENDERED, messageId => queueRenderMessageImage(messageId));
   eventOn(tavern_events.MORE_MESSAGES_LOADED, renderVisibleImages);
   eventOn(tavern_events.CHAT_CHANGED, () => setTimeout(renderVisibleImages, 80));
+
+  const handleFloorRenderRequest = (event: Event) => {
+    const detail = (event as CustomEvent<{ messageId?: unknown }>).detail;
+    const messageId = Number(detail?.messageId);
+    if (Number.isInteger(messageId)) queueRenderMessageImage(messageId);
+  };
+  window.addEventListener(FLOOR_RENDER_EVENT, handleFloorRenderRequest);
 
   $('body').on('click.nai-image-script', `.${REGENERATE_CLASS}`, event => {
     void handleRegenerateClick(event, pinia);
@@ -836,6 +845,7 @@ $(() => {
     $app.remove();
     $renderStyle.remove();
     $('body').off('.nai-image-script');
+    window.removeEventListener(FLOOR_RENDER_EVENT, handleFloorRenderRequest);
     destroy();
   });
 
