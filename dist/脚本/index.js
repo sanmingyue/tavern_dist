@@ -1,2 +1,0 @@
-$(()=>{appendInexistentScriptButtons([{name:'插入地图标签',visible:!0}]),eventOn(getButtonEvent('插入地图标签'),errorCatched(async()=>{const e=getLastMessageId(),s=getChatMessages(`0-${e}`,{role:'assistant'});if(0===s.length)return void toastr.warning('没有找到 AI 消息楼层');const t=s[s.length-1],a=t.message_id,n=t.message+'\n<map>';await setChatMessages([{message_id:a,message:n}]),toastr.success(`已在第 ${a} 楼插入 <map> 标签`)}))});
-//# sourceMappingURL=index.js.map

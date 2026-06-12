@@ -3,9 +3,11 @@
   "type": "object",
   "properties": {
     "交易次数": {
+      "default": 0,
       "type": "number"
     },
     "本周交易次数": {
+      "default": 0,
       "type": "number"
     },
     "奥妮安存款": {
