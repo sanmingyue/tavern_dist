@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.6</strong>
+            <strong>NAI 生图 v0.0.7</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>
@@ -361,7 +361,7 @@
                     :value="store.settings.nSamples"
                     @change="updateNumber('nSamples', $event)"
                   />
-                  <small>多张通常会增加消耗。</small>
+                  <small>多张会按单图请求排队生成。</small>
                 </label>
               </div>
               <label class="field">
@@ -836,8 +836,10 @@ import {
 import {
   IMAGE_BLOCK_PATTERN,
   buildNaiPayload,
+  buildSingleNaiPayload,
   downloadImage,
   getCostWarnings,
+  getRequestedImageCount,
   parseImageBlockRaw,
   renderDownloadName,
   requestNaiImage,
@@ -1030,6 +1032,17 @@ function getAnyMessage(messageId: number): ChatMessage | null {
   return (getChatMessages(messageId, { role: 'all' })[0] as ChatMessage | undefined) ?? null;
 }
 
+function getMessagesByFloorRange(start: number, end: number): ChatMessage[] {
+  const messages: ChatMessage[] = [];
+  const from = Math.min(start, end);
+  const to = Math.max(start, end);
+  for (let messageId = from; messageId <= to; messageId += 1) {
+    const message = getAnyMessage(messageId);
+    if (message) messages.push(message);
+  }
+  return messages;
+}
+
 function normalizeRawImageInput(input: string): string {
   const match = input.match(IMAGE_BLOCK_PATTERN);
   return (match ? match[1] : input).trim();
@@ -1057,9 +1070,13 @@ async function generateFloorFromRaw(
 
   const raw = normalizeRawImageInput(rawInput);
   const config = parseImageBlockRaw(raw);
-  const configForPayload: Partial<NaiBlockConfig> = {
+  const requestedCount = getRequestedImageCount(store.settings, {
     ...config,
     n_samples: imagesPerFloor ?? config.n_samples,
+  });
+  const configForPayload: Partial<NaiBlockConfig> = {
+    ...config,
+    n_samples: requestedCount,
   };
   const warnings = getCostWarnings(store.settings, configForPayload);
   const baseState: NaiMessageImageState = {
@@ -1092,60 +1109,99 @@ async function generateFloorFromRaw(
     anlas_warnings: warnings,
   });
 
-  const payload = buildNaiPayload(store.settings, configForPayload);
-  const images = await requestNaiImages(store.settings, payload);
-  const downloadNames = images.map((image, index) => {
-    const ext = image.mimeType.includes('webp') ? 'webp' : 'png';
-    return renderIndexedDownloadName(store.settings.downloadNameTemplate, {
-      messageId,
-      seed: image.seed,
-      ext,
-      index,
-      total: images.length,
+  const caches: Awaited<ReturnType<typeof putCachedImage>>[] = [];
+  let lastPayload: ReturnType<typeof buildSingleNaiPayload> | null = null;
+
+  try {
+    for (let requestIndex = 0; requestIndex < requestedCount; requestIndex += 1) {
+      const payload = buildSingleNaiPayload(store.settings, configForPayload, requestIndex);
+      lastPayload = payload;
+      const images = await requestNaiImages(store.settings, payload);
+
+      for (const image of images) {
+        const cacheIndex = caches.length;
+        const ext = image.mimeType.includes('webp') ? 'webp' : 'png';
+        const downloadName = renderIndexedDownloadName(store.settings.downloadNameTemplate, {
+          messageId,
+          seed: image.seed,
+          ext,
+          index: cacheIndex,
+          total: requestedCount,
+        });
+        const cache = await putCachedImage(image, downloadName, store.settings.imageTtlDays);
+        caches.push(cache);
+
+        if (store.settings.autoDownload || store.settings.storageMode === 'download') {
+          downloadImage(image, downloadName);
+        }
+
+        await setFloorImageState(message, {
+          ...baseState,
+          status: 'generating',
+          model: payload.model,
+          seed: caches[0]?.seed,
+          width: Number(payload.parameters.width),
+          height: Number(payload.parameters.height),
+          generated_at: new Date().toISOString(),
+          cache: caches[0],
+          caches: [...caches],
+          anlas_warnings: warnings,
+        });
+      }
+    }
+
+    await setFloorImageState(message, {
+      ...baseState,
+      status: 'ready',
+      model: lastPayload?.model,
+      seed: caches[0]?.seed,
+      width: Number(lastPayload?.parameters.width),
+      height: Number(lastPayload?.parameters.height),
+      generated_at: new Date().toISOString(),
+      cache: caches[0],
+      caches: [...caches],
+      anlas_warnings: warnings,
     });
-  });
-  const caches = await Promise.all(
-    images.map((image, index) => putCachedImage(image, downloadNames[index], store.settings.imageTtlDays)),
-  );
 
-  if (store.settings.autoDownload || store.settings.storageMode === 'download') {
-    images.forEach((image, index) => downloadImage(image, downloadNames[index]));
+    store.setLastLog({
+      level: 'success',
+      title: `${source}生图成功`,
+      message: `第 ${messageId} 楼已生成 ${caches.length} 张图片，首张 seed=${caches[0]?.seed ?? '未知'}。`,
+      solution:
+        warnings.length > 0 ? `本次参数可能消耗 Anlas：\n${warnings.join('\n')}` : '当前参数处于会员免费生图范围内。',
+      detail: JSON.stringify(
+        {
+          source,
+          model: lastPayload?.model,
+          width: lastPayload?.parameters.width,
+          height: lastPayload?.parameters.height,
+          steps: lastPayload?.parameters.steps,
+          requestedImages: requestedCount,
+          requestNSamples: lastPayload?.parameters.n_samples,
+          cacheIds: caches.map(cache => cache.id),
+        },
+        null,
+        2,
+      ),
+    });
+    return caches.length;
+  } catch (error) {
+    const translated = translateUnknownError(error);
+    await setFloorImageState(message, {
+      ...baseState,
+      status: 'error',
+      model: lastPayload?.model,
+      seed: caches[0]?.seed,
+      width: Number(lastPayload?.parameters.width),
+      height: Number(lastPayload?.parameters.height),
+      generated_at: new Date().toISOString(),
+      cache: caches[0],
+      caches: [...caches],
+      anlas_warnings: warnings,
+      last_error: translated.message,
+    });
+    throw error;
   }
-
-  await setFloorImageState(message, {
-    ...baseState,
-    status: 'ready',
-    model: payload.model,
-    seed: images[0]?.seed,
-    width: Number(payload.parameters.width),
-    height: Number(payload.parameters.height),
-    generated_at: new Date().toISOString(),
-    cache: caches[0],
-    caches,
-    anlas_warnings: warnings,
-  });
-
-  store.setLastLog({
-    level: 'success',
-    title: `${source}生图成功`,
-    message: `第 ${messageId} 楼已生成 ${images.length} 张图片，首张 seed=${images[0]?.seed ?? '未知'}。`,
-    solution:
-      warnings.length > 0 ? `本次参数可能消耗 Anlas：\n${warnings.join('\n')}` : '当前参数处于会员免费生图范围内。',
-    detail: JSON.stringify(
-      {
-        source,
-        model: payload.model,
-        width: payload.parameters.width,
-        height: payload.parameters.height,
-        steps: payload.parameters.steps,
-        nSamples: payload.parameters.n_samples,
-        cacheIds: caches.map(cache => cache.id),
-      },
-      null,
-      2,
-    ),
-  });
-  return images.length;
 }
 
 async function generateManualFloor(): Promise<void> {
@@ -1199,7 +1255,7 @@ async function loadComicModels(): Promise<void> {
 
 function buildComicContext(targetMessageId: number): string {
   const start = Math.min(store.settings.comicStartMessageId, targetMessageId);
-  const messages = getChatMessages(`${start}-${targetMessageId}`, { role: 'all', hide_state: 'unhidden' }) as ChatMessage[];
+  const messages = getMessagesByFloorRange(start, targetMessageId);
   return messages
     .filter(message => {
       if (message.message_id > targetMessageId) return false;
@@ -1222,7 +1278,7 @@ function ensureComicTarget(message: ChatMessage, messageId: number): void {
 }
 
 function getComicTargetMessages(start: number, end: number): ChatMessage[] {
-  return getChatMessages(`${start}-${end}`, { role: 'assistant', hide_state: 'unhidden' }) as ChatMessage[];
+  return getMessagesByFloorRange(start, end).filter(message => message.role === 'assistant');
 }
 
 async function generateComicFloor(messageId: number): Promise<number> {
@@ -1468,7 +1524,7 @@ async function testImageEndpoint(): Promise<void> {
       level: 'warning',
       title: '测试被扣点策略阻止',
       message: warnings.join('\n'),
-      solution: '测试生图固定使用 512x512 与 28 步；如果仍有提醒，请检查张数、SMEA 等设置。',
+      solution: '测试生图固定使用 512x512 与 28 步；如果仍有提醒，请检查 SMEA 等设置。',
       detail: '',
     });
     return;
