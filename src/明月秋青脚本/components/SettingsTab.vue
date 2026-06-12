@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useMainStore } from '../stores/mainStore';
 import { analyzePersona } from '../core/persona';
+import { fetchAvailableModels } from '../utils/apiCaller';
 
 const store = useMainStore();
 
@@ -46,71 +47,49 @@ const isClaudeModel = computed(() => {
   return /claude/i.test(model);
 });
 
-// 自定义API测试
-const apiTesting = ref(false);
-const apiTestResult = ref<{ ok: boolean; message: string } | null>(null);
+// 模型列表获取
+const modelList = ref<string[]>([]);
+const modelListLoading = ref(false);
+const modelListError = ref('');
 
-async function testApiConnection() {
+// 小总结模型列表
+const smallModelList = ref<string[]>([]);
+const smallModelListLoading = ref(false);
+const smallModelListError = ref('');
+
+async function loadModelList() {
   const url = store.settings.customApiUrl?.trim();
   const key = store.settings.customApiKey?.trim();
-  const model = store.settings.customApiModel?.trim();
-
-  if (!url || !key || !model) {
-    apiTestResult.value = { ok: false, message: '请先填写 API 地址、Key 和模型名称' };
+  if (!url || !key) {
+    modelListError.value = '请先填写API地址和Key';
     return;
   }
-
-  apiTesting.value = true;
-  apiTestResult.value = null;
-
+  modelListLoading.value = true;
+  modelListError.value = '';
   try {
-    const apiUrl = url.endsWith('/chat/completions') ? url : url.replace(/\/+$/, '') + '/chat/completions';
-
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'user', content: 'hi' }],
-        max_tokens: 5,
-      }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text().catch(() => '');
-      apiTestResult.value = {
-        ok: false,
-        message: `连接失败: HTTP ${response.status}${errText ? ' — ' + errText.slice(0, 200) : ''}`,
-      };
-      return;
-    }
-
-    const data = await response.json();
-    const returnedModel = data?.model || data?.choices?.[0]?.model || '';
-    const content = data?.choices?.[0]?.message?.content;
-
-    if (!content && content !== '') {
-      apiTestResult.value = {
-        ok: false,
-        message: '响应格式异常，未找到 choices[0].message.content',
-      };
-      return;
-    }
-
-    apiTestResult.value = {
-      ok: true,
-      message: `连接成功！模型: ${returnedModel || model}`,
-    };
-  } catch (err: any) {
-    apiTestResult.value = {
-      ok: false,
-      message: `网络错误: ${err.message || err}`,
-    };
+    modelList.value = await fetchAvailableModels(url, key);
+  } catch (e: any) {
+    modelListError.value = e?.message || '获取失败';
   } finally {
-    apiTesting.value = false;
+    modelListLoading.value = false;
+  }
+}
+
+async function loadSmallModelList() {
+  const url = (store.settings as any).smallSummaryApiUrl?.trim();
+  const key = (store.settings as any).smallSummaryApiKey?.trim();
+  if (!url || !key) {
+    smallModelListError.value = '请先填写API地址和Key';
+    return;
+  }
+  smallModelListLoading.value = true;
+  smallModelListError.value = '';
+  try {
+    smallModelList.value = await fetchAvailableModels(url, key);
+  } catch (e: any) {
+    smallModelListError.value = e?.message || '获取失败';
+  } finally {
+    smallModelListLoading.value = false;
   }
 }
 
@@ -477,24 +456,80 @@ function restoreCharacter(name: string) {
           />
         </div>
         <div class="zhino-api-field">
-          <div class="zhino-detail-label">模型名称</div>
-          <input
-            class="zhino-input"
-            :value="store.settings.customApiModel"
-            @change="store.updateSettings({ customApiModel: ($event.target as HTMLInputElement).value })"
-            placeholder="gpt-4o"
-          />
+          <div class="zhino-detail-label">模型</div>
+          <div class="zhino-model-row">
+            <select
+              class="zhino-input zhino-model-select"
+              :value="store.settings.customApiModel"
+              @change="store.updateSettings({ customApiModel: ($event.target as HTMLSelectElement).value })"
+            >
+              <option value="" disabled>选择模型</option>
+              <option v-for="m in modelList" :key="m" :value="m">{{ m }}</option>
+              <option v-if="store.settings.customApiModel && !modelList.includes(store.settings.customApiModel)" :value="store.settings.customApiModel">{{ store.settings.customApiModel }}</option>
+            </select>
+            <button class="zhino-btn-sm" :disabled="modelListLoading" @click="loadModelList">
+              {{ modelListLoading ? '...' : '获取' }}
+            </button>
+          </div>
+          <div v-if="modelListError" class="zhino-api-warn">{{ modelListError }}</div>
         </div>
         <div class="zhino-api-warn">
-          ⚠️ 禁止使用gemini-3-fast等低智模型
+          禁止使用gemini-3-fast等低智模型
         </div>
-        <div class="zhino-btn-row" style="margin-top:8px">
-          <button class="zhino-btn-sm zhino-btn-save" :disabled="apiTesting" @click="testApiConnection">
-            {{ apiTesting ? '测试中...' : '测试连接' }}
-          </button>
+      </template>
+    </div>
+
+    <!-- 小总结独立API -->
+    <div class="zhino-section">
+      <div class="zhino-section-title">小总结API（廉价模型）</div>
+      <div class="zhino-setting-hint" style="margin-bottom:8px">
+        小总结可使用廉价模型（如 DeepSeek）独立运行。不填则跟随通用API。
+      </div>
+
+      <label class="zhino-toggle-row">
+        <span class="zhino-toggle-label">使用独立API</span>
+        <input type="checkbox"
+          :checked="(store.settings as any).smallSummaryApiEnabled"
+          @change="store.updateSettings({ smallSummaryApiEnabled: ($event.target as HTMLInputElement).checked } as any)" />
+      </label>
+
+      <template v-if="(store.settings as any).smallSummaryApiEnabled">
+        <div class="zhino-api-field">
+          <div class="zhino-detail-label">API地址</div>
+          <input
+            class="zhino-input"
+            :value="(store.settings as any).smallSummaryApiUrl"
+            @change="store.updateSettings({ smallSummaryApiUrl: ($event.target as HTMLInputElement).value } as any)"
+            placeholder="https://api.deepseek.com/v1"
+          />
         </div>
-        <div v-if="apiTestResult" class="zhino-api-result" :class="{ ok: apiTestResult.ok, fail: !apiTestResult.ok }">
-          {{ apiTestResult.message }}
+        <div class="zhino-api-field">
+          <div class="zhino-detail-label">API Key</div>
+          <input
+            class="zhino-input"
+            type="password"
+            :value="(store.settings as any).smallSummaryApiKey"
+            @change="store.updateSettings({ smallSummaryApiKey: ($event.target as HTMLInputElement).value } as any)"
+            placeholder="sk-..."
+          />
+        </div>
+        <div class="zhino-api-field">
+          <div class="zhino-detail-label">模型</div>
+          <div class="zhino-model-row">
+            <select
+              class="zhino-input zhino-model-select"
+              :value="(store.settings as any).smallSummaryApiModel"
+              @change="store.updateSettings({ smallSummaryApiModel: ($event.target as HTMLSelectElement).value } as any)"
+            >
+              <option value="" disabled>选择模型</option>
+              <option v-for="m in smallModelList" :key="m" :value="m">{{ m }}</option>
+              <option v-if="(store.settings as any).smallSummaryApiModel && !smallModelList.includes((store.settings as any).smallSummaryApiModel)" :value="(store.settings as any).smallSummaryApiModel">{{ (store.settings as any).smallSummaryApiModel }}</option>
+            </select>
+            <button class="zhino-btn-sm" :disabled="smallModelListLoading" @click="loadSmallModelList">
+              {{ smallModelListLoading ? '...' : '获取' }}
+            </button>
+          </div>
+          <div v-if="smallModelListError" class="zhino-api-warn">{{ smallModelListError }}</div>
         </div>
       </template>
     </div>
@@ -1096,6 +1131,15 @@ function restoreCharacter(name: string) {
 
 .zhino-api-field {
   margin-top: 6px;
+}
+.zhino-model-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.zhino-model-select {
+  flex: 1;
+  min-width: 0;
 }
 .zhino-api-result {
   margin-top: 6px;

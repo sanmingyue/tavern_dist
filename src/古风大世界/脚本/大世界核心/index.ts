@@ -1,4 +1,5 @@
 import { DEFAULT_DIFFICULTY_ID, DIFFICULTY_DEFINITIONS } from './data/difficulty';
+import { CORE_STATIC_SEED_PACK } from './data/staticSeed';
 import {
   autoAdvanceBattle,
   createBattleState,
@@ -78,6 +79,7 @@ import {
 import { acceptQuest, advanceQuest, getQuestEvidenceIds, recordQuestEvidence, upsertQuestDefinition } from './engine/quest';
 import { adjustFactionRelation, adjustNpcRelation, adjustWorldReputation } from './engine/relation';
 import { closeScene, getActiveScene, requireScene, setScenePresence, startScene } from './engine/scene';
+import { applyStaticSeedPack, buildSeedReportSummary } from './engine/staticSeed';
 import {
   addResources,
   canAfford,
@@ -120,6 +122,7 @@ import {
 } from './storage/localStorageAdapter';
 import { GUFENG_SCRIPT_VERSION, type GameSave, type SaveSlotId } from './types/schema';
 import type { GameAction } from './types/actions';
+import type { StaticSeedApplyOptions } from './types/staticSeed';
 
 type GufengWorldApi = {
   version: string;
@@ -227,6 +230,12 @@ type GufengWorldApi = {
     generate: typeof generateWorldEvents;
     activate: typeof activateWorldEvent;
     resolve: typeof resolveWorldEvent;
+  };
+  staticSeed: {
+    corePack: typeof CORE_STATIC_SEED_PACK;
+    applyPack: typeof applyStaticSeedPack;
+    applyCorePack: (save: GameSave, options?: StaticSeedApplyOptions) => ReturnType<typeof applyStaticSeedPack>;
+    buildReportSummary: typeof buildSeedReportSummary;
   };
   characterMemory: {
     set: typeof setCharacterMemory;
@@ -394,6 +403,12 @@ function installApi(): GufengWorldApi {
       generate: generateWorldEvents,
       activate: activateWorldEvent,
       resolve: resolveWorldEvent,
+    },
+    staticSeed: {
+      corePack: CORE_STATIC_SEED_PACK,
+      applyPack: applyStaticSeedPack,
+      applyCorePack: (save: GameSave, options?: StaticSeedApplyOptions) => applyStaticSeedPack(save, CORE_STATIC_SEED_PACK, options),
+      buildReportSummary: buildSeedReportSummary,
     },
     characterMemory: {
       set: setCharacterMemory,

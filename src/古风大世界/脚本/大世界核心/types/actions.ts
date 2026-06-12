@@ -27,6 +27,7 @@ import type { NarrativeModeDecisionInput, NarrativeOutputModePreference, Narrati
 import type { QuestAcceptPayload, QuestAdvancePayload, QuestDefinition, QuestEvidencePayload } from './quest';
 import type { FactionRelationAdjustPayload, NpcRelationAdjustPayload, WorldReputationAdjustPayload } from './relation';
 import type { ScenePresencePayload, SceneStartPayload } from './scene';
+import type { StaticSeedApplyOptions } from './staticSeed';
 import type { StrategyCampaignSetup, StrategyOrder } from './strategy';
 
 export type ActionTone = 'green' | 'blue' | 'yellow' | 'red';
@@ -162,6 +163,7 @@ export type GameAction =
   | { type: 'NARRATIVE_SCENE_CATEGORY_SET'; category: NarrativeSceneCategory; tags?: string[] }
   | { type: 'NARRATIVE_USER_INPUT_PARSE'; rawInput: string }
   | { type: 'NARRATIVE_MODE_DECIDE'; payload?: NarrativeModeDecisionInput }
+  | { type: 'STATIC_SEED_APPLY_CORE'; options?: StaticSeedApplyOptions }
   | { type: 'MEMORY_SUMMARY_SET'; globalSummary?: string; recentSummary?: string }
   | { type: 'NARRATIVE_BIND'; tavernChatId?: string; messageId?: number }
   | { type: 'LOG_ONLY'; summary: string; relatedIds?: string[] };

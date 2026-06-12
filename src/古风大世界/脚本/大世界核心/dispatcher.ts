@@ -56,10 +56,12 @@ import {
 import { acceptQuest, advanceQuest, recordQuestEvidence, upsertQuestDefinition } from './engine/quest';
 import { adjustFactionRelation, adjustNpcRelation, adjustWorldReputation } from './engine/relation';
 import { closeScene, setScenePresence, startScene } from './engine/scene';
+import { applyStaticSeedPack, buildSeedReportSummary } from './engine/staticSeed';
 import { enqueueActiveStrategyOrder, resolveActiveStrategyTurn, startStrategyCampaign } from './engine/strategyRuntime';
 import { advanceWorldTime } from './engine/time';
 import { changeLocation } from './engine/travel';
 import { nowIso, pushSaveLog } from './state/defaults';
+import { CORE_STATIC_SEED_PACK } from './data/staticSeed';
 import type { ActionResult, CharacterCreatePayload, GameAction } from './types/actions';
 import type { GameSave, OpeningGameStage } from './types/schema';
 
@@ -202,6 +204,10 @@ function dispatchWithoutCatch(save: GameSave, action: GameAction): string {
       return parseAndStoreUserInput(save, action.rawInput);
     case 'NARRATIVE_MODE_DECIDE':
       return decideAndStoreNarrativeMode(save, action.payload ?? {});
+    case 'STATIC_SEED_APPLY_CORE': {
+      const report = applyStaticSeedPack(save, CORE_STATIC_SEED_PACK, action.options ?? {});
+      return buildSeedReportSummary(report);
+    }
     case 'MEMORY_SUMMARY_SET':
       if (action.globalSummary !== undefined) save.memory.globalSummary = action.globalSummary;
       if (action.recentSummary !== undefined) save.memory.recentSummary = action.recentSummary;

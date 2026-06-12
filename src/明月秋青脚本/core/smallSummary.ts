@@ -5,7 +5,7 @@
  */
 
 import type { SmallSummaryRecord } from '../stores/mainStore';
-import { callGenerateRaw } from '../utils/apiCaller';
+import { callSmallSummaryApi } from '../utils/apiCaller';
 import { scanCharacterNamesFromContent } from './dreamtalk';
 
 // ========== 破限常量 ==========
@@ -138,7 +138,7 @@ export async function executeSmallSummary(
   ];
 
   try {
-    const rawResult = await callGenerateRaw({
+    const rawResult = await callSmallSummaryApi({
       user_input: instruction,
       _monitorLabel: '小总结',
       max_chat_history: 0,
