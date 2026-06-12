@@ -128,10 +128,42 @@ function schema_dump(compiler: webpack.Compiler) {
   }
 }
 
+// ─── 复制角色卡资源到 dist ───
+function copy_characters(compiler: webpack.Compiler) {
+  const srcDir = path.join(import.meta.dirname, '我的角色卡');
+  const destDir = path.join(import.meta.dirname, 'dist', 'characters');
+
+  const doCopy = () => {
+    if (!fs.existsSync(srcDir)) return;
+    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+
+    const files = fs.readdirSync(srcDir).filter(f => f.endsWith('.png'));
+    let copied = 0;
+    for (const file of files) {
+      const src = path.join(srcDir, file);
+      const dest = path.join(destDir, file);
+      // 仅在源文件更新时复制
+      if (!fs.existsSync(dest) || fs.statSync(src).mtimeMs > fs.statSync(dest).mtimeMs) {
+        fs.copyFileSync(src, dest);
+        copied++;
+      }
+    }
+    if (copied > 0) {
+      console.info(`\x1b[36m[copy_characters]\x1b[0m 已复制 ${copied} 个角色卡到 dist/characters/`);
+    }
+  };
+
+  if (!compiler.options.watch) {
+    doCopy();
+  } else {
+    compiler.hooks.watchRun.tap('copy_characters', doCopy);
+  }
+}
+
 let child_process: ChildProcess;
 const bundle = () => {
-  exec('pnpm sync bundle all', { cwd: import.meta.dirname });
-  console.info('\x1b[36m[tavern_sync]\x1b[0m 已打包所有配置了的角色卡/世界书/预设');
+  exec('pnpm sync bundle 角色卡示例', { cwd: import.meta.dirname });
+  console.info('\x1b[36m[tavern_sync]\x1b[0m 已打包默认预设；8bit 世界书需手动运行 npm run bundle:8bit-worldbook');
 };
 const bundle_debounced = _.debounce(bundle, 500, { leading: true, trailing: false });
 function tavern_sync(compiler: webpack.Compiler) {
@@ -336,6 +368,11 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
               ],
             },
             {
+              test: /\.txt$/,
+              type: 'asset/source',
+              exclude: /node_modules/,
+            },
+            {
               test: /\.ya?ml$/,
               loader: 'yaml-loader',
               options: { asStream: true },
@@ -440,6 +477,7 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
         { apply: watch_tavern_helper },
         { apply: schema_dump },
         { apply: tavern_sync },
+        { apply: copy_characters },
         new VueLoaderPlugin(),
         unpluginAutoImport({
           dts: true,

@@ -212,6 +212,7 @@ interface PipelineState {
   activeRoles: RoleDraft[];
   isMultiRole: boolean;
   roleResults: RoleResult[];
+  retryAvoidTerms: Record<string, string[]>;
   worldview?: WorldviewResult;
   artifacts?: WriterArtifacts;
 }
@@ -357,6 +358,32 @@ function getCompletedRoles(state: PipelineState): RoleResult[] {
   return state.roleResults.filter(Boolean);
 }
 
+function extractAvoidTerms(message: string): string[] {
+  const exactTerms = Array.from(message.matchAll(/（([^）]+)）/gu))
+    .map(match => match[1]?.trim())
+    .filter(Boolean);
+  if (exactTerms.length > 0) return exactTerms;
+  if (/工程词|占位内容|模板词|工程占位词/u.test(message)) {
+    return ['模板', '提示词', '工程词', '占位符', 'placeholder'];
+  }
+  return [];
+}
+
+function rememberRetryAvoidTerms(state: PipelineState, stageKey: string, message: string) {
+  const terms = extractAvoidTerms(message);
+  if (terms.length === 0) return;
+  state.retryAvoidTerms[stageKey] = Array.from(new Set([...(state.retryAvoidTerms[stageKey] ?? []), ...terms]));
+  pushLog('warning', `下次重试会提醒 AI 避开：${state.retryAvoidTerms[stageKey].join('、')}`);
+}
+
+function retryOptionsFor(state: PipelineState, stageKey: string) {
+  return { avoidTerms: state.retryAvoidTerms[stageKey] ?? [] };
+}
+
+function clearRetryAvoidTerms(state: PipelineState, stageKey: string) {
+  delete state.retryAvoidTerms[stageKey];
+}
+
 function ensureArtifacts(state: PipelineState): WriterArtifacts {
   if (!state.artifacts) {
     state.artifacts = buildArtifacts(requireWorldview(state), getCompletedRoles(state));
@@ -404,7 +431,7 @@ async function executeStage(stageKey: string) {
   if (stageKey === 'generate-worldview') {
     state.roleResults = [];
     state.artifacts = undefined;
-    const worldview = await generateWorldview(state.worldviewSeed);
+    const worldview = await generateWorldview(state.worldviewSeed, retryOptionsFor(state, stageKey));
     state.worldview = worldview;
     previewText.value = worldview.content;
     pushLog('success', '世界观生成完成');
@@ -421,7 +448,7 @@ async function executeStage(stageKey: string) {
     const roleIndex = Number(generateRoleMatch[1]);
     const role = state.activeRoles[roleIndex];
     if (!role) throw new Error(`未找到角色${roleIndex + 1}素材`);
-    const result = await generateRole(role, requireWorldview(state).content, roleIndex);
+    const result = await generateRole(role, requireWorldview(state).content, roleIndex, retryOptionsFor(state, stageKey));
     state.roleResults[roleIndex] = result;
     state.artifacts = undefined;
     previewText.value = result.basic;
@@ -490,6 +517,7 @@ async function runPipeline(startIndex = 0) {
       activeRoles,
       isMultiRole: activeRoles.length > 1,
       roleResults: [],
+      retryAvoidTerms: {},
     };
     workStages.value = buildWorkStages(activeRoles, Boolean(avatarFile.value));
   } else {
@@ -502,6 +530,7 @@ async function runPipeline(startIndex = 0) {
       updateStage(index, 'running');
       pushLog('info', stageItem.title);
       await executeStage(stageItem.key);
+      clearRetryAvoidTerms(requirePipelineState(), stageItem.key);
       updateStage(index, 'done');
     }
 
@@ -512,6 +541,8 @@ async function runPipeline(startIndex = 0) {
     failedStageIndex.value = workStages.value.findIndex(item => item.status === 'running');
     if (failedStageIndex.value < 0) failedStageIndex.value = startIndex;
     updateStage(failedStageIndex.value, 'error', message);
+    const failedStage = workStages.value[failedStageIndex.value];
+    if (pipelineState.value && failedStage) rememberRetryAvoidTerms(pipelineState.value, failedStage.key, message);
     pushLog('error', message);
     toastr.error(message, '一键角色卡写卡器');
   } finally {
@@ -545,7 +576,8 @@ async function rerollRoleStage(roleIndex: number, stageIndex: number) {
   try {
     updateStage(stageIndex, 'running');
     pushLog('info', `重ROLL ${role.label}`);
-    const result = await generateRole(role, requireWorldview(state).content, roleIndex);
+    const stageKey = `generate-role-${roleIndex}`;
+    const result = await generateRole(role, requireWorldview(state).content, roleIndex, retryOptionsFor(state, stageKey));
     state.roleResults[roleIndex] = result;
     state.artifacts = undefined;
     previewText.value = result.basic;
@@ -558,6 +590,7 @@ async function rerollRoleStage(roleIndex: number, stageIndex: number) {
     await installMvuRegexes(artifacts.statusRegexHtml);
 
     updateStage(stageIndex, 'done');
+    clearRetryAvoidTerms(state, stageKey);
     const writeIndex = findStageIndex(`write-role-${roleIndex}`);
     if (writeIndex >= 0) updateStage(writeIndex, 'done');
     pushLog('success', `${result.name} 已重ROLL并刷新世界书/MVU/状态栏`);
@@ -566,6 +599,7 @@ async function rerollRoleStage(roleIndex: number, stageIndex: number) {
     const message = error instanceof Error ? error.message : String(error);
     failedStageIndex.value = stageIndex;
     updateStage(stageIndex, 'error', message);
+    rememberRetryAvoidTerms(state, `generate-role-${roleIndex}`, message);
     pushLog('error', message);
     toastr.error(message, '一键角色卡写卡器');
   } finally {

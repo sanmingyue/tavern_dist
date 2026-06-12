@@ -1,0 +1,7 @@
+com.sanmingyue.xiaoshouji.app-pngs-0 C:\Users\三明月\Desktop\三明月\src\小手机独立版\android-apk\app\build\generated\res\pngs\debug
+com.sanmingyue.xiaoshouji.app-resValues-1 C:\Users\三明月\Desktop\三明月\src\小手机独立版\android-apk\app\build\generated\res\resValues\debug
+com.sanmingyue.xiaoshouji.app-packageDebugResources-2 C:\Users\三明月\Desktop\三明月\src\小手机独立版\android-apk\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.sanmingyue.xiaoshouji.app-packageDebugResources-3 C:\Users\三明月\Desktop\三明月\src\小手机独立版\android-apk\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.sanmingyue.xiaoshouji.app-debug-4 C:\Users\三明月\Desktop\三明月\src\小手机独立版\android-apk\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.sanmingyue.xiaoshouji.app-debug-5 C:\Users\三明月\Desktop\三明月\src\小手机独立版\android-apk\app\src\debug\res
+com.sanmingyue.xiaoshouji.app-main-6 C:\Users\三明月\Desktop\三明月\src\小手机独立版\android-apk\app\src\main\res

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8bit的幻想 — 世界切换过渡动画 Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+    background: #000;
+    color: #fff;
+  }
+
+  /* ═══ 两个世界场景 ═══ */
+  .world {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: none;
+  }
+
+  .world.hidden { display: none; }
+
+  /* 现实世界 */
+  .world-reality {
+    background: linear-gradient(135deg, #f5f0e8 0%, #e8ddd0 30%, #d4c8b8 60%, #bfb3a0 100%);
+    color: #2a2420;
+  }
+
+  .world-reality .scene-content {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+  }
+
+  .world-reality h1 {
+    font-size: 42px;
+    font-weight: 900;
+    color: #c8504a;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .world-reality p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #5a4e42;
+    margin-bottom: 12px;
+  }
+
+  .world-reality .scene-decor {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  .world-reality .decor-card {
+    width: 120px;
+    height: 160px;
+    background: rgba(255,255,255,0.7);
+    border: 2px solid #c8504a;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  .world-reality .decor-card svg {
+    width: 48px;
+    height: 48px;
+    stroke: #c8504a;
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .world-reality .decor-card span {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5a4e42;
+  }
+
+  /* 8bit世界 */
+  .world-8bit {
+    background: #0a0a15;
+    color: #fff;
+    image-rendering: pixelated;
+  }
+
+  .world-8bit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.015) 2px, rgba(0,255,0,0.015) 4px);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .world-8bit .scene-content {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .world-8bit h1 {
+    font-size: 48px;
+    font-weight: 900;
+    color: #e8002a;
+    letter-spacing: 6px;
+    text-shadow: 4px 4px 0 #000, -1px -1px 0 #ff4060;
+    transform: skewX(-4deg);
+    margin-bottom: 16px;
+  }
+
+  .world-8bit p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #aaa;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    margin-bottom: 12px;
+  }
+
+  .world-8bit .pixel-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    width: 280px;
+    margin: 24px auto 0;
+  }
+
+  .world-8bit .pixel-cell {
+    aspect-ratio: 1;
+    border-radius: 2px;
+  }
+
+  /* ═══ 控制栏 ═══ */
+  .controls {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 16px;
+    z-index: 1000;
+  }
+
+  .ctrl-btn {
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    border: 2px solid;
+    cursor: pointer;
+    transition: all 150ms;
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  }
+
+  .ctrl-btn:hover { transform: scale(1.05); }
+  .ctrl-btn:active { transform: scale(0.95); }
+  .ctrl-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+  .ctrl-btn.to-8bit {
+    background: #e8002a;
+    color: #fff;
+    border-color: #ff4060;
+  }
+
+  .ctrl-btn.to-reality {
+    background: rgba(200,80,74,0.9);
+    color: #fff;
+    border-color: #e8a090;
+  }
+
+  .state-label {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 8px 24px;
+    border-radius: 4px;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+  }
+
+  .state-label.reality {
+    background: rgba(200,80,74,0.2);
+    color: #c8504a;
+    border: 1px solid rgba(200,80,74,0.4);
+  }
+
+  .state-label.eight-bit {
+    background: rgba(232,0,42,0.2);
+    color: #e8002a;
+    border: 1px solid rgba(232,0,42,0.4);
+  }
+
+  /* ═══ 过渡动画覆盖层 ═══ */
+  .transition-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+    display: none;
+  }
+
+  .transition-overlay.active {
+    display: block;
+    pointer-events: all;
+  }
+
+  /* 马赛克 Canvas */
+  .transition-overlay canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ═══ 进入8bit: 抖动 + 花屏 ═══ */
+  @keyframes screen-shake {
+    0%   { transform: translate(0, 0); }
+    10%  { transform: translate(-8px, 4px); }
+    20%  { transform: translate(6px, -6px); }
+    30%  { transform: translate(-4px, 8px); }
+    40%  { transform: translate(10px, -2px); }
+    50%  { transform: translate(-6px, -8px); }
+    60%  { transform: translate(8px, 6px); }
+    70%  { transform: translate(-10px, 2px); }
+    80%  { transform: translate(4px, -4px); }
+    90%  { transform: translate(-2px, 6px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .shake-active {
+    animation: screen-shake 0.15s ease-in-out infinite;
+  }
+
+  /* 花屏条纹 */
+  .glitch-bars {
+    position: fixed;
+    inset: 0;
+    z-index: 510;
+    pointer-events: none;
+    display: none;
+  }
+
+  .glitch-bars.active { display: block; }
+
+  .glitch-bar {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background: rgba(232, 0, 42, 0.6);
+    mix-blend-mode: screen;
+  }
+
+  /* 白闪 */
+  .flash-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 520;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 80ms;
+  }
+
+  .flash-overlay.active {
+    opacity: 1;
+  }
+
+  /* ═══ 回归现实: 扭曲效果 ═══ */
+  .distort-active {
+    animation: distort-warp 0.12s ease-in-out infinite;
+  }
+
+  @keyframes distort-warp {
+    0%   { transform: skewX(0deg) scaleY(1); }
+    25%  { transform: skewX(3deg) scaleY(1.02); }
+    50%  { transform: skewX(-2deg) scaleY(0.98); }
+    75%  { transform: skewX(4deg) scaleY(1.01); }
+    100% { transform: skewX(0deg) scaleY(1); }
+  }
+
+  /* 色差叠加 */
+  .chromatic-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 505;
+    pointer-events: none;
+    display: none;
+    mix-blend-mode: screen;
+  }
+
+  .chromatic-overlay.active { display: block; }
+
+  .chromatic-r, .chromatic-b {
+    position: absolute;
+    inset: 0;
+    opacity: 0.4;
+  }
+
+  .chromatic-r {
+    background: rgba(255, 0, 60, 0.3);
+    transform: translateX(4px);
+  }
+
+  .chromatic-b {
+    background: rgba(0, 100, 255, 0.3);
+    transform: translateX(-4px);
+  }
+
+  /* 扫描线加强 */
+  .scanline-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 506;
+    pointer-events: none;
+    display: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent, transparent 1px,
+      rgba(0,0,0,0.3) 1px,
+      rgba(0,0,0,0.3) 3px
+    );
+    animation: scanline-scroll 0.3s linear infinite;
+  }
+
+  .scanline-overlay.active { display: block; }
+
+  @keyframes scanline-scroll {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 现实世界场景 -->
+<div id="world-reality" class="world world-reality">
+  <div class="scene-content">
+    <h1>现实世界</h1>
+    <p>阳光透过窗帘洒在桌面上，一切都是那么平常。</p>
+    <p>你的右手腕上，那块古怪的手表正安静地闪烁着微弱的光芒……</p>
+    <div class="scene-decor">
+      <div class="decor-card">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>住所</span>
+      </div>
+      <div class="decor-card">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>8 bit</span>
+      </div>
+      <div class="decor-card">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>街区</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 8bit世界场景 -->
+<div id="world-8bit" class="world world-8bit hidden">
+  <div class="scene-content">
+    <h1>8bit 世界</h1>
+    <p>像素的光芒在眼前跳动，你已经身处那个古早的勇者冒险世界。</p>
+    <p>方块构成的村庄、简洁的地图、以及远方魔王城的轮廓……</p>
+    <div class="pixel-grid" id="pixel-grid"></div>
+  </div>
+</div>
+
+<!-- 状态标签 -->
+<div id="state-label" class="state-label reality">当前: 现实世界</div>
+
+<!-- 控制按钮 -->
+<div class="controls">
+  <button id="btn-to-8bit" class="ctrl-btn to-8bit">进入 8bit 世界</button>
+  <button id="btn-to-reality" class="ctrl-btn to-reality" disabled>回归现实世界</button>
+</div>
+
+<!-- 过渡覆盖层 -->
+<div id="transition-overlay" class="transition-overlay">
+  <canvas id="mosaic-canvas"></canvas>
+</div>
+
+<!-- 花屏条纹 -->
+<div id="glitch-bars" class="glitch-bars"></div>
+
+<!-- 白闪 -->
+<div id="flash-overlay" class="flash-overlay"></div>
+
+<!-- 色差 -->
+<div id="chromatic-overlay" class="chromatic-overlay">
+  <div class="chromatic-r"></div>
+  <div class="chromatic-b"></div>
+</div>
+
+<!-- 扫描线 -->
+<div id="scanline-overlay" class="scanline-overlay"></div>
+
+<script>
+(function() {
+  // ─── 元素引用 ───
+  const worldReality = document.getElementById('world-reality');
+  const world8bit = document.getElementById('world-8bit');
+  const stateLabel = document.getElementById('state-label');
+  const btnTo8bit = document.getElementById('btn-to-8bit');
+  const btnToReality = document.getElementById('btn-to-reality');
+  const transitionOverlay = document.getElementById('transition-overlay');
+  const mosaicCanvas = document.getElementById('mosaic-canvas');
+  const glitchBars = document.getElementById('glitch-bars');
+  const flashOverlay = document.getElementById('flash-overlay');
+  const chromaticOverlay = document.getElementById('chromatic-overlay');
+  const scanlineOverlay = document.getElementById('scanline-overlay');
+
+  const ctx = mosaicCanvas.getContext('2d');
+  let currentWorld = 'reality'; // 'reality' | 'eight_bit'
+  let isTransitioning = false;
+
+  // ─── 初始化像素网格 ───
+  const pixelColors = [
+    '#e8002a','#ff4060','#0a0a15','#222','#e8002a','#333','#111','#ff4060',
+    '#111','#e8002a','#333','#0a0a15','#ff4060','#222','#e8002a','#111',
+    '#333','#111','#ff4060','#e8002a','#0a0a15','#ff4060','#222','#333',
+    '#e8002a','#222','#0a0a15','#333','#111','#e8002a','#ff4060','#0a0a15',
+    '#ff4060','#333','#e8002a','#111','#222','#0a0a15','#111','#e8002a',
+    '#0a0a15','#e8002a','#111','#ff4060','#333','#222','#e8002a','#ff4060',
+    '#222','#ff4060','#333','#e8002a','#0a0a15','#111','#333','#222',
+    '#111','#0a0a15','#222','#333','#e8002a','#ff4060','#0a0a15','#e8002a',
+  ];
+
+  const grid = document.getElementById('pixel-grid');
+  pixelColors.forEach(color => {
+    const cell = document.createElement('div');
+    cell.className = 'pixel-cell';
+    cell.style.background = color;
+    grid.appendChild(cell);
+  });
+
+  // ─── 调整 Canvas 尺寸 ───
+  function resizeCanvas() {
+    mosaicCanvas.width = window.innerWidth;
+    mosaicCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // ─── 捕获当前页面截图到 Canvas ───
+  function captureScreen() {
+    // 用纯色块模拟当前场景(因为 html2canvas 太重，这里用 CSS 渐变模拟)
+    const w = mosaicCanvas.width;
+    const h = mosaicCanvas.height;
+
+    if (currentWorld === 'reality') {
+      // 现实世界 — 暖色渐变
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#f5f0e8');
+      grad.addColorStop(0.3, '#e8ddd0');
+      grad.addColorStop(0.6, '#d4c8b8');
+      grad.addColorStop(1, '#bfb3a0');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      // 模拟卡片
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      for (let i = 0; i < 3; i++) {
+        ctx.fillRect(w/2 - 200 + i*140, h/2 + 40, 100, 140);
+      }
+      // 文字区域
+      ctx.fillStyle = '#c8504a';
+      ctx.fillRect(w/2 - 120, h/2 - 100, 240, 40);
+    } else {
+      // 8bit世界 — 暗色
+      ctx.fillStyle = '#0a0a15';
+      ctx.fillRect(0, 0, w, h);
+      // 像素格
+      const gridSize = 35;
+      const startX = w/2 - gridSize * 4;
+      const startY = h/2 + 40;
+      pixelColors.forEach((color, i) => {
+        const col = i % 8;
+        const row = Math.floor(i / 8);
+        ctx.fillStyle = color;
+        ctx.fillRect(startX + col * gridSize, startY + row * gridSize, gridSize - 2, gridSize - 2);
+      });
+      // 标题
+      ctx.fillStyle = '#e8002a';
+      ctx.fillRect(w/2 - 140, h/2 - 100, 280, 50);
+    }
+  }
+
+  // ─── 马赛克化效果 ───
+  function drawMosaic(blockSize) {
+    const w = mosaicCanvas.width;
+    const h = mosaicCanvas.height;
+    if (blockSize <= 1) return;
+
+    const imageData = ctx.getImageData(0, 0, w, h);
+    const data = imageData.data;
+
+    for (let y = 0; y < h; y += blockSize) {
+      for (let x = 0; x < w; x += blockSize) {
+        // 取块中心颜色
+        const cx = Math.min(x + Math.floor(blockSize / 2), w - 1);
+        const cy = Math.min(y + Math.floor(blockSize / 2), h - 1);
+        const idx = (cy * w + cx) * 4;
+        const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(x, y, blockSize, blockSize);
+      }
+    }
+  }
+
+  // ─── 随机花屏条纹 ───
+  function generateGlitchBars() {
+    glitchBars.innerHTML = '';
+    const count = 5 + Math.floor(Math.random() * 8);
+    for (let i = 0; i < count; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'glitch-bar';
+      const top = Math.random() * 100;
+      const height = 2 + Math.random() * 20;
+      const hue = Math.random() > 0.5 ? '0' : (120 + Math.random() * 60);
+      const alpha = 0.3 + Math.random() * 0.5;
+      bar.style.cssText = `
+        top: ${top}%;
+        height: ${height}px;
+        background: hsla(${hue}, 100%, 50%, ${alpha});
+        transform: translateX(${(Math.random() - 0.5) * 20}px);
+      `;
+      glitchBars.appendChild(bar);
+    }
+  }
+
+  // ─── 进入 8bit 世界过渡动画 ───
+  async function transitionToEightBit() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    btnTo8bit.disabled = true;
+    btnToReality.disabled = true;
+
+    // 1. 捕获当前画面
+    captureScreen();
+    transitionOverlay.classList.add('active');
+
+    // 2. 逐步马赛克化 (0~600ms)
+    const mosaicSteps = [2, 4, 6, 10, 16, 24, 36, 48, 64];
+    for (let i = 0; i < mosaicSteps.length; i++) {
+      captureScreen(); // 重新绘制原始
+      drawMosaic(mosaicSteps[i]);
+      await sleep(70);
+    }
+
+    // 3. 开始抖动 (600~1200ms)
+    document.body.classList.add('shake-active');
+
+    // 4. 花屏闪烁 (600~1200ms)
+    for (let i = 0; i < 4; i++) {
+      generateGlitchBars();
+      glitchBars.classList.add('active');
+
+      // 随机色块覆盖
+      const w = mosaicCanvas.width;
+      const h = mosaicCanvas.height;
+      for (let j = 0; j < 12; j++) {
+        ctx.fillStyle = `hsla(${Math.random()*360}, 100%, 50%, ${0.2 + Math.random()*0.4})`;
+        ctx.fillRect(
+          Math.random() * w,
+          Math.random() * h,
+          20 + Math.random() * 200,
+          4 + Math.random() * 30
+        );
+      }
+
+      await sleep(100);
+      glitchBars.classList.remove('active');
+      await sleep(50);
+    }
+
+    // 5. 白闪 (1200~1400ms)
+    document.body.classList.remove('shake-active');
+    flashOverlay.classList.add('active');
+    await sleep(120);
+
+    // 6. 切换场景
+    worldReality.classList.add('hidden');
+    world8bit.classList.remove('hidden');
+    currentWorld = 'eight_bit';
+    stateLabel.textContent = '当前: 8bit 世界';
+    stateLabel.className = 'state-label eight-bit';
+
+    // 7. 白闪渐退
+    await sleep(80);
+    flashOverlay.classList.remove('active');
+    transitionOverlay.classList.remove('active');
+
+    // 8. 轻微残留抖动
+    document.body.classList.add('shake-active');
+    await sleep(200);
+    document.body.classList.remove('shake-active');
+
+    btnToReality.disabled = false;
+    isTransitioning = false;
+  }
+
+  // ─── 回归现实世界过渡动画 ───
+  async function transitionToReality() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    btnTo8bit.disabled = true;
+    btnToReality.disabled = true;
+
+    // 1. 捕获当前画面
+    captureScreen();
+    transitionOverlay.classList.add('active');
+
+    // 2. 画面开始扭曲 (0~400ms) — 色差 + 扫描线 + 扭曲
+    chromaticOverlay.classList.add('active');
+    scanlineOverlay.classList.add('active');
+    document.body.classList.add('distort-active');
+
+    await sleep(200);
+
+    // 3. 扭曲加剧 + 画面撕裂 (400~900ms)
+    const w = mosaicCanvas.width;
+    const h = mosaicCanvas.height;
+
+    for (let step = 0; step < 6; step++) {
+      captureScreen();
+
+      // 水平撕裂效果
+      const sliceCount = 8 + step * 3;
+      const sliceHeight = Math.ceil(h / sliceCount);
+      const imageData = ctx.getImageData(0, 0, w, h);
+
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < sliceCount; i++) {
+        const sy = i * sliceHeight;
+        const sh = Math.min(sliceHeight, h - sy);
+        if (sh <= 0) continue;
+
+        const offset = (Math.random() - 0.5) * (10 + step * 8);
+        ctx.putImageData(imageData, offset, 0, 0, sy, w, sh);
+      }
+
+      // 色彩偏移条纹
+      for (let j = 0; j < 3 + step; j++) {
+        ctx.fillStyle = `hsla(${Math.random() > 0.5 ? 0 : 220}, 100%, 60%, ${0.1 + Math.random()*0.15})`;
+        ctx.fillRect(0, Math.random() * h, w, 2 + Math.random() * 8);
+      }
+
+      await sleep(100);
+    }
+
+    // 4. 画面完全扭曲 — 短暂全黑/全白
+    await sleep(100);
+
+    // 波纹收缩效果
+    ctx.clearRect(0, 0, w, h);
+    for (let r = Math.max(w, h); r > 0; r -= Math.max(w, h) / 8) {
+      ctx.fillStyle = `rgba(${Math.random()*100}, ${Math.random()*50}, ${Math.random()*100}, 0.3)`;
+      ctx.beginPath();
+      ctx.arc(w/2, h/2, r, 0, Math.PI * 2);
+      ctx.fill();
+      await sleep(40);
+    }
+
+    // 5. 闪白
+    flashOverlay.classList.add('active');
+    document.body.classList.remove('distort-active');
+    chromaticOverlay.classList.remove('active');
+    scanlineOverlay.classList.remove('active');
+    await sleep(150);
+
+    // 6. 切换场景
+    world8bit.classList.add('hidden');
+    worldReality.classList.remove('hidden');
+    currentWorld = 'reality';
+    stateLabel.textContent = '当前: 现实世界';
+    stateLabel.className = 'state-label reality';
+
+    // 7. 闪白渐退
+    await sleep(100);
+    flashOverlay.classList.remove('active');
+    transitionOverlay.classList.remove('active');
+
+    // 8. 轻微残留扭曲
+    document.body.classList.add('distort-active');
+    await sleep(300);
+    document.body.classList.remove('distort-active');
+
+    btnTo8bit.disabled = false;
+    isTransitioning = false;
+  }
+
+  // ─── 工具函数 ───
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // ─── 绑定事件 ───
+  btnTo8bit.addEventListener('click', transitionToEightBit);
+  btnToReality.addEventListener('click', transitionToReality);
+})();
+</script>
+
+</body>
+</html>

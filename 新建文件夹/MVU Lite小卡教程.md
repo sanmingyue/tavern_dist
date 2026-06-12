@@ -1,6 +1,6 @@
 ﻿# MVU Lite 小卡教程
 
-MVU Lite 是给新作者使用的轻量 MVU 写法。它不是 MVU ZOD 的简化版，而是挂在 MVU beta 上的一层中文解析器。
+MVU Lite 是给新作者使用的轻量 MVU 写法。它是挂在 MVU zod 上的一层中文解析器。
 
 世界书条目前缀仍然使用 MVU 原本的 `[mvu_update]`，因为它负责让 MVU 进入额外变量解析流程。Lite 只改变变量规则和输出格式的写法，不改变 MVU 的条目识别入口。
 

@@ -1,0 +1,97 @@
+@@preprocessing
+<%
+if (typeof tradeCount === 'undefined') var tradeCount = getvar('stat_data.交易次数[0]') || 40;
+if (typeof weeklyTrade === 'undefined') var weeklyTrade = getvar('stat_data.本周交易次数[0]') || 3;
+if (typeof jingweiMoney === 'undefined') var jingweiMoney = getvar('stat_data.奥妮安存款[0]') || 2800;
+if (typeof currentScene === 'undefined') var currentScene = getvar('stat_data.当前场景[0]') || '学校教室';
+if (typeof dayOfWeek === 'undefined') var dayOfWeek = getvar('stat_data.星期[0]') || '星期三';
+if (typeof timeOfDay === 'undefined') var timeOfDay = getvar('stat_data.时间段[0]') || '上午';
+if (typeof specialEvent === 'undefined') var specialEvent = getvar('stat_data.特殊事件[0]') || '无';
+%>
+
+<%_ if (currentScene === '学校天台' && timeOfDay === '中午' && dayOfWeek !== '星期六' && dayOfWeek !== '星期日') { _%>
+天台交易场景触发
+<%_ } _%>
+
+<%_ if ((currentScene.endsWith('家客厅') || currentScene.endsWith('家卧室') || currentScene.endsWith('家浴室') || currentScene.endsWith('家阳台')) && dayOfWeek === '星期六' && timeOfDay === '下午') { _%>
+{{user}}家交易场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '地铁上' && (timeOfDay === '傍晚' || timeOfDay === '晚上')) { _%>
+地铁偷看场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '便利店' && (timeOfDay === '傍晚' || timeOfDay === '晚上')) { _%>
+便利店打工场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '学校走廊' && (timeOfDay === '上午' || timeOfDay === '下午' || timeOfDay === '中午')) { _%>
+学校走廊场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '学校厕所' && (timeOfDay === '中午' || timeOfDay === '上午' || timeOfDay === '下午')) { _%>
+学校厕所场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '学校图书馆' && (timeOfDay === '下午' || timeOfDay === '傍晚')) { _%>
+学校图书馆场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '学校体育馆' && (timeOfDay === '上午' || timeOfDay === '下午')) { _%>
+学校体育馆场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '学校食堂' && (timeOfDay === '中午' || timeOfDay === '傍晚')) { _%>
+学校食堂场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '公园长椅' && (dayOfWeek === '星期六' || dayOfWeek === '星期日')) { _%>
+公园长椅场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '电影院' && (dayOfWeek === '星期六' || dayOfWeek === '星期日')) { _%>
+电影院场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '商场' && (dayOfWeek === '星期六' || dayOfWeek === '星期日')) { _%>
+商场场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '奥妮安家') { _%>
+奥妮安家场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '街道' && (timeOfDay === '傍晚' || timeOfDay === '晚上')) { _%>
+街道场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '天桥下' && (timeOfDay === '傍晚' || timeOfDay === '晚上')) { _%>
+天桥下场景触发
+<%_ } _%>
+
+<%_ if (currentScene === '小巷子' && (timeOfDay === '傍晚' || timeOfDay === '晚上')) { _%>
+小巷子场景触发
+<%_ } _%>
+
+<%_ if (tradeCount >= 1 && tradeCount <= 20) { _%>
+初期关系阶段触发
+<%_ } else if (tradeCount >= 21 && tradeCount <= 50) { _%>
+中期关系阶段触发
+<%_ } else if (tradeCount >= 51 && tradeCount <= 100) { _%>
+后期关系阶段触发
+<%_ } else if (tradeCount > 100) { _%>
+深入期关系阶段触发
+<%_ } _%>
+
+<%_ if (jingweiMoney < 500) { _%>
+极度缺钱事件触发
+<%_ } _%>
+
+<%_ if (specialEvent === '差点被发现') { _%>
+差点被发现事件触发
+<%_ } else if (specialEvent === '体育课后') { _%>
+体育课后事件触发
+<%_ } else if (specialEvent === '雨天湿身') { _%>
+雨天湿身事件触发
+<%_ } _%>
+

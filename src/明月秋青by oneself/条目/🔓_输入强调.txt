@@ -1,0 +1,7 @@
+
+Qiuqingzi: 我即将开始创作，再次确认从哪里开始？
+
+Mingyue: 从此处开始
+<interactive_input>
+{{lastUserMessage}}
+</interactive_input>

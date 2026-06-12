@@ -11,7 +11,10 @@
         "list_console_messages",
         "evaluate_script",
         "take_snapshot",
-        "select_page"
+        "select_page",
+        "get_network_request",
+        "list_network_requests",
+        "take_screenshot"
       ]
     }
   }

@@ -59379,6 +59379,23 @@ class Syncer_interface {
     async get_parsed_tavern({ queit = false } = {}) {
         const socket = await wait_socket();
         const data = await socket.emitWithAck(`pull_${this.type}`, { name: this.name, queit });
+        if (data && typeof data === 'object') {
+            if (data.settings && typeof data.settings === 'object' && data.settings.reply_count === 0) {
+                data.settings.reply_count = 1;
+            }
+            const normalize_prompt = prompt => {
+                if (prompt && typeof prompt === 'object' && prompt.role === 'model') {
+                    prompt.role = 'assistant';
+                }
+                return prompt;
+            };
+            if (Array.isArray(data.prompts)) {
+                data.prompts = data.prompts.filter(prompt => prompt !== null).map(normalize_prompt);
+            }
+            if (Array.isArray(data.prompts_unused)) {
+                data.prompts_unused = data.prompts_unused.filter(prompt => prompt !== null).map(normalize_prompt);
+            }
+        }
         return typeof data === 'string' ? data : detailed_parse(this.tavern_type, data);
     }
     get_parsed_local() {
