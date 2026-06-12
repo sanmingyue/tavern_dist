@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.7</strong>
+            <strong>NAI 生图 v0.0.8</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>
@@ -1002,6 +1002,8 @@ function updateNumber(key: NumericSettingKey, event: Event): void {
 }
 
 function readLastMessageId(): number {
+  const lastFromMessages = getAllChatMessages().at(-1)?.message_id;
+  if (Number.isInteger(lastFromMessages)) return Number(lastFromMessages);
   return getLastMessageId();
 }
 
@@ -1019,7 +1021,7 @@ function applyComicApiMode(mode: ComicApiMode): void {
 }
 
 function syncComicRange(): void {
-  const lastId = getLastMessageId();
+  const lastId = readLastMessageId();
   if (lastId < 0) return;
   store.updateSettings({
     comicStartMessageId: Math.min(store.settings.comicStartMessageId, lastId),
@@ -1028,19 +1030,40 @@ function syncComicRange(): void {
   manualMessageId.value = lastId;
 }
 
+function getAllChatMessages(): ChatMessage[] {
+  try {
+    const messages = getChatMessages('0-{{lastMessageId}}', { role: 'all', hide_state: 'all' }) as ChatMessage[];
+    if (messages.length > 0) return messages;
+  } catch (error) {
+    console.warn('[NAI生图脚本] 使用官方范围读取楼层失败，准备降级读取。', error);
+  }
+
+  try {
+    const lastId = getLastMessageId();
+    if (lastId < 0) return [];
+    return getChatMessages(`0-${lastId}`, { role: 'all', hide_state: 'all' }) as ChatMessage[];
+  } catch (error) {
+    console.warn('[NAI生图脚本] 降级读取楼层也失败。', error);
+    return [];
+  }
+}
+
 function getAnyMessage(messageId: number): ChatMessage | null {
-  return (getChatMessages(messageId, { role: 'all' })[0] as ChatMessage | undefined) ?? null;
+  const message = getAllChatMessages().find(message => message.message_id === messageId);
+  if (message) return message;
+
+  try {
+    return (getChatMessages(messageId, { role: 'all', hide_state: 'all' })[0] as ChatMessage | undefined) ?? null;
+  } catch (error) {
+    console.warn(`[NAI生图脚本] 读取第 ${messageId} 楼失败。`, error);
+    return null;
+  }
 }
 
 function getMessagesByFloorRange(start: number, end: number): ChatMessage[] {
-  const messages: ChatMessage[] = [];
   const from = Math.min(start, end);
   const to = Math.max(start, end);
-  for (let messageId = from; messageId <= to; messageId += 1) {
-    const message = getAnyMessage(messageId);
-    if (message) messages.push(message);
-  }
-  return messages;
+  return getAllChatMessages().filter(message => message.message_id >= from && message.message_id <= to);
 }
 
 function normalizeRawImageInput(input: string): string {
@@ -1281,6 +1304,11 @@ function getComicTargetMessages(start: number, end: number): ChatMessage[] {
   return getMessagesByFloorRange(start, end).filter(message => message.role === 'assistant');
 }
 
+function describeComicScan(messages: ChatMessage[]): string {
+  if (messages.length === 0) return '没有读取到任何楼层。';
+  return messages.map(message => `#${message.message_id} ${message.role} ${message.name}`).join('\n');
+}
+
 async function generateComicFloor(messageId: number): Promise<number> {
   const target = getAnyMessage(messageId);
   if (!target) throw new Error(`没有找到第 ${messageId} 楼。`);
@@ -1295,7 +1323,7 @@ async function generateComicCurrentFloor(): Promise<void> {
   if (comicGenerating.value) return;
   comicGenerating.value = true;
   try {
-    const messageId = store.settings.comicEndMessageId || getLastMessageId();
+    const messageId = store.settings.comicEndMessageId;
     comicProgress.value = `正在处理第 ${messageId} 楼`;
     const count = await generateComicFloor(messageId);
     comicProgress.value = `第 ${messageId} 楼完成，共 ${count} 张`;
@@ -1314,9 +1342,22 @@ async function generateComicRange(): Promise<void> {
   comicGenerating.value = true;
   try {
     const start = Math.min(store.settings.comicStartMessageId, store.settings.comicEndMessageId);
-    const end = Math.max(store.settings.comicStartMessageId, store.settings.comicEndMessageId || getLastMessageId());
-    const targets = getComicTargetMessages(start, end);
-    if (targets.length === 0) throw new Error('范围内没有可处理的 AI 楼层。');
+    const end = Math.max(store.settings.comicStartMessageId, store.settings.comicEndMessageId);
+    const scannedMessages = getMessagesByFloorRange(start, end);
+    const targets = scannedMessages.filter(message => message.role === 'assistant');
+    if (targets.length === 0) {
+      store.setLastLog({
+        level: 'warning',
+        title: '没有扫描到 AI 楼层',
+        message: `范围 ${start}-${end} 内读取到 ${scannedMessages.length} 个楼层，但没有可处理的 AI 楼层。`,
+        solution:
+          '确认起始楼层和结束楼层填的是酒馆真实楼层号；如果刚生成完新回复，先点“同步当前范围”再批量生成。',
+        detail: describeComicScan(scannedMessages),
+      });
+      comicProgress.value = `范围 ${start}-${end} 没有可处理的 AI 楼层`;
+      toastr.warning('范围内没有可处理的 AI 楼层。');
+      return;
+    }
 
     let totalImages = 0;
     const completed: Array<{ messageId: number; count: number }> = [];
