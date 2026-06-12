@@ -1,0 +1,928 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "default": 1,
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "savedAt": {
+      "default": 0,
+      "type": "number"
+    },
+    "user": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "name": {
+          "default": "",
+          "type": "string"
+        },
+        "age": {
+          "default": 18,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "birthday": {
+          "default": "",
+          "type": "string"
+        },
+        "background": {
+          "default": "",
+          "type": "string"
+        },
+        "bazi": {
+          "default": "",
+          "type": "string"
+        },
+        "fortune": {
+          "default": "",
+          "type": "string"
+        },
+        "residence": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "district": {
+              "default": "",
+              "type": "string"
+            },
+            "street": {
+              "default": "",
+              "type": "string"
+            },
+            "detail": {
+              "default": "",
+              "type": "string"
+            },
+            "locationId": {
+              "default": "unknown",
+              "type": "string"
+            }
+          }
+        },
+        "appearance": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "height": {
+              "default": 0,
+              "type": "number",
+              "minimum": 0
+            },
+            "looks": {
+              "default": "",
+              "type": "string"
+            },
+            "outfit": {
+              "default": "",
+              "type": "string"
+            },
+            "bodyExternal": {
+              "default": "",
+              "type": "string"
+            }
+          }
+        },
+        "internal": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "bodyInternal": {
+              "default": "",
+              "type": "string"
+            },
+            "experiences": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "currentLocationId": {
+          "default": "unknown",
+          "type": "string"
+        },
+        "inventory": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        }
+      }
+    },
+    "assets": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "money": {
+          "default": 0,
+          "type": "number"
+        },
+        "items": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        "properties": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "default": "",
+                "type": "string"
+              },
+              "type": {
+                "default": "其他",
+                "type": "string",
+                "enum": [
+                  "房产",
+                  "车辆",
+                  "大型物品",
+                  "其他"
+                ]
+              },
+              "locationId": {
+                "default": "unknown",
+                "type": "string"
+              },
+              "acquiredAt": {
+                "default": "",
+                "type": "string"
+              },
+              "condition": {
+                "default": "正常",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        "transactions": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "收入",
+                  "支出"
+                ]
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": {
+                "type": "string"
+              },
+              "source": {
+                "default": "其他",
+                "type": "string",
+                "enum": [
+                  "正文",
+                  "淘宝",
+                  "闲鱼",
+                  "外卖",
+                  "电影票",
+                  "打工",
+                  "小手机",
+                  "其他"
+                ]
+              },
+              "relatedItemId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "timestamp",
+              "type",
+              "amount",
+              "description"
+            ]
+          }
+        }
+      }
+    },
+    "time": {
+      "type": "object",
+      "properties": {
+        "current": {
+          "type": "string"
+        },
+        "season": {
+          "type": "string",
+          "enum": [
+            "春",
+            "夏",
+            "秋",
+            "冬"
+          ]
+        },
+        "weather": {
+          "default": "晴",
+          "type": "string"
+        },
+        "dayOfWeek": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6
+        }
+      },
+      "required": [
+        "current",
+        "season"
+      ]
+    },
+    "calendar": {
+      "type": "object",
+      "properties": {
+        "appointments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "default": "appointment_1781285920729_s3rwoq",
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "start": {
+                "type": "string"
+              },
+              "end": {
+                "type": "string"
+              },
+              "locationId": {
+                "type": "string"
+              },
+              "withCharIds": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "description": {
+                "default": "",
+                "type": "string"
+              },
+              "note": {
+                "default": "",
+                "type": "string"
+              },
+              "reminderMinutesBefore": {
+                "default": 30,
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "status": {
+                "default": "计划中",
+                "type": "string",
+                "enum": [
+                  "计划中",
+                  "已提醒",
+                  "已完成",
+                  "已取消"
+                ]
+              },
+              "reminded": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "title",
+              "start"
+            ]
+          }
+        },
+        "huangli": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string"
+            },
+            "yi": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "ji": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "luck": {
+              "default": "平",
+              "type": "string"
+            }
+          },
+          "required": [
+            "date"
+          ]
+        },
+        "events": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "time": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "default": "",
+                "type": "string"
+              },
+              "source": {
+                "default": "系统",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "time",
+              "title"
+            ]
+          }
+        }
+      },
+      "required": [
+        "huangli"
+      ]
+    },
+    "chars": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "appearance": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "height": {
+                "default": 0,
+                "type": "number",
+                "minimum": 0
+              },
+              "looks": {
+                "default": "",
+                "type": "string"
+              },
+              "outfit": {
+                "default": "",
+                "type": "string"
+              },
+              "bodyExternal": {
+                "default": "",
+                "type": "string"
+              },
+              "currentLocationId": {
+                "default": "unknown",
+                "type": "string"
+              }
+            }
+          },
+          "internal": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "thoughts": {
+                "default": "",
+                "type": "string"
+              },
+              "secrets": {
+                "default": "",
+                "type": "string"
+              },
+              "bodyInternal": {
+                "default": "",
+                "type": "string"
+              }
+            }
+          },
+          "schedule": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "defaultLocationId": {
+                "default": "unknown",
+                "type": "string"
+              },
+              "rules": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "daysOfWeek": {
+                      "default": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                      ],
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      }
+                    },
+                    "start": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "end": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "locationId": {
+                      "type": "string"
+                    },
+                    "note": {
+                      "default": "",
+                      "type": "string"
+                    },
+                    "priority": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "start",
+                    "end",
+                    "locationId"
+                  ]
+                }
+              },
+              "slots": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "default": "schedule_1781285920730_c148o1",
+                      "type": "string"
+                    },
+                    "days": {
+                      "default": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                      ],
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      }
+                    },
+                    "start": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "end": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "locationId": {
+                      "type": "string"
+                    },
+                    "note": {
+                      "default": "",
+                      "type": "string"
+                    },
+                    "priority": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end",
+                    "locationId"
+                  ]
+                }
+              },
+              "overrides": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "start": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "end": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "locationId": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "date",
+                    "start",
+                    "end",
+                    "locationId"
+                  ]
+                }
+              }
+            }
+          },
+          "relationship": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "favorability": {
+                "default": 0,
+                "type": "number"
+              },
+              "label": {
+                "default": "陌生人",
+                "type": "string"
+              },
+              "firstImpression": {
+                "default": "",
+                "type": "string"
+              },
+              "memories": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "default": "memory_1781285920730_77vtt0",
+                      "type": "string"
+                    },
+                    "time": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "default": "",
+                      "type": "string"
+                    },
+                    "event": {
+                      "default": "",
+                      "type": "string"
+                    },
+                    "delta": {
+                      "default": 0,
+                      "type": "number"
+                    },
+                    "summary": {
+                      "default": "",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "default": "",
+                      "type": "string"
+                    },
+                    "tags": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "giftStatus": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "itemId": {
+                      "type": "string"
+                    },
+                    "itemName": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "default": 1,
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "lastGivenAt": {
+                      "default": "",
+                      "type": "string"
+                    },
+                    "reaction": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "itemId",
+                    "itemName"
+                  ]
+                }
+              }
+            }
+          },
+          "social": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "shanxunId": {
+                "default": "",
+                "type": "string"
+              },
+              "shanxunNickname": {
+                "default": "",
+                "type": "string"
+              },
+              "isFriend": {
+                "default": false,
+                "type": "boolean"
+              },
+              "isBlocked": {
+                "default": false,
+                "type": "boolean"
+              }
+            }
+          },
+          "interactionSummary": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    },
+    "world": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "landmarks": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "default": "landmark_1781285920730_rt9vbg",
+                "type": "string"
+              },
+              "locationId": {
+                "type": "string"
+              },
+              "type": {
+                "default": "其他",
+                "type": "string",
+                "enum": [
+                  "拆迁",
+                  "新建",
+                  "改建",
+                  "老化",
+                  "修复",
+                  "其他"
+                ]
+              },
+              "time": {
+                "default": "",
+                "type": "string"
+              },
+              "changedAt": {
+                "default": "",
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "permanent": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "locationId",
+              "description"
+            ]
+          }
+        },
+        "discoveredLocations": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "worldEvents": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "time": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "default": "",
+                "type": "string"
+              },
+              "tags": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "time",
+              "title"
+            ]
+          }
+        }
+      }
+    },
+    "lastTickAt": {
+      "default": 0,
+      "type": "number"
+    },
+    "actionLog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "actionType": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "type": "boolean"
+          },
+          "metadata": {
+            "default": {},
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "id",
+          "message"
+        ]
+      }
+    },
+    "gameStarted": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "time",
+    "calendar"
+  ],
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "type": "string"
+        },
+        "quantity": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "portable": {
+          "default": true,
+          "type": "boolean",
+          "const": true
+        },
+        "source": {
+          "default": "未知",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  }
+}

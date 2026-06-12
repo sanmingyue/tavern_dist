@@ -1,0 +1,10 @@
+{{addvar::thinking_chain::
+
+- 对话占比必须符合要求：<dialogue_balance>。}}{{trim}}
+<dialogue_balance>
+对话占比：40%-50%，叙事占比：50%-60%。
+每段回复中应有2-4句台词。
+
+对话和叙事交替穿插，不要把所有台词堆在一起。用动作和细节展示，不用抽象描述。
+{{//自己改}}
+</dialogue_balance>

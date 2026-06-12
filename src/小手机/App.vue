@@ -1,119 +1,91 @@
 <template>
   <div class="phone-root" :class="themeClass">
-    <!-- 折叠态：悬浮按钮（可拖动） -->
+    <!-- 悬浮按钮 -->
     <Transition name="fab">
       <button
         v-if="!store.isOpen"
-        ref="fabRef"
         class="fab"
-        :class="{ 'is-dragging': isDragging }"
+        :class="{ 'is-dragging': isFabDragging }"
         :style="fabStyle"
         @pointerdown="onFabPointerDown"
       >
-        <!-- 手机 SVG 图标 -->
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="5" y="2" width="14" height="20" rx="3" ry="3" />
           <line x1="12" y1="18" x2="12.01" y2="18" />
         </svg>
-        <span v-if="store.totalUnread > 0" class="fab-badge">{{ store.totalUnread > 99 ? '99+' : store.totalUnread }}</span>
+        <span v-if="store.totalUnread > 0" class="fab-badge">
+          {{ store.totalUnread > 99 ? '99+' : store.totalUnread }}
+        </span>
       </button>
     </Transition>
 
-    <!-- 展开态：手机面板 -->
+    <!-- 手机面板 -->
     <Transition name="panel">
       <div
         v-if="store.isOpen"
-        class="phone-panel"
-        :class="{ 'is-mobile': isMobile }"
+        class="phone-shell"
+        :class="{ 'is-fullscreen': isFullscreen }"
         :style="panelStyle"
+        @wheel.stop
+        @touchmove.stop
       >
-        <!-- 灵动岛状态栏 -->
-        <div
-          class="phone-statusbar"
-          :class="{ 'is-dragging': isPanelDragging }"
-          @pointerdown="!isMobile && onPanelPointerDown($event)"
-        >
-          <span class="statusbar-time">{{ currentTime }}</span>
-          <!-- 灵动岛 -->
-          <div class="dynamic-island">
-            <div class="island-content">
-              <template v-if="musicStore.isPlaying">
-                <div class="island-music-indicator">
-                  <div class="island-bar" v-for="i in 4" :key="i" :style="{ animationDelay: (i * 0.12) + 's' }" />
-                </div>
-                <span class="island-text">{{ musicStore.currentTrackTitle }}</span>
-              </template>
-              <template v-else>
-                <span class="island-dot" />
-              </template>
-            </div>
+        <!-- iOS 外壳边框 -->
+        <div class="phone-frame">
+          <!-- 拖动手柄（覆盖在状态栏上方的透明区域） -->
+          <div
+            v-if="!isFullscreen"
+            class="drag-handle"
+            :class="{ 'is-dragging': isPanelDragging }"
+            @pointerdown="onPanelPointerDown"
+          ></div>
+
+          <!-- 状态栏 -->
+          <StatusBar
+            :is-dark="store.isDark"
+            @close="store.closePhone()"
+            @toggle-theme="store.toggleTheme()"
+          />
+
+          <!-- 主内容区 -->
+          <div class="phone-body" :style="phoneBodyStyle">
+            <!-- APP 打开时的页面 -->
+            <Transition :name="appTransitionName">
+              <div
+                v-if="store.activeApp"
+                class="app-page"
+                :class="{ 'is-edge-swiping': isEdgeSwipingBack }"
+                @pointerdown.capture="onAppPagePointerDown"
+              >
+                <component
+                  v-if="currentAppComponent"
+                  :is="currentAppComponent"
+                  :key="store.activeApp"
+                />
+                <div
+                  v-if="isFullscreen"
+                  class="app-edge-swipe-feedback"
+                  :class="{ 'is-active': isEdgeSwipingBack }"
+                  aria-hidden="true"
+                ></div>
+              </div>
+            </Transition>
+
+            <!-- 首页 -->
+            <Transition :name="homeTransitionName">
+              <div v-if="!store.activeApp" class="home-page-wrapper" key="home">
+                <component :is="HomeApp" />
+              </div>
+            </Transition>
           </div>
-          <div class="statusbar-right">
-            <!-- 主题切换按钮 -->
-            <button class="theme-toggle-btn" @click.stop="store.toggleTheme()" :title="store.isDark ? '切换到白色模式' : '切换到深夜模式'">
-              <!-- 太阳/月亮图标 -->
-              <svg v-if="store.isDark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
-              <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-              </svg>
-            </button>
-            <!-- WiFi 图标 -->
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="statusbar-icon">
-              <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
-            </svg>
-            <!-- 电池图标 -->
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="statusbar-icon">
-              <path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/>
-            </svg>
-            <button class="phone-close-btn" @click="store.isOpen = false" @pointerdown.stop>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
+
+          <!-- Home Indicator -->
+          <div class="home-indicator-area" @click="onHomeIndicatorClick">
+            <div
+              class="home-indicator-bar"
+              :class="{ 'is-swiping': isSwipingUp }"
+              @pointerdown="onHomeBarPointerDown"
+            ></div>
           </div>
-        </div>
-
-        <!-- 手机主体内容 -->
-        <div class="phone-body">
-          <Transition :name="transitionName" mode="out-in">
-            <!-- 消息Tab中的聊天详情 -->
-            <ChatView v-if="activeTab === 'messages' && store.activeContact" :key="'chat-' + store.activeContact" />
-            <!-- 消息Tab -->
-            <ContactList v-else-if="activeTab === 'messages'" key="messages" />
-            <!-- 联系人Tab -->
-            <FriendList v-else-if="activeTab === 'contacts'" key="contacts" @open-chat="onFriendOpenChat" />
-            <!-- 动态Tab -->
-            <PlaceholderPage v-else-if="activeTab === 'discover'" key="discover" title="动态" subtitle="暂未完成此功能，敬请期待" />
-            <!-- 音乐Tab -->
-            <MusicPlayer v-else-if="activeTab === 'music'" key="music" />
-          </Transition>
-
-          <!-- 添加好友弹窗 -->
-          <AddContactModal />
-        </div>
-
-        <!-- 底部Tab导航栏（QQ风格） -->
-        <div class="phone-tabbar">
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            class="tabbar-item"
-            :class="{ active: activeTab === tab.id }"
-            @click="switchTab(tab.id)"
-          >
-            <div class="tabbar-icon-wrap">
-              <component :is="tab.icon" />
-              <span v-if="tab.badge > 0" class="tabbar-badge">{{ tab.badge > 99 ? '99+' : tab.badge }}</span>
-            </div>
-            <span class="tabbar-label">{{ tab.label }}</span>
-          </button>
         </div>
       </div>
     </Transition>
@@ -121,191 +93,276 @@
 </template>
 
 <script setup lang="ts">
-import { usePhoneStore } from './store';
-import { useMusicStore } from './music-store';
-import ContactList from './components/ContactList.vue';
-import ChatView from './components/ChatView.vue';
-import FriendList from './components/FriendList.vue';
-import MusicPlayer from './components/MusicPlayer.vue';
-import PlaceholderPage from './components/PlaceholderPage.vue';
-import AddContactModal from './components/AddContactModal.vue';
-import TabIconMessages from './components/icons/TabIconMessages.vue';
-import TabIconContacts from './components/icons/TabIconContacts.vue';
-import TabIconDiscover from './components/icons/TabIconDiscover.vue';
-import TabIconMusic from './components/icons/TabIconMusic.vue';
+import { defineAsyncComponent, onMounted } from 'vue';
+import StatusBar from './components/StatusBar.vue';
+import HomeApp from './apps/首页/App.vue';
+import { usePhoneStore } from './stores/phone-store';
+import { useAppRegistry } from './stores/app-registry';
+import { generateForApp } from './utils/generation-pipeline';
+import { getAppFormalName } from './utils/app-names';
+import { indexPhoneSessionMemory } from './utils/memory-system';
 
 const store = usePhoneStore();
-const musicStore = useMusicStore();
-const fabRef = ref<HTMLButtonElement | null>(null);
+const appRegistry = useAppRegistry();
 
-// ─── 主题 ───
-const themeClass = computed(() => store.isDark ? 'theme-dark' : 'theme-light');
-
-// ─── Tab 导航 ───
-const activeTab = ref<'messages' | 'contacts' | 'discover' | 'music'>('messages');
-
-const tabOrder = ['messages', 'contacts', 'discover', 'music'] as const;
-
-const tabs = computed(() => [
-  { id: 'messages' as const, label: '消息', icon: TabIconMessages, badge: store.totalUnread },
-  { id: 'contacts' as const, label: '联系人', icon: TabIconContacts, badge: 0 },
-  { id: 'discover' as const, label: '动态', icon: TabIconDiscover, badge: 0 },
-  { id: 'music' as const, label: '音乐', icon: TabIconMusic, badge: 0 },
-]);
-
-const transitionName = ref('slide-left');
-
-function onFriendOpenChat(_name: string) {
-  transitionName.value = 'slide-right';
-  activeTab.value = 'messages';
-}
-
-function switchTab(tabId: typeof activeTab.value) {
-  if (tabId === activeTab.value) return;
-
-  // 如果在聊天详情里按消息tab，先返回消息列表
-  if (tabId === 'messages' && store.activeContact) {
-    store.goBack();
-    return;
-  }
-
-  const oldIdx = tabOrder.indexOf(activeTab.value);
-  const newIdx = tabOrder.indexOf(tabId);
-  transitionName.value = newIdx > oldIdx ? 'slide-left' : 'slide-right';
-  activeTab.value = tabId;
-}
-
-// 聊天详情进入时用 slide-left
-watch(() => store.activeContact, (newVal, oldVal) => {
-  if (newVal && !oldVal) transitionName.value = 'slide-left';
-  else if (!newVal && oldVal) transitionName.value = 'slide-right';
+const phoneBodyStyle = computed(() => {
+  if (!store.wallpaperImage) return {};
+  return {
+    backgroundImage: `url("${store.wallpaperImage}")`,
+  };
 });
 
-// ─── 时间显示 ───
-const currentTime = ref('');
-function updateTime() {
-  const now = new Date();
-  currentTime.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-}
-updateTime();
-const timeInterval = setInterval(updateTime, 30000);
-onUnmounted(() => clearInterval(timeInterval));
+// ─── 关闭手机时触发操作总结 ───
+watch(() => store.isOpen, async (isOpen, wasOpen) => {
+  if (!wasOpen || isOpen) return;
+  const hasActions = store.pendingActions.length > 0;
+  const hasChatLogs = store.pendingChatLogs.length > 0;
+  if (!hasActions && !hasChatLogs) return;
 
-// ─── 响应式尺寸检测 ───
+  try {
+    // 1. 构建操作摘要行（供 AI 总结用）
+    const actionsByType = categorizeActions(store.pendingActions);
+    const actionLines = store.pendingActions.map(
+      a => `在「${getAppFormalName(a.appId)}」${a.summary}`,
+    ).join('\n');
+
+    // 2. 构建完整聊天记录文本块（脚本直接拼接）
+    const chatLogsText = store.formatChatLogsText();
+
+    // 3. AI 总结（将操作摘要 + 聊天记录摘要一起发给 AI）
+    let aiSummary = '';
+    if (hasActions) {
+      const smartPrompt = buildSmartSummaryPrompt(actionsByType);
+      // 如果有聊天记录，把聊天记录也发给 AI 以便它准确概括
+      const aiInput = chatLogsText
+        ? `${actionLines}\n\n以下是完整聊天记录（你只需概括核心事件，不要逐条复述）：\n${chatLogsText}`
+        : actionLines;
+
+      const result = await generateForApp('summary', aiInput, smartPrompt);
+      aiSummary = result.success
+        ? (typeof result.parsed === 'string' ? result.parsed : result.raw?.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '').trim() || '')
+        : actionLines;
+    }
+
+    // 4. 拼接最终正文楼层内容：AI 总结 + 完整聊天记录
+    const parts: string[] = [];
+    if (aiSummary) parts.push(aiSummary);
+    if (chatLogsText) parts.push(chatLogsText);
+
+    const finalMessage = parts.join('\n\n');
+    if (finalMessage) {
+      await createChatMessages([{
+        role: 'user',
+        message: `📱 手机操作：\n${finalMessage}`,
+      }]);
+    }
+
+    await indexPhoneSessionMemory({
+      summary: aiSummary,
+      chatLogsText,
+      actions: [...store.pendingActions],
+    });
+
+    store.clearPendingActions();
+  } catch (e) {
+    console.warn('[小手机] 操作总结生成失败:', e);
+    // 降级：直接写入原始操作记录
+    try {
+      const fallbackLines = store.pendingActions.map(
+        a => `在「${getAppFormalName(a.appId)}」${a.summary}`,
+      ).join('\n');
+      const chatLogsText = store.formatChatLogsText();
+      const fallbackParts = [fallbackLines, chatLogsText].filter(Boolean);
+      if (fallbackParts.length > 0) {
+        await createChatMessages([{
+          role: 'user',
+          message: `📱 手机操作：\n${fallbackParts.join('\n\n')}`,
+        }]);
+      }
+      await indexPhoneSessionMemory({
+        summary: fallbackLines,
+        chatLogsText,
+        actions: [...store.pendingActions],
+      });
+      store.clearPendingActions();
+    } catch {
+      // 彻底失败，放弃
+    }
+  }
+});
+
+// ─── 操作总结智能化：按类型分类 ───
+type ActionCategory = 'financial' | 'social' | 'browse' | 'other';
+
+function categorizeActions(actions: Array<{ appId: string; summary: string }>): Record<ActionCategory, string[]> {
+  const result: Record<ActionCategory, string[]> = { financial: [], social: [], browse: [], other: [] };
+  const financialApps = new Set(['delivery', 'shop', 'secondhand', 'taxi', 'wallet']);
+  const socialApps = new Set(['messages', 'forum', 'sms']);
+  const browseApps = new Set(['tiktok', 'bilibili', 'live', 'music', 'movie', 'browser']);
+
+  for (const action of actions) {
+    const appId = action.appId;
+    const line = `在「${getAppFormalName(appId)}」${action.summary}`;
+    if (financialApps.has(appId)) result.financial.push(line);
+    else if (socialApps.has(appId)) result.social.push(line);
+    else if (browseApps.has(appId)) result.browse.push(line);
+    else result.other.push(line);
+  }
+  return result;
+}
+
+function buildSmartSummaryPrompt(actionsByType: Record<ActionCategory, string[]>): string {
+  const hints: string[] = [];
+  hints.push('请将以上手机操作总结为一段简洁的自然语言描述，不超过3句话，用第三人称。');
+
+  if (actionsByType.financial.length > 0) {
+    hints.push('【重要】涉及金额的操作（外卖/购物/打车/二手交易），必须写具体金额和商品/服务名称，如"在xxx点了xxx花了¥xx"。');
+  }
+  if (actionsByType.social.length > 0) {
+    hints.push('社交操作（发消息/评论/发帖/加好友），要概括聊天的核心事件和情感变化，不要逐条复述消息——完整聊天记录会由系统自动附加在总结下方。');
+  }
+  if (actionsByType.browse.length > 0) {
+    hints.push('纯浏览操作（刷视频/看直播/听音乐）简单概括即可，如"刷了会儿短视频"。');
+  }
+
+  return hints.join('\n');
+}
+
+// ─── 主题 ───
+const themeClass = computed(() => (store.isDark ? 'theme-dark' : 'theme-light'));
+
+// ─── APP 切换动画方向 ───
+const appTransitionName = ref('app-open');
+const homeTransitionName = ref('app-close');
+
+watch(() => store.activeApp, (newApp, oldApp) => {
+  if (newApp && !oldApp) {
+    // 从首页打开 APP
+    appTransitionName.value = 'app-open';
+    homeTransitionName.value = 'app-open';
+  } else if (!newApp && oldApp) {
+    // 返回首页
+    appTransitionName.value = 'app-close';
+    homeTransitionName.value = 'app-close';
+  } else {
+    // APP 之间切换
+    appTransitionName.value = 'app-switch';
+    homeTransitionName.value = 'app-switch';
+  }
+});
+
+// ─── 当前显示的组件 ───
+const currentAppComponent = computed(() => {
+  if (store.activeApp) {
+    const comp = appRegistry.getAppComponent(store.activeApp);
+    if (comp) return comp;
+  }
+  return HomeApp;
+});
+
+// ─── 响应式尺寸 ───
 const hostWindow = window.parent;
 const windowWidth = ref(hostWindow.innerWidth);
 const windowHeight = ref(hostWindow.innerHeight);
-const MOBILE_BREAKPOINT = 500;
-const isMobile = computed(() => windowWidth.value <= MOBILE_BREAKPOINT);
+const isFullscreen = computed(() => windowWidth.value <= 500);
 
-// ─── 拖动常量 ───
-const DRAG_THRESHOLD = 3;
+// ─── 面板尺寸常量 ───
+const PANEL_W = 340;
+const PANEL_H = 620;
 const FAB_SIZE = 52;
 const EDGE_GAP = 12;
 
-// 面板尺寸
-const panelWidth = computed(() => isMobile.value ? windowWidth.value : 340);
-const panelHeight = computed(() => isMobile.value ? windowHeight.value : 620);
-
-// ─── FAB 拖动逻辑 ───
-const isDragging = ref(false);
-let dragStartX = 0;
-let dragStartY = 0;
-let dragBaseX = 0;
-let dragBaseY = 0;
-let hasMoved = false;
+// ─── FAB 拖动 ───
+const isFabDragging = ref(false);
+let fabDragStartX = 0, fabDragStartY = 0;
+let fabDragBaseX = 0, fabDragBaseY = 0;
+let fabHasMoved = false;
 
 const fabStyle = computed(() => ({
   left: `${store.fabPosition.x}px`,
   top: `${store.fabPosition.y}px`,
 }));
 
-// ─── 面板拖动逻辑 ───
-const isPanelDragging = ref(false);
-const panelOffset = ref<{ x: number; y: number } | null>(null);
-let panelDragStartX = 0;
-let panelDragStartY = 0;
-let panelDragBaseX = 0;
-let panelDragBaseY = 0;
-let panelHasMoved = false;
-
-function calcPanelInitialPos() {
-  if (isMobile.value) return { x: 0, y: 0 };
-  const vw = hostWindow.innerWidth;
-  const vh = hostWindow.innerHeight;
-  const fabX = store.fabPosition.x;
-  const fabY = store.fabPosition.y;
-  const pw = panelWidth.value;
-  const ph = panelHeight.value;
-
-  let left = fabX > vw * 0.5 ? fabX + FAB_SIZE - pw : fabX;
-  left = _.clamp(left, EDGE_GAP, Math.max(EDGE_GAP, vw - pw - EDGE_GAP));
-
-  const above = fabY - ph - 12;
-  const below = fabY + FAB_SIZE + 12;
-  let top = above >= EDGE_GAP ? above : below + ph <= vh - EDGE_GAP ? below : _.clamp(above, EDGE_GAP, Math.max(EDGE_GAP, vh - ph - EDGE_GAP));
-
-  return { x: left, y: top };
-}
-
-const panelStyle = computed(() => {
-  if (isMobile.value) {
-    return { left: '0px', top: '0px', width: '100vw', height: '100vh' };
-  }
-  const pos = panelOffset.value ?? calcPanelInitialPos();
-  return {
-    left: `${pos.x}px`,
-    top: `${pos.y}px`,
-    width: `${panelWidth.value}px`,
-    height: `${panelHeight.value}px`,
-  };
-});
-
-watch(() => store.isOpen, (open) => {
-  if (open) panelOffset.value = null;
-});
-
-// ─── FAB 拖动处理 ───
 function onFabPointerDown(e: PointerEvent) {
   if (e.button !== 0) return;
   e.preventDefault();
-  isDragging.value = false;
-  hasMoved = false;
-  dragStartX = e.clientX;
-  dragStartY = e.clientY;
-  dragBaseX = store.fabPosition.x;
-  dragBaseY = store.fabPosition.y;
+  isFabDragging.value = false;
+  fabHasMoved = false;
+  fabDragStartX = e.clientX;
+  fabDragStartY = e.clientY;
+  fabDragBaseX = store.fabPosition.x;
+  fabDragBaseY = store.fabPosition.y;
   hostWindow.addEventListener('pointermove', onFabPointerMove);
   hostWindow.addEventListener('pointerup', onFabPointerUp);
 }
 
 function onFabPointerMove(e: PointerEvent) {
-  const dx = e.clientX - dragStartX;
-  const dy = e.clientY - dragStartY;
-  if (!hasMoved && Math.abs(dx) <= DRAG_THRESHOLD && Math.abs(dy) <= DRAG_THRESHOLD) return;
-  hasMoved = true;
-  isDragging.value = true;
-  store.updateFabPosition(dragBaseX + dx, dragBaseY + dy);
+  const dx = e.clientX - fabDragStartX;
+  const dy = e.clientY - fabDragStartY;
+  if (!fabHasMoved && Math.abs(dx) <= 3 && Math.abs(dy) <= 3) return;
+  fabHasMoved = true;
+  isFabDragging.value = true;
+  store.updateFabPosition(fabDragBaseX + dx, fabDragBaseY + dy);
 }
 
 function onFabPointerUp() {
   hostWindow.removeEventListener('pointermove', onFabPointerMove);
   hostWindow.removeEventListener('pointerup', onFabPointerUp);
-  isDragging.value = false;
-  if (!hasMoved) store.isOpen = true;
+  isFabDragging.value = false;
+  if (!fabHasMoved) store.openPhone();
 }
 
-// ─── 面板拖动处理 ───
+// ─── 面板拖动（通过 StatusBar） ───
+const isPanelDragging = ref(false);
+const panelPosition = ref({ x: 0, y: 0 });
+let panelDragStartX = 0, panelDragStartY = 0;
+let panelDragBaseX = 0, panelDragBaseY = 0;
+let panelHasMoved = false;
+
+// 初始化面板位置
+function initPanelPosition() {
+  if (isFullscreen.value) return;
+  const x = Math.max(EDGE_GAP, Math.min(store.fabPosition.x - PANEL_W / 2, windowWidth.value - PANEL_W - EDGE_GAP));
+  const y = Math.max(EDGE_GAP, Math.min(store.fabPosition.y - PANEL_H, windowHeight.value - PANEL_H - EDGE_GAP));
+  panelPosition.value = { x, y };
+}
+
+watch(() => store.isOpen, (isOpen) => {
+  if (isOpen) {
+    nextTick(() => initPanelPosition());
+  }
+});
+
+const panelStyle = computed(() => {
+  if (isFullscreen.value) {
+    return {
+      left: '0px',
+      top: '0px',
+      width: `${windowWidth.value}px`,
+      height: `${windowHeight.value}px`,
+    };
+  }
+  return {
+    left: `${panelPosition.value.x}px`,
+    top: `${panelPosition.value.y}px`,
+    width: `${PANEL_W}px`,
+    height: `${PANEL_H}px`,
+  };
+});
+
 function onPanelPointerDown(e: PointerEvent) {
-  if (e.button !== 0 || isMobile.value) return;
+  if (e.button !== 0 || isFullscreen.value) return;
+  // 不要阻止事件传播到 StatusBar 内部按钮
+  const target = e.target as HTMLElement;
+  if (target.closest('.status-btn') || target.closest('.close-btn')) return;
+
   e.preventDefault();
   isPanelDragging.value = false;
   panelHasMoved = false;
   panelDragStartX = e.clientX;
   panelDragStartY = e.clientY;
-  const currentPos = panelOffset.value ?? calcPanelInitialPos();
-  panelDragBaseX = currentPos.x;
-  panelDragBaseY = currentPos.y;
+  panelDragBaseX = panelPosition.value.x;
+  panelDragBaseY = panelPosition.value.y;
   hostWindow.addEventListener('pointermove', onPanelPointerMove);
   hostWindow.addEventListener('pointerup', onPanelPointerUp);
 }
@@ -313,17 +370,13 @@ function onPanelPointerDown(e: PointerEvent) {
 function onPanelPointerMove(e: PointerEvent) {
   const dx = e.clientX - panelDragStartX;
   const dy = e.clientY - panelDragStartY;
-  if (!panelHasMoved && Math.abs(dx) <= DRAG_THRESHOLD && Math.abs(dy) <= DRAG_THRESHOLD) return;
+  if (!panelHasMoved && Math.abs(dx) <= 3 && Math.abs(dy) <= 3) return;
   panelHasMoved = true;
   isPanelDragging.value = true;
-  const vw = hostWindow.innerWidth;
-  const vh = hostWindow.innerHeight;
-  const pw = panelWidth.value;
-  const ph = panelHeight.value;
-  panelOffset.value = {
-    x: _.clamp(panelDragBaseX + dx, EDGE_GAP, Math.max(EDGE_GAP, vw - pw - EDGE_GAP)),
-    y: _.clamp(panelDragBaseY + dy, EDGE_GAP, Math.max(EDGE_GAP, vh - ph - EDGE_GAP)),
-  };
+
+  const newX = _.clamp(panelDragBaseX + dx, EDGE_GAP, windowWidth.value - PANEL_W - EDGE_GAP);
+  const newY = _.clamp(panelDragBaseY + dy, EDGE_GAP, windowHeight.value - PANEL_H - EDGE_GAP);
+  panelPosition.value = { x: newX, y: newY };
 }
 
 function onPanelPointerUp() {
@@ -332,381 +385,477 @@ function onPanelPointerUp() {
   isPanelDragging.value = false;
 }
 
+// ─── App edge swipe back (mobile fullscreen) ───
+const EDGE_SWIPE_ZONE_MIN = 72;
+const EDGE_SWIPE_ZONE_MAX = 136;
+const EDGE_SWIPE_ZONE_RATIO = 0.28;
+const EDGE_SWIPE_TRIGGER_DISTANCE = 56;
+const EDGE_SWIPE_VERTICAL_LIMIT = 60;
+const EDGE_SWIPE_CANCEL_VERTICAL = 90;
+
+const isEdgeSwipingBack = ref(false);
+let edgeSwipePointerId: number | null = null;
+let edgeSwipeStartX = 0;
+let edgeSwipeStartY = 0;
+let edgeSwipeIsHorizontal = false;
+let edgeSwipeShouldReturnHome = false;
+
+const edgeSwipeZoneWidth = computed(() => (
+  _.clamp(windowWidth.value * EDGE_SWIPE_ZONE_RATIO, EDGE_SWIPE_ZONE_MIN, EDGE_SWIPE_ZONE_MAX)
+));
+
+function addAppPagePointerListeners(): void {
+  window.addEventListener('pointermove', onAppPagePointerMove);
+  window.addEventListener('pointerup', onAppPagePointerUp);
+  window.addEventListener('pointercancel', onAppPagePointerCancel);
+  if (hostWindow !== window) {
+    hostWindow.addEventListener('pointermove', onAppPagePointerMove);
+    hostWindow.addEventListener('pointerup', onAppPagePointerUp);
+    hostWindow.addEventListener('pointercancel', onAppPagePointerCancel);
+  }
+}
+
+function removeAppPagePointerListeners(): void {
+  window.removeEventListener('pointermove', onAppPagePointerMove);
+  window.removeEventListener('pointerup', onAppPagePointerUp);
+  window.removeEventListener('pointercancel', onAppPagePointerCancel);
+  if (hostWindow !== window) {
+    hostWindow.removeEventListener('pointermove', onAppPagePointerMove);
+    hostWindow.removeEventListener('pointerup', onAppPagePointerUp);
+    hostWindow.removeEventListener('pointercancel', onAppPagePointerCancel);
+  }
+}
+
+function resetAppPageEdgeSwipe(): void {
+  edgeSwipePointerId = null;
+  edgeSwipeIsHorizontal = false;
+  edgeSwipeShouldReturnHome = false;
+  isEdgeSwipingBack.value = false;
+  removeAppPagePointerListeners();
+}
+
+function onAppPagePointerDown(e: PointerEvent) {
+  if (!isFullscreen.value || !store.activeApp || edgeSwipePointerId !== null) return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  if (e.clientX < windowWidth.value - edgeSwipeZoneWidth.value) return;
+
+  edgeSwipePointerId = e.pointerId;
+  edgeSwipeStartX = e.clientX;
+  edgeSwipeStartY = e.clientY;
+  edgeSwipeIsHorizontal = false;
+  edgeSwipeShouldReturnHome = false;
+  addAppPagePointerListeners();
+}
+
+function onAppPagePointerMove(e: PointerEvent) {
+  if (edgeSwipePointerId !== e.pointerId) return;
+
+  const dx = e.clientX - edgeSwipeStartX;
+  const dy = e.clientY - edgeSwipeStartY;
+  const absX = Math.abs(dx);
+  const absY = Math.abs(dy);
+
+  if (absY > EDGE_SWIPE_CANCEL_VERTICAL && absY > absX) {
+    resetAppPageEdgeSwipe();
+    return;
+  }
+
+  if (!edgeSwipeIsHorizontal && absX > 10) {
+    edgeSwipeIsHorizontal = dx < 0 && absX > absY;
+  }
+
+  if (!edgeSwipeIsHorizontal) return;
+
+  isEdgeSwipingBack.value = dx < -12;
+  edgeSwipeShouldReturnHome = dx <= -EDGE_SWIPE_TRIGGER_DISTANCE && absY <= EDGE_SWIPE_VERTICAL_LIMIT;
+
+  if (isEdgeSwipingBack.value) {
+    e.preventDefault();
+  }
+}
+
+function onAppPagePointerUp(e: PointerEvent) {
+  if (edgeSwipePointerId !== e.pointerId) return;
+
+  const shouldReturnHome = edgeSwipeShouldReturnHome;
+  resetAppPageEdgeSwipe();
+  if (shouldReturnHome) {
+    store.returnHome();
+  }
+}
+
+function onAppPagePointerCancel(e: PointerEvent) {
+  if (edgeSwipePointerId !== e.pointerId) return;
+  resetAppPageEdgeSwipe();
+}
+
+// ─── Home Indicator 手势 ───
+const isSwipingUp = ref(false);
+let homeBarStartY = 0;
+
+function onHomeIndicatorClick() {
+  if (store.activeApp) {
+    store.returnHome();
+  }
+}
+
+function onHomeBarPointerDown(e: PointerEvent) {
+  homeBarStartY = e.clientY;
+  hostWindow.addEventListener('pointermove', onHomeBarPointerMove);
+  hostWindow.addEventListener('pointerup', onHomeBarPointerUp);
+}
+
+function onHomeBarPointerMove(e: PointerEvent) {
+  const dy = homeBarStartY - e.clientY;
+  if (dy > 30) {
+    isSwipingUp.value = true;
+  }
+}
+
+function onHomeBarPointerUp() {
+  hostWindow.removeEventListener('pointermove', onHomeBarPointerMove);
+  hostWindow.removeEventListener('pointerup', onHomeBarPointerUp);
+  if (isSwipingUp.value) {
+    store.returnHome();
+    isSwipingUp.value = false;
+  }
+}
+
 // ─── 窗口 resize ───
 const onResize = () => {
   windowWidth.value = hostWindow.innerWidth;
   windowHeight.value = hostWindow.innerHeight;
-  store.updateFabPosition(store.fabPosition.x, store.fabPosition.y);
-  if (panelOffset.value && !isMobile.value) {
-    const vw = hostWindow.innerWidth;
-    const vh = hostWindow.innerHeight;
-    const pw = panelWidth.value;
-    const ph = panelHeight.value;
-    panelOffset.value = {
-      x: _.clamp(panelOffset.value.x, EDGE_GAP, Math.max(EDGE_GAP, vw - pw - EDGE_GAP)),
-      y: _.clamp(panelOffset.value.y, EDGE_GAP, Math.max(EDGE_GAP, vh - ph - EDGE_GAP)),
-    };
-  }
 };
 onMounted(() => hostWindow.addEventListener('resize', onResize));
-onUnmounted(() => hostWindow.removeEventListener('resize', onResize));
+onUnmounted(() => {
+  hostWindow.removeEventListener('resize', onResize);
+  resetAppPageEdgeSwipe();
+});
 </script>
 
 <style scoped>
-/* ─── CSS 变量：双主题 ─── */
+/* ─── 主题变量 ─── */
 .theme-dark {
-  --bg-primary: #0b0e14;
-  --bg-secondary: #111318;
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
   --bg-tertiary: rgba(255, 255, 255, 0.04);
   --bg-hover: rgba(255, 255, 255, 0.06);
   --bg-active: rgba(255, 255, 255, 0.08);
-  --bg-input: rgba(255, 255, 255, 0.05);
-  --bg-fab: rgba(10, 18, 30, 0.92);
-  --bg-statusbar: rgba(0, 0, 0, 0.3);
+  --bg-input: rgba(255, 255, 255, 0.08);
+  --bg-fab: rgba(10, 10, 10, 0.95);
+  --bg-statusbar: transparent;
   --bg-island: #000;
-  --bg-tabbar: rgba(12, 14, 20, 0.95);
-  --bg-panel: #0b0e14;
-  --bg-bubble-self: linear-gradient(135deg, #4a9ebb 0%, #3a7d99 100%);
-  --bg-bubble-other: rgba(255, 255, 255, 0.08);
+  --bg-tabbar: rgba(0, 0, 0, 0.7);
+  --bg-panel: #000000;
+  --bg-card: rgba(28, 28, 30, 1);
+  --bg-card-elevated: rgba(44, 44, 46, 1);
+  --bg-grouped: rgba(28, 28, 30, 1);
+  --bg-dock: rgba(30, 30, 30, 0.6);
   --border-primary: rgba(255, 255, 255, 0.08);
-  --border-secondary: rgba(255, 255, 255, 0.06);
-  --border-fab: rgba(255, 255, 255, 0.1);
-  --text-primary: rgba(255, 255, 255, 0.9);
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-tertiary: rgba(255, 255, 255, 0.45);
-  --text-muted: rgba(255, 255, 255, 0.25);
-  --text-hint: rgba(255, 255, 255, 0.15);
-  --accent: #579bf0;
-  --accent-hover: #6aa8f4;
-  --accent-bg: rgba(87, 155, 240, 0.15);
-  --danger: #e74c3c;
-  --success: #2ecc71;
-  --shadow-panel: 0 16px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-  --shadow-fab: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-muted: rgba(255, 255, 255, 0.2);
+  --accent: #0a84ff;
+  --accent-bg: rgba(10, 132, 255, 0.12);
+  --danger: #ff453a;
+  --success: #30d158;
+  --warning: #ffd60a;
+  --shadow-panel: 0 24px 80px rgba(0, 0, 0, 0.8);
+  --shadow-fab: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --wallpaper: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --shell-border: rgba(255, 255, 255, 0.12);
+  --shell-bg: #1c1c1e;
 }
 
 .theme-light {
   --bg-primary: #ffffff;
-  --bg-secondary: #f5f6f8;
+  --bg-secondary: #f2f2f7;
   --bg-tertiary: rgba(0, 0, 0, 0.03);
   --bg-hover: rgba(0, 0, 0, 0.04);
   --bg-active: rgba(0, 0, 0, 0.06);
-  --bg-input: rgba(0, 0, 0, 0.04);
-  --bg-fab: rgba(255, 255, 255, 0.95);
-  --bg-statusbar: rgba(245, 246, 248, 0.95);
-  --bg-island: #1a1c24;
-  --bg-tabbar: rgba(255, 255, 255, 0.98);
-  --bg-panel: #ffffff;
-  --bg-bubble-self: linear-gradient(135deg, #95ec69 0%, #7ed856 100%);
-  --bg-bubble-other: #f0f0f0;
+  --bg-input: rgba(118, 118, 128, 0.12);
+  --bg-fab: rgba(255, 255, 255, 0.96);
+  --bg-statusbar: transparent;
+  --bg-island: #000;
+  --bg-tabbar: rgba(249, 249, 249, 0.94);
+  --bg-panel: #f2f2f7;
+  --bg-card: #ffffff;
+  --bg-card-elevated: #ffffff;
+  --bg-grouped: #ffffff;
+  --bg-dock: rgba(230, 230, 230, 0.6);
   --border-primary: rgba(0, 0, 0, 0.08);
-  --border-secondary: rgba(0, 0, 0, 0.06);
-  --border-fab: rgba(0, 0, 0, 0.1);
-  --text-primary: rgba(0, 0, 0, 0.88);
-  --text-secondary: rgba(0, 0, 0, 0.65);
-  --text-tertiary: rgba(0, 0, 0, 0.45);
-  --text-muted: rgba(0, 0, 0, 0.25);
-  --text-hint: rgba(0, 0, 0, 0.12);
-  --accent: #1989fa;
-  --accent-hover: #3a9bff;
-  --accent-bg: rgba(25, 137, 250, 0.1);
-  --danger: #e74c3c;
-  --success: #07c160;
-  --shadow-panel: 0 8px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
-  --shadow-fab: 0 2px 12px rgba(0, 0, 0, 0.12);
+  --border-secondary: rgba(0, 0, 0, 0.04);
+  --text-primary: #000000;
+  --text-secondary: rgba(60, 60, 67, 0.6);
+  --text-tertiary: rgba(60, 60, 67, 0.3);
+  --text-muted: rgba(60, 60, 67, 0.18);
+  --accent: #007aff;
+  --accent-bg: rgba(0, 122, 255, 0.1);
+  --danger: #ff3b30;
+  --success: #34c759;
+  --warning: #ffcc00;
+  --shadow-panel: 0 24px 80px rgba(0, 0, 0, 0.15);
+  --shadow-fab: 0 2px 16px rgba(0, 0, 0, 0.12);
+  --wallpaper: linear-gradient(145deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  --shell-border: rgba(0, 0, 0, 0.12);
+  --shell-bg: #e5e5ea;
 }
 
 .phone-root {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Helvetica Neue', system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--font-size-base, 14px);
+  --font-size-base: 14px;
+  --font-size-sm: 12px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-title: 34px;
 }
 
-/* ─── 悬浮按钮 ─── */
+/* ─── FAB ─── */
 .fab {
   position: fixed;
   width: 52px;
   height: 52px;
-  border-radius: 14px;
-  border: 1px solid var(--border-fab);
+  border-radius: 16px;
+  border: 1px solid var(--border-primary);
   background: var(--bg-fab);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-fab);
-  transition: box-shadow 0.2s, border-radius 0.2s;
-  padding: 0;
   z-index: 9998;
-  pointer-events: auto;
   user-select: none;
   touch-action: none;
   color: var(--text-secondary);
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s;
 }
 
-.fab:hover { box-shadow: 0 6px 28px rgba(0, 0, 0, 0.2); color: var(--text-primary); }
-.fab:active, .fab.is-dragging { cursor: grabbing; }
-.fab.is-dragging { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
+.fab:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.25);
+}
+
+.fab.is-dragging {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
 
 .fab-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -5px;
+  right: -5px;
   background: var(--danger);
   color: white;
-  font-size: 10px;
-  font-weight: 700;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
+  padding: 0 5px;
   border: 2px solid var(--bg-fab);
 }
 
-/* ─── 手机面板 ─── */
-.phone-panel {
+/* ─── 手机外壳 ─── */
+.phone-shell {
   position: fixed;
-  border-radius: 24px;
-  border: 1px solid var(--border-primary);
+  z-index: 9998;
+}
+
+.phone-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 44px;
   background: var(--bg-panel);
   box-shadow: var(--shadow-panel);
+  border: 3px solid var(--shell-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 9998;
-  pointer-events: auto;
+  position: relative;
 }
 
-.phone-panel.is-mobile {
-  width: 100vw !important;
-  height: 100vh !important;
+/* ─── 拖动手柄 ─── */
+.drag-handle {
+  position: absolute;
+  top: 0;
+  left: 40px;
+  right: 40px;
+  height: 44px;
+  z-index: 20;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.drag-handle.is-dragging {
+  cursor: grabbing;
+}
+
+.is-fullscreen .phone-frame {
   border-radius: 0;
   border: none;
   box-shadow: none;
-  left: 0 !important;
-  top: 0 !important;
 }
 
-/* ─── 灵动岛状态栏 ─── */
-.phone-statusbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 16px;
-  background: var(--bg-statusbar);
-  flex-shrink: 0;
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
-}
-
-.is-mobile .phone-statusbar { cursor: default; padding: 8px 16px; }
-.phone-statusbar.is-dragging { cursor: grabbing; }
-
-.statusbar-time {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  min-width: 36px;
-}
-
-/* 灵动岛 */
-.dynamic-island {
-  background: var(--bg-island);
-  border-radius: 20px;
-  padding: 4px 12px;
-  min-width: 90px;
-  max-width: 160px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-.island-content {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow: hidden;
-}
-
-.island-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.island-music-indicator {
-  display: flex;
-  align-items: flex-end;
-  gap: 1.5px;
-  height: 12px;
-}
-
-.island-bar {
-  width: 2px;
-  background: #1db954;
-  border-radius: 1px;
-  animation: island-bar-bounce 0.6s ease-in-out infinite alternate;
-}
-
-.island-bar:nth-child(1) { height: 4px; }
-.island-bar:nth-child(2) { height: 8px; }
-.island-bar:nth-child(3) { height: 6px; }
-.island-bar:nth-child(4) { height: 10px; }
-
-@keyframes island-bar-bounce {
-  0% { transform: scaleY(0.4); }
-  100% { transform: scaleY(1); }
-}
-
-.island-text {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.7);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 80px;
-}
-
-.statusbar-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.statusbar-icon {
-  opacity: 0.4;
-  color: var(--text-secondary);
-}
-
-.theme-toggle-btn {
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  border: none;
-  background: transparent;
-  color: var(--text-tertiary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.theme-toggle-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-.phone-close-btn {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s;
-  margin-left: 4px;
-}
-
-.phone-close-btn:hover { background: var(--bg-hover); color: var(--text-secondary); }
-
-/* ─── 手机主体 ─── */
+/* ─── 内容区 ─── */
 .phone-body {
   flex: 1;
   overflow: hidden;
   position: relative;
-  background: var(--bg-secondary);
+  background: var(--wallpaper);
+  background-size: cover;
+  background-position: center;
 }
 
-/* ─── 底部Tab导航栏（QQ风格） ─── */
-.phone-tabbar {
-  display: flex;
-  align-items: stretch;
-  background: var(--bg-tabbar);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border-secondary);
-  flex-shrink: 0;
-  padding: 2px 0 4px;
-}
-
-.tabbar-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 4px 0;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: color 0.15s;
-  position: relative;
-}
-
-.tabbar-item.active { color: var(--accent); }
-.tabbar-item:not(.active):hover { color: var(--text-tertiary); }
-
-.tabbar-icon-wrap {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tabbar-badge {
-  position: absolute;
-  top: -4px;
-  right: -8px;
-  background: var(--danger);
-  color: white;
-  font-size: 9px;
-  font-weight: 700;
-  min-width: 14px;
-  height: 14px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 3px;
-}
-
-.tabbar-label {
-  font-size: 10px;
-  font-weight: 500;
-}
-
-/* ─── 过渡动画 ─── */
-.fab-enter-active, .fab-leave-active { transition: opacity 0.25s ease; }
-.fab-enter-from, .fab-leave-to { opacity: 0; }
-
-.panel-enter-active, .panel-leave-active { transition: all 0.3s ease; }
-.panel-enter-from { opacity: 0; transform: translateY(30px) scale(0.9); }
-.panel-leave-to { opacity: 0; transform: translateY(30px) scale(0.9); }
-.is-mobile.panel-enter-from { opacity: 0; transform: translateY(100%); }
-.is-mobile.panel-leave-to { opacity: 0; transform: translateY(100%); }
-
-/* 页面切换过渡 */
-.slide-left-enter-active, .slide-left-leave-active,
-.slide-right-enter-active, .slide-right-leave-active {
-  transition: all 0.25s ease;
+.app-page,
+.home-page-wrapper {
   position: absolute;
   inset: 0;
+  overflow: hidden;
 }
 
-.slide-left-enter-from { transform: translateX(100%); opacity: 0; }
-.slide-left-leave-to { transform: translateX(-30%); opacity: 0; }
-.slide-right-enter-from { transform: translateX(-30%); opacity: 0; }
-.slide-right-leave-to { transform: translateX(100%); opacity: 0; }
+.app-page.is-edge-swiping {
+  cursor: w-resize;
+}
+
+.app-edge-swipe-feedback {
+  position: absolute;
+  top: 22%;
+  right: 0;
+  width: 4px;
+  height: 56%;
+  border-radius: 4px 0 0 4px;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transform: scaleY(0.72);
+  transform-origin: center right;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  z-index: 60;
+}
+
+.app-edge-swipe-feedback.is-active {
+  opacity: 0.45;
+  transform: scaleY(1);
+}
+
+/* ─── Home Indicator ─── */
+.home-indicator-area {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 10px;
+  background: var(--bg-panel);
+  cursor: pointer;
+}
+
+.home-indicator-bar {
+  width: 134px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--text-tertiary);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.home-indicator-bar:hover {
+  background: var(--text-secondary);
+  width: 140px;
+}
+
+.home-indicator-bar.is-swiping {
+  width: 160px;
+  background: var(--text-primary);
+}
+
+/* ─── APP 打开/关闭过渡 ─── */
+.app-open-enter-active {
+  transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.app-open-leave-active {
+  transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.app-open-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+.app-open-leave-to {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+.app-close-enter-active {
+  transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.app-close-leave-active {
+  transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.app-close-enter-from {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.app-close-leave-to {
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+}
+
+.app-switch-enter-active {
+  transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.app-switch-leave-active {
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.app-switch-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.app-switch-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* ─── FAB 过渡 ─── */
+.fab-enter-active,
+.fab-leave-active {
+  transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.fab-enter-from,
+.fab-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+/* ─── 面板过渡 ─── */
+.panel-enter-active {
+  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.panel-leave-active {
+  transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.panel-enter-from {
+  opacity: 0;
+  transform: translateY(40px) scale(0.92);
+}
+.panel-leave-to {
+  opacity: 0;
+  transform: translateY(40px) scale(0.92);
+}
+.is-fullscreen.panel-enter-from {
+  opacity: 0;
+  transform: translateY(100%);
+}
+.is-fullscreen.panel-leave-to {
+  opacity: 0;
+  transform: translateY(100%);
+}
 </style>

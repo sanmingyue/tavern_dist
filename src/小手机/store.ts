@@ -67,57 +67,6 @@ interface PhoneCacheData {
   lastSyncedMessageId: number;
 }
 
-/* ─── 世界书条目名称约定 ─── */
-
-const ENTRY_CONTACTS = '[手机通讯录]';
-function chatEntryName(contactName: string): string {
-  return `[手机聊天-${contactName}]`;
-}
-
-/* ─── 动态获取世界书名称 ─── */
-
-/**
- * 自动检测当前角色卡绑定的世界书名称
- * 优先级：角色卡 primary > additional[0] > 聊天世界书 > 自动创建
- */
-async function resolveWorldbookName(): Promise<string> {
-  try {
-    const charName = getCurrentCharacterName();
-    if (charName) {
-      const charWbs = getCharWorldbookNames('current');
-
-      // 1. 优先使用角色卡的 primary 世界书
-      if (charWbs.primary) {
-        console.info('[小手机] 使用角色卡主世界书:', charWbs.primary);
-        return charWbs.primary;
-      }
-
-      // 2. 其次使用 additional 中的第一个
-      if (charWbs.additional.length > 0) {
-        console.info('[小手机] 使用角色卡附加世界书:', charWbs.additional[0]);
-        return charWbs.additional[0];
-      }
-    }
-
-    // 3. 尝试使用聊天文件绑定的世界书
-    const chatWb = getChatWorldbookName('current');
-    if (chatWb) {
-      console.info('[小手机] 使用聊天世界书:', chatWb);
-      return chatWb;
-    }
-
-    // 4. 都没有的话，获取或创建一个聊天世界书
-    const newWb = await getOrCreateChatWorldbook('current', `手机数据-${charName || 'default'}`);
-    console.info('[小手机] 创建聊天世界书:', newWb);
-    return newWb;
-  } catch (e) {
-    console.warn('[小手机] 获取世界书名称失败, 使用兜底方案:', e);
-    // 兜底：创建或获取一个通用聊天世界书
-    const fallback = await getOrCreateChatWorldbook('current', '手机数据');
-    return fallback;
-  }
-}
-
 /* ─── 头像工具 ─── */
 
 function readAvatars(): Record<string, string> {
@@ -164,9 +113,6 @@ export const usePhoneStore = defineStore('yubing-phone', () => {
 
   /* 上次同步的最大楼层号 */
   const lastSyncedMessageId = ref(-1);
-
-  /* 动态世界书名称（初始化时解析） */
-  const worldbookName = ref<string | null>(null);
 
   /* 头像数据（name -> base64 dataURL） */
   const avatars = ref<Record<string, string>>(readAvatars());
@@ -310,10 +256,6 @@ export const usePhoneStore = defineStore('yubing-phone', () => {
     contacts.value.push(newContact);
     chatRecords.value[trimmed] = chatRecords.value[trimmed] || [];
 
-    /* 写入世界书 */
-    await syncContactsToWorldbook();
-    await syncChatToWorldbook(trimmed);
-
     toastr.success(`已添加 ${trimmed}`, '小手机', { timeOut: 1500 });
     console.info('[小手机] 添加联系人:', trimmed);
     saveToCacheStorage();
@@ -337,15 +279,6 @@ export const usePhoneStore = defineStore('yubing-phone', () => {
 
     /* 同时删除头像 */
     removeAvatar(name);
-
-    /* 更新世界书：删除该联系人的聊天条目 */
-    await syncContactsToWorldbook();
-    try {
-      const wbName = await getWbName();
-      await deleteWorldbookEntries(wbName, entry => entry.name === chatEntryName(name));
-    } catch (e) {
-      console.warn('[小手机] 删除聊天条目失败:', e);
-    }
 
     toastr.info(`已删除 ${name}`, '小手机', { timeOut: 1500 });
     saveToCacheStorage();
@@ -505,124 +438,6 @@ export const usePhoneStore = defineStore('yubing-phone', () => {
     }
   }
 
-  /* ─── 世界书同步 ─── */
-
-  /** 获取已解析的世界书名称，确保可用 */
-  async function getWbName(): Promise<string> {
-    if (!worldbookName.value) {
-      worldbookName.value = await resolveWorldbookName();
-    }
-    return worldbookName.value;
-  }
-
-  /** 将通讯录写入世界书 */
-  async function syncContactsToWorldbook() {
-    try {
-      const wbName = await getWbName();
-      const contactsData = JSON.stringify(contacts.value);
-
-      await updateWorldbookWith(wbName, (entries) => {
-        const existing = entries.find(e => e.name === ENTRY_CONTACTS);
-        if (existing) {
-          existing.content = contactsData;
-          return entries;
-        }
-        return [...entries, {
-          name: ENTRY_CONTACTS,
-          enabled: false,
-          content: contactsData,
-          strategy: { type: 'constant' as const },
-          position: { type: 'before_character_definition' as const, order: 100 },
-        }];
-      });
-    } catch (e) {
-      console.warn('[小手机] 同步通讯录到世界书失败:', e);
-    }
-  }
-
-  /** 将某个联系人的聊天记录写入世界书 */
-  async function syncChatToWorldbook(contactName: string) {
-    try {
-      const wbName = await getWbName();
-      const entryName = chatEntryName(contactName);
-      const messages = chatRecords.value[contactName] || [];
-      const chatData = JSON.stringify(messages);
-
-      await updateWorldbookWith(wbName, (entries) => {
-        const existing = entries.find(e => e.name === entryName);
-        if (existing) {
-          existing.content = chatData;
-          return entries;
-        }
-        return [...entries, {
-          name: entryName,
-          enabled: false,
-          content: chatData,
-          strategy: { type: 'constant' as const },
-          position: { type: 'before_character_definition' as const, order: 101 },
-        }];
-      });
-    } catch (e) {
-      console.warn(`[小手机] 同步聊天记录(${contactName})到世界书失败:`, e);
-    }
-  }
-
-  /** 同步所有数据到世界书 */
-  async function syncAllToWorldbook() {
-    await syncContactsToWorldbook();
-    for (const contact of contacts.value) {
-      await syncChatToWorldbook(contact.name);
-    }
-    console.info('[小手机] 已同步所有数据到世界书');
-  }
-
-  /** 从世界书加载通讯录和聊天记录 */
-  async function loadFromWorldbook(): Promise<boolean> {
-    try {
-      const wbName = await getWbName();
-      const allNames = getWorldbookNames();
-      if (!allNames.includes(wbName)) return false;
-
-      const entries = await getWorldbook(wbName);
-
-      /* 加载通讯录 */
-      const contactsEntry = entries.find(e => e.name === ENTRY_CONTACTS);
-      if (contactsEntry) {
-        try {
-          const parsed: Contact[] = JSON.parse(contactsEntry.content);
-          if (Array.isArray(parsed)) {
-            contacts.value = parsed;
-          }
-        } catch {
-          console.warn('[小手机] 通讯录数据格式异常');
-        }
-      }
-
-      /* 加载每个联系人的聊天记录 */
-      for (const contact of contacts.value) {
-        const chatEntry = entries.find(e => e.name === chatEntryName(contact.name));
-        if (chatEntry) {
-          try {
-            const messages: PhoneMessage[] = JSON.parse(chatEntry.content);
-            if (Array.isArray(messages)) {
-              chatRecords.value[contact.name] = messages;
-            }
-          } catch {
-            console.warn(`[小手机] 聊天记录(${contact.name})数据格式异常`);
-          }
-        } else {
-          chatRecords.value[contact.name] = [];
-        }
-      }
-
-      console.info(`[小手机] 从世界书 "${wbName}" 加载了数据`);
-      return true;
-    } catch (e) {
-      console.warn('[小手机] 从世界书加载失败:', e);
-    }
-    return false;
-  }
-
   /* ─── 本地缓存 ─── */
 
   function saveToCacheStorage() {
@@ -649,11 +464,7 @@ export const usePhoneStore = defineStore('yubing-phone', () => {
   /* ─── 初始化 ─── */
 
   async function initialize() {
-    const cachedLoaded = loadFromCacheStorage();
-
-    if (!cachedLoaded) {
-      await loadFromWorldbook();
-    }
+    loadFromCacheStorage();
 
     /* 判断是否需要全量扫描：
      * 1. 从未同步过（lastSyncedMessageId < 0）
@@ -702,10 +513,6 @@ export const usePhoneStore = defineStore('yubing-phone', () => {
     sendReply,
     scanAllMessages,
     scanNewMessages,
-    syncAllToWorldbook,
-    syncContactsToWorldbook,
-    syncChatToWorldbook,
-    loadFromWorldbook,
     initialize,
   };
 });

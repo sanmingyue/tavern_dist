@@ -1,0 +1,2 @@
+import{registerMvuSchema as r}from'https://testingcf.jsdelivr.net/gh/StageDog/tavern_resource/dist/util/mvu_zod.js';const e=z,t=e.z.object({抽卡进度:e.z.coerce.number().prefault(0),可用抽数:e.z.coerce.number().transform(r=>Math.max(0,r)).prefault(1),剩余分钟:e.z.coerce.number().transform(r=>Math.max(0,r)).prefault(0)}).transform(r=>{for(;r.抽卡进度>=100;)r.抽卡进度-=100,r.可用抽数+=1;return r.抽卡进度=_.clamp(r.抽卡进度,0,99),r});$(()=>{r(t)});
+//# sourceMappingURL=index.js.map

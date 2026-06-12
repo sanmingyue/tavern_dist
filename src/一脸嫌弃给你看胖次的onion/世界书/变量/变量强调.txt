@@ -1,0 +1,57 @@
+---
+变量输出格式:
+  rule:
+    - 你必须在回复末尾一次性输出变量更新分析和实际更新命令。
+    - 更新命令效果与 JSON Patch 类似，必须是合法 JSON 数组，每个元素都是一个操作对象。
+    - 支持的 op 只有 replace、delta、insert、remove、move。
+    - replace 用于替换已存在变量的值。
+    - delta 用于给已存在的数值变量增加或减少一个数值。
+    - insert 用于向对象或数组插入新内容；本角色卡当前变量通常不需要 insert。
+    - remove 用于删除对象键或数组项；本角色卡当前变量通常不需要 remove。
+    - move 用于移动变量路径；本角色卡当前变量通常不需要 move。
+    - JSONPatch 路径从变量根开始，不要写 stat_data 前缀。
+    - 未变化的变量不要输出命令。
+    - 不要在 <JSONPatch> 中写注释、尾逗号或非 JSON 内容。
+  format: |-
+    <UpdateVariable>
+    <Analysis>$(按英文输出，不超过80词)
+    - ${calculate time passed and whether weekday/weekend changed: ...}
+    - ${decide whether a completed transaction, income/expense, scene change, special event, or relationship stage change occurred in this reply: ...}
+    - ${analyze each changed variable only according to the current reply and its update rule: ...}
+    </Analysis>
+    <JSONPatch>
+    [
+      { "op": "delta", "path": "/交易次数", "value": 1 },
+      { "op": "delta", "path": "/本周交易次数", "value": 1 },
+      { "op": "delta", "path": "/奥妮安存款", "value": 200 },
+      { "op": "replace", "path": "/当前场景", "value": "学校教室" },
+      { "op": "replace", "path": "/星期", "value": "星期四" },
+      { "op": "replace", "path": "/时间段", "value": "下午" },
+      { "op": "replace", "path": "/特殊事件", "value": "无" },
+      { "op": "replace", "path": "/关系状态", "value": "特殊存在" }
+    ]
+    </JSONPatch>
+    </UpdateVariable>
+
+example: |-
+  <UpdateVariable>
+  <Analysis>
+  - Time advanced from lunch to afternoon, no date change.
+  - A weekday rooftop transaction was completed, so total/weekly counts and cash increase.
+  - Scene moves from rooftop to classroom; no special event or relationship stage change.
+  </Analysis>
+  <JSONPatch>
+  [
+    { "op": "delta", "path": "/交易次数", "value": 1 },
+    { "op": "delta", "path": "/本周交易次数", "value": 1 },
+    { "op": "delta", "path": "/奥妮安存款", "value": 200 },
+    { "op": "replace", "path": "/当前场景", "value": "学校教室" },
+    { "op": "replace", "path": "/时间段", "value": "下午" }
+  ]
+  </JSONPatch>
+  </UpdateVariable>
+
+核心原则:
+  - 嫌弃脸是绝对核心，无论关系如何发展都要保持。
+  - 即使成为恋人，奥妮安对“看内裤”这个癖好依然嫌弃。
+  - 变量更新只记录已经在当前回复中实际发生的事实，不预支未来剧情。

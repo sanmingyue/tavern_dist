@@ -1,0 +1,2094 @@
+{
+  "version": 1,
+  "updatedAt": 1780275591245,
+  "tavern": {
+    "connected": false,
+    "chatId": "default",
+    "characterName": "",
+    "userName": "用户",
+    "lastSeenAt": 1780275482310
+  },
+  "phone": {
+    "device": {
+      "id": "phone_1780231019700_15731199",
+      "name": "小手机独立版",
+      "owner": "用户"
+    },
+    "contacts": {
+      "乱按联系人0": {
+        "name": "乱按联系人0",
+        "alias": "",
+        "phone": "",
+        "tags": [
+          "stress"
+        ],
+        "addedAt": 1780275034075
+      },
+      "乱按联系人1": {
+        "name": "乱按联系人1",
+        "alias": "",
+        "phone": "",
+        "tags": [
+          "stress"
+        ],
+        "addedAt": 1780275034085
+      },
+      "乱按联系人2": {
+        "name": "乱按联系人2",
+        "alias": "",
+        "phone": "",
+        "tags": [
+          "stress"
+        ],
+        "addedAt": 1780275034090
+      },
+      "乱按联系人3": {
+        "name": "乱按联系人3",
+        "alias": "",
+        "phone": "",
+        "tags": [
+          "stress"
+        ],
+        "addedAt": 1780275034094
+      },
+      "乱按联系人4": {
+        "name": "乱按联系人4",
+        "alias": "",
+        "phone": "",
+        "tags": [
+          "stress"
+        ],
+        "addedAt": 1780275034101
+      },
+      "乱按联系人5": {
+        "name": "乱按联系人5",
+        "alias": "",
+        "phone": "",
+        "tags": [
+          "stress"
+        ],
+        "addedAt": 1780275034108
+      },
+      "乱按联系人6": {
+        "name": "乱按联系人6",
+        "alias": "",
+        "phone": "",
+        "tags": [
+          "stress"
+        ],
+        "addedAt": 1780275034113
+      },
+      "模拟角色0": {
+        "name": "模拟角色0",
+        "alias": "",
+        "phone": "",
+        "tags": [],
+        "addedAt": 1780275482274
+      },
+      "模拟角色1": {
+        "name": "模拟角色1",
+        "alias": "",
+        "phone": "",
+        "tags": [],
+        "addedAt": 1780275482279
+      },
+      "模拟角色2": {
+        "name": "模拟角色2",
+        "alias": "",
+        "phone": "",
+        "tags": [],
+        "addedAt": 1780275482282
+      }
+    },
+    "conversations": {
+      "乱按联系人0": {
+        "contactName": "乱按联系人0",
+        "messages": [
+          {
+            "id": "msg_1780275034189_158b486d",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 0",
+            "timestamp": 1780275034190,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034225_0e20896b",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 7 xxxxxxx",
+            "timestamp": 1780275034225,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034258_64ff2d38",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 14 xxx",
+            "timestamp": 1780275034258,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034293_ac0347da",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 21 xxxxxxxxxx",
+            "timestamp": 1780275034293,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034326_c740504c",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 28 xxxxxx",
+            "timestamp": 1780275034326,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034360_640ced9b",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 35 xx",
+            "timestamp": 1780275034360,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034393_05be1ed5",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 42 xxxxxxxxx",
+            "timestamp": 1780275034393,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034425_00dbb038",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 49 xxxxx",
+            "timestamp": 1780275034425,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034457_bb690213",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 56 x",
+            "timestamp": 1780275034457,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034488_e9d7f381",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 63 xxxxxxxx",
+            "timestamp": 1780275034488,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034519_23aaccba",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 70 xxxx",
+            "timestamp": 1780275034519,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034547_59b7e490",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 77",
+            "timestamp": 1780275034547,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590875_e94b1428",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 0",
+            "timestamp": 1780275590875,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590906_6a6ebaa9",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 7 xxxxxxx",
+            "timestamp": 1780275590906,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590936_59bed6a0",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 14 xxx",
+            "timestamp": 1780275590936,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590972_bfa3999a",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 21 xxxxxxxxxx",
+            "timestamp": 1780275590972,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591003_1b3fbc4c",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 28 xxxxxx",
+            "timestamp": 1780275591003,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591034_4796b12f",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 35 xx",
+            "timestamp": 1780275591034,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591067_0505a5ee",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 42 xxxxxxxxx",
+            "timestamp": 1780275591067,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591099_297fd0d9",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 49 xxxxx",
+            "timestamp": 1780275591099,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591132_aedfc671",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 56 x",
+            "timestamp": 1780275591132,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591165_5b2bce83",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 63 xxxxxxxx",
+            "timestamp": 1780275591165,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591197_5617075a",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 70 xxxx",
+            "timestamp": 1780275591197,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591234_9ac2c63a",
+            "from": "用户",
+            "to": "乱按联系人0",
+            "content": "乱操作消息 77",
+            "timestamp": 1780275591234,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          }
+        ],
+        "unread": 0,
+        "lastUpdate": 1780275591234
+      },
+      "乱按联系人1": {
+        "contactName": "乱按联系人1",
+        "messages": [
+          {
+            "id": "msg_1780275034194_d9b36221",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 1 x",
+            "timestamp": 1780275034194,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034230_a814a788",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 8 xxxxxxxx",
+            "timestamp": 1780275034230,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034262_4f0649e5",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 15 xxxx",
+            "timestamp": 1780275034262,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034297_cb244d91",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 22",
+            "timestamp": 1780275034297,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034330_8d3e4c14",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 29 xxxxxxx",
+            "timestamp": 1780275034330,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034366_cb14b749",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 36 xxx",
+            "timestamp": 1780275034366,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034398_ceed785b",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 43 xxxxxxxxxx",
+            "timestamp": 1780275034398,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034429_78af849b",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 50 xxxxxx",
+            "timestamp": 1780275034429,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034461_502db8a4",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 57 xx",
+            "timestamp": 1780275034461,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034492_759b7ded",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 64 xxxxxxxxx",
+            "timestamp": 1780275034492,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034523_d20e1664",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 71 xxxxx",
+            "timestamp": 1780275034523,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034556_c625ef69",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 78 x",
+            "timestamp": 1780275034556,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590879_74f5620e",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 1 x",
+            "timestamp": 1780275590879,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590910_cb2165cf",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 8 xxxxxxxx",
+            "timestamp": 1780275590910,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590942_50461a3a",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 15 xxxx",
+            "timestamp": 1780275590942,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590976_3047fad7",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 22",
+            "timestamp": 1780275590976,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591008_45dfda00",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 29 xxxxxxx",
+            "timestamp": 1780275591008,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591039_72c1ee11",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 36 xxx",
+            "timestamp": 1780275591039,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591073_d4636d34",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 43 xxxxxxxxxx",
+            "timestamp": 1780275591073,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591104_807e0904",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 50 xxxxxx",
+            "timestamp": 1780275591104,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591137_3a2f6c85",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 57 xx",
+            "timestamp": 1780275591137,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591171_d00d66cc",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 64 xxxxxxxxx",
+            "timestamp": 1780275591171,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591201_0265f5f5",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 71 xxxxx",
+            "timestamp": 1780275591201,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591240_d0da11b4",
+            "from": "用户",
+            "to": "乱按联系人1",
+            "content": "乱操作消息 78 x",
+            "timestamp": 1780275591240,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          }
+        ],
+        "unread": 0,
+        "lastUpdate": 1780275591240
+      },
+      "乱按联系人2": {
+        "contactName": "乱按联系人2",
+        "messages": [
+          {
+            "id": "msg_1780275034201_b0ebaae3",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 2 xx",
+            "timestamp": 1780275034201,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034236_cbd59434",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 9 xxxxxxxxx",
+            "timestamp": 1780275034236,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034268_603a6193",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 16 xxxxx",
+            "timestamp": 1780275034268,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034303_cc2e5c81",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 23 x",
+            "timestamp": 1780275034303,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034336_50576f49",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 30 xxxxxxxx",
+            "timestamp": 1780275034336,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034371_9107ebba",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 37 xxxx",
+            "timestamp": 1780275034371,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034403_dd1be817",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 44",
+            "timestamp": 1780275034403,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034434_082c2713",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 51 xxxxxxx",
+            "timestamp": 1780275034434,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034465_d9159455",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 58 xxx",
+            "timestamp": 1780275034465,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034496_3aaf1f12",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 65 xxxxxxxxxx",
+            "timestamp": 1780275034496,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034526_d1fd72dd",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 72 xxxxxx",
+            "timestamp": 1780275034526,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034560_7dc7b80e",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 79 xx",
+            "timestamp": 1780275034560,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590883_efaf93fd",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 2 xx",
+            "timestamp": 1780275590883,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590914_317ff2f2",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 9 xxxxxxxxx",
+            "timestamp": 1780275590914,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590946_381c22a1",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 16 xxxxx",
+            "timestamp": 1780275590946,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590980_a9674932",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 23 x",
+            "timestamp": 1780275590980,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591012_ef576eb8",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 30 xxxxxxxx",
+            "timestamp": 1780275591012,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591044_64df3159",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 37 xxxx",
+            "timestamp": 1780275591044,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591077_391dd80d",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 44",
+            "timestamp": 1780275591077,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591108_2253be18",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 51 xxxxxxx",
+            "timestamp": 1780275591108,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591142_9230a51b",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 58 xxx",
+            "timestamp": 1780275591143,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591176_878e114e",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 65 xxxxxxxxxx",
+            "timestamp": 1780275591176,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591209_9ffa1fe3",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 72 xxxxxx",
+            "timestamp": 1780275591209,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591245_f075f880",
+            "from": "用户",
+            "to": "乱按联系人2",
+            "content": "乱操作消息 79 xx",
+            "timestamp": 1780275591245,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          }
+        ],
+        "unread": 0,
+        "lastUpdate": 1780275591245
+      },
+      "乱按联系人3": {
+        "contactName": "乱按联系人3",
+        "messages": [
+          {
+            "id": "msg_1780275034205_ee82a7b1",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 3 xxx",
+            "timestamp": 1780275034205,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034240_ed2ac47d",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 10 xxxxxxxxxx",
+            "timestamp": 1780275034240,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034272_da91e582",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 17 xxxxxx",
+            "timestamp": 1780275034272,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034307_0b433bff",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 24 xx",
+            "timestamp": 1780275034307,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034341_dc8c2669",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 31 xxxxxxxxx",
+            "timestamp": 1780275034341,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034376_15750744",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 38 xxxxx",
+            "timestamp": 1780275034376,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034408_ddff6f11",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 45 x",
+            "timestamp": 1780275034408,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034439_034e4a38",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 52 xxxxxxxx",
+            "timestamp": 1780275034439,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034470_3894f0fd",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 59 xxxx",
+            "timestamp": 1780275034470,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034501_da701043",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 66",
+            "timestamp": 1780275034501,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034530_0202cdd2",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 73 xxxxxxx",
+            "timestamp": 1780275034530,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590889_cbca3e47",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 3 xxx",
+            "timestamp": 1780275590889,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590918_f43d6c21",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 10 xxxxxxxxxx",
+            "timestamp": 1780275590918,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590950_b27de809",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 17 xxxxxx",
+            "timestamp": 1780275590950,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590984_8a291887",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 24 xx",
+            "timestamp": 1780275590984,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591016_e6b95c57",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 31 xxxxxxxxx",
+            "timestamp": 1780275591016,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591048_7083d975",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 38 xxxxx",
+            "timestamp": 1780275591048,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591081_71fc9d1c",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 45 x",
+            "timestamp": 1780275591081,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591113_561eea0a",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 52 xxxxxxxx",
+            "timestamp": 1780275591114,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591147_ba747d35",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 59 xxxx",
+            "timestamp": 1780275591147,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591180_093e8943",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 66",
+            "timestamp": 1780275591180,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591213_7fc73a81",
+            "from": "用户",
+            "to": "乱按联系人3",
+            "content": "乱操作消息 73 xxxxxxx",
+            "timestamp": 1780275591213,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          }
+        ],
+        "unread": 0,
+        "lastUpdate": 1780275591213
+      },
+      "乱按联系人4": {
+        "contactName": "乱按联系人4",
+        "messages": [
+          {
+            "id": "msg_1780275034210_bcb73c07",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 4 xxxx",
+            "timestamp": 1780275034210,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034244_48dc7fe8",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 11",
+            "timestamp": 1780275034244,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034277_9f4ed4dc",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 18 xxxxxxx",
+            "timestamp": 1780275034277,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034312_53acf78e",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 25 xxx",
+            "timestamp": 1780275034312,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034345_9ce324e3",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 32 xxxxxxxxxx",
+            "timestamp": 1780275034345,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034380_255fb0a0",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 39 xxxxxx",
+            "timestamp": 1780275034380,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034412_f9111003",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 46 xx",
+            "timestamp": 1780275034412,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034444_6899e161",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 53 xxxxxxxxx",
+            "timestamp": 1780275034444,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034475_2092aa24",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 60 xxxxx",
+            "timestamp": 1780275034475,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034506_997bbb5f",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 67 x",
+            "timestamp": 1780275034506,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034535_ee88b36c",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 74 xxxxxxxx",
+            "timestamp": 1780275034535,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590893_f0ca0071",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 4 xxxx",
+            "timestamp": 1780275590893,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590924_7c7595d9",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 11",
+            "timestamp": 1780275590924,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590957_3b7ab091",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 18 xxxxxxx",
+            "timestamp": 1780275590957,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590990_33cd03ea",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 25 xxx",
+            "timestamp": 1780275590990,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591021_f0b55107",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 32 xxxxxxxxxx",
+            "timestamp": 1780275591021,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591053_2e4f460a",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 39 xxxxxx",
+            "timestamp": 1780275591053,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591085_43e6ac68",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 46 xx",
+            "timestamp": 1780275591085,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591118_319408c9",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 53 xxxxxxxxx",
+            "timestamp": 1780275591118,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591151_975964e5",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 60 xxxxx",
+            "timestamp": 1780275591151,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591184_34f94634",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 67 x",
+            "timestamp": 1780275591184,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591217_e9a3a5b8",
+            "from": "用户",
+            "to": "乱按联系人4",
+            "content": "乱操作消息 74 xxxxxxxx",
+            "timestamp": 1780275591217,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          }
+        ],
+        "unread": 0,
+        "lastUpdate": 1780275591217
+      },
+      "乱按联系人5": {
+        "contactName": "乱按联系人5",
+        "messages": [
+          {
+            "id": "msg_1780275034215_10e7a8b1",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 5 xxxxx",
+            "timestamp": 1780275034215,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034249_5b32d6b8",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 12 x",
+            "timestamp": 1780275034249,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034282_d72a038d",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 19 xxxxxxxx",
+            "timestamp": 1780275034282,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034317_1e5237f9",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 26 xxxx",
+            "timestamp": 1780275034317,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034352_c235b48b",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 33",
+            "timestamp": 1780275034352,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034385_1fadd385",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 40 xxxxxxx",
+            "timestamp": 1780275034385,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034417_75ba0bb0",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 47 xxx",
+            "timestamp": 1780275034417,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034449_47891b16",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 54 xxxxxxxxxx",
+            "timestamp": 1780275034449,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034479_8048bf16",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 61 xxxxxx",
+            "timestamp": 1780275034479,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034510_8a32a876",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 68 xx",
+            "timestamp": 1780275034510,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034539_db415f80",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 75 xxxxxxxxx",
+            "timestamp": 1780275034540,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590897_02361af9",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 5 xxxxx",
+            "timestamp": 1780275590897,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590928_51ae6340",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 12 x",
+            "timestamp": 1780275590928,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590961_b125c81c",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 19 xxxxxxxx",
+            "timestamp": 1780275590961,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590994_d1590913",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 26 xxxx",
+            "timestamp": 1780275590994,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591025_b97f86e5",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 33",
+            "timestamp": 1780275591025,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591058_3078011a",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 40 xxxxxxx",
+            "timestamp": 1780275591058,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591091_031894c7",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 47 xxx",
+            "timestamp": 1780275591091,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591124_1a01b2e5",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 54 xxxxxxxxxx",
+            "timestamp": 1780275591124,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591157_7c0e515d",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 61 xxxxxx",
+            "timestamp": 1780275591157,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591189_052af31b",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 68 xx",
+            "timestamp": 1780275591189,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591224_55809015",
+            "from": "用户",
+            "to": "乱按联系人5",
+            "content": "乱操作消息 75 xxxxxxxxx",
+            "timestamp": 1780275591224,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          }
+        ],
+        "unread": 0,
+        "lastUpdate": 1780275591224
+      },
+      "乱按联系人6": {
+        "contactName": "乱按联系人6",
+        "messages": [
+          {
+            "id": "msg_1780275034220_cae6b03a",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 6 xxxxxx",
+            "timestamp": 1780275034220,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034254_2875e9d0",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 13 xx",
+            "timestamp": 1780275034254,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034289_c711df44",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 20 xxxxxxxxx",
+            "timestamp": 1780275034289,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034321_bf95fc27",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 27 xxxxx",
+            "timestamp": 1780275034321,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034356_fb34336a",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 34 x",
+            "timestamp": 1780275034356,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034389_78962fa7",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 41 xxxxxxxx",
+            "timestamp": 1780275034389,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034421_b12bd798",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 48 xxxx",
+            "timestamp": 1780275034421,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034453_46eea134",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 55",
+            "timestamp": 1780275034453,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034484_cd0c8e5a",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 62 xxxxxxx",
+            "timestamp": 1780275034484,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034513_9dbf15f2",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 69 xxx",
+            "timestamp": 1780275034513,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275034543_14e320d5",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 76 xxxxxxxxxx",
+            "timestamp": 1780275034543,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275441964_a7a6c218",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "这是浏览器乱操作发出的消息",
+            "timestamp": 1780275441964,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590901_bdb89f21",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 6 xxxxxx",
+            "timestamp": 1780275590901,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590932_889371fc",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 13 xx",
+            "timestamp": 1780275590932,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590966_34477a4b",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 20 xxxxxxxxx",
+            "timestamp": 1780275590966,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275590998_a6dbd68a",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 27 xxxxx",
+            "timestamp": 1780275590998,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591029_ff142406",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 34 x",
+            "timestamp": 1780275591029,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591063_fb5d6395",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 41 xxxxxxxx",
+            "timestamp": 1780275591063,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591095_51b08188",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 48 xxxx",
+            "timestamp": 1780275591095,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591128_84260bac",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 55",
+            "timestamp": 1780275591128,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591162_80b9f6e0",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 62 xxxxxxx",
+            "timestamp": 1780275591162,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591193_db6e92f7",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 69 xxx",
+            "timestamp": 1780275591193,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          },
+          {
+            "id": "msg_1780275591228_c8455521",
+            "from": "用户",
+            "to": "乱按联系人6",
+            "content": "乱操作消息 76 xxxxxxxxxx",
+            "timestamp": 1780275591228,
+            "type": "text",
+            "read": true,
+            "source": "phone-ui"
+          }
+        ],
+        "unread": 0,
+        "lastUpdate": 1780275591228
+      },
+      "模拟角色0": {
+        "contactName": "模拟角色0",
+        "messages": [
+          {
+            "id": "msg_1780275482274_daba2a68",
+            "from": "模拟角色0",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 0",
+            "timestamp": 1780275482274,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          },
+          {
+            "id": "msg_1780275482286_9518b9a4",
+            "from": "模拟角色0",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 3",
+            "timestamp": 1780275482286,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          },
+          {
+            "id": "msg_1780275482298_1925a343",
+            "from": "模拟角色0",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 6",
+            "timestamp": 1780275482298,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          },
+          {
+            "id": "msg_1780275482310_0ef4042b",
+            "from": "模拟角色0",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 9",
+            "timestamp": 1780275482310,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          }
+        ],
+        "unread": 4,
+        "lastUpdate": 1780275482310
+      },
+      "模拟角色1": {
+        "contactName": "模拟角色1",
+        "messages": [
+          {
+            "id": "msg_1780275482279_53d79e7b",
+            "from": "模拟角色1",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 1",
+            "timestamp": 1780275482279,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          },
+          {
+            "id": "msg_1780275482291_a8e96b35",
+            "from": "模拟角色1",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 4",
+            "timestamp": 1780275482291,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          },
+          {
+            "id": "msg_1780275482302_8d39b7a7",
+            "from": "模拟角色1",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 7",
+            "timestamp": 1780275482302,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          }
+        ],
+        "unread": 3,
+        "lastUpdate": 1780275482302
+      },
+      "模拟角色2": {
+        "contactName": "模拟角色2",
+        "messages": [
+          {
+            "id": "msg_1780275482282_efe5643a",
+            "from": "模拟角色2",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 2",
+            "timestamp": 1780275482282,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          },
+          {
+            "id": "msg_1780275482295_e77e6f1f",
+            "from": "模拟角色2",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 5",
+            "timestamp": 1780275482295,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          },
+          {
+            "id": "msg_1780275482305_de091cc0",
+            "from": "模拟角色2",
+            "to": "用户",
+            "content": "浏览器模拟酒馆消息 8",
+            "timestamp": 1780275482305,
+            "type": "text",
+            "read": false,
+            "source": "tavern-tag"
+          }
+        ],
+        "unread": 3,
+        "lastUpdate": 1780275482305
+      }
+    },
+    "events": [
+      {
+        "id": "evt_1780275482310_fa84583a",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9009,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色0\">浏览器模拟酒馆消息 9</闪讯>"
+        },
+        "timestamp": 1780275482310
+      },
+      {
+        "id": "evt_1780275482305_3c6b0e4e",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9008,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色2\">浏览器模拟酒馆消息 8</闪讯>"
+        },
+        "timestamp": 1780275482305
+      },
+      {
+        "id": "evt_1780275482302_eaed7574",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9007,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色1\">浏览器模拟酒馆消息 7</闪讯>"
+        },
+        "timestamp": 1780275482302
+      },
+      {
+        "id": "evt_1780275482298_45040385",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9006,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色0\">浏览器模拟酒馆消息 6</闪讯>"
+        },
+        "timestamp": 1780275482298
+      },
+      {
+        "id": "evt_1780275482295_9b854899",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9005,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色2\">浏览器模拟酒馆消息 5</闪讯>"
+        },
+        "timestamp": 1780275482295
+      },
+      {
+        "id": "evt_1780275482291_a3f1d9c0",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9004,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色1\">浏览器模拟酒馆消息 4</闪讯>"
+        },
+        "timestamp": 1780275482291
+      },
+      {
+        "id": "evt_1780275482286_7d28d311",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9003,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色0\">浏览器模拟酒馆消息 3</闪讯>"
+        },
+        "timestamp": 1780275482286
+      },
+      {
+        "id": "evt_1780275482282_bb91ad02",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9002,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色2\">浏览器模拟酒馆消息 2</闪讯>"
+        },
+        "timestamp": 1780275482282
+      },
+      {
+        "id": "evt_1780275482278_43007c23",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9001,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色1\">浏览器模拟酒馆消息 1</闪讯>"
+        },
+        "timestamp": 1780275482278
+      },
+      {
+        "id": "evt_1780275482273_72bcc99f",
+        "type": "tavern.message.received",
+        "payload": {
+          "chatId": "browser-stress-chat",
+          "messageId": 9000,
+          "role": "assistant",
+          "name": "模拟角色",
+          "content": "<闪讯 from=\"模拟角色0\">浏览器模拟酒馆消息 0</闪讯>"
+        },
+        "timestamp": 1780275482273
+      }
+    ],
+    "notifications": [
+      {
+        "id": "ntf_1780275482310_679a6e3e",
+        "appId": "messages",
+        "title": "来自 模拟角色0",
+        "content": "浏览器模拟酒馆消息 9",
+        "timestamp": 1780275482310,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482305_bd4b2dd1",
+        "appId": "messages",
+        "title": "来自 模拟角色2",
+        "content": "浏览器模拟酒馆消息 8",
+        "timestamp": 1780275482305,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482302_18b66c63",
+        "appId": "messages",
+        "title": "来自 模拟角色1",
+        "content": "浏览器模拟酒馆消息 7",
+        "timestamp": 1780275482302,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482298_43f52abd",
+        "appId": "messages",
+        "title": "来自 模拟角色0",
+        "content": "浏览器模拟酒馆消息 6",
+        "timestamp": 1780275482298,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482295_b98ca991",
+        "appId": "messages",
+        "title": "来自 模拟角色2",
+        "content": "浏览器模拟酒馆消息 5",
+        "timestamp": 1780275482295,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482291_3547ff0d",
+        "appId": "messages",
+        "title": "来自 模拟角色1",
+        "content": "浏览器模拟酒馆消息 4",
+        "timestamp": 1780275482291,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482286_65e24f0a",
+        "appId": "messages",
+        "title": "来自 模拟角色0",
+        "content": "浏览器模拟酒馆消息 3",
+        "timestamp": 1780275482286,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482282_676ed9e1",
+        "appId": "messages",
+        "title": "来自 模拟角色2",
+        "content": "浏览器模拟酒馆消息 2",
+        "timestamp": 1780275482282,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482279_3c06614e",
+        "appId": "messages",
+        "title": "来自 模拟角色1",
+        "content": "浏览器模拟酒馆消息 1",
+        "timestamp": 1780275482279,
+        "read": false
+      },
+      {
+        "id": "ntf_1780275482274_8f9003be",
+        "appId": "messages",
+        "title": "来自 模拟角色0",
+        "content": "浏览器模拟酒馆消息 0",
+        "timestamp": 1780275482274,
+        "read": false
+      }
+    ],
+    "settings": {
+      "theme": "dark",
+      "wallpaper": ""
+    }
+  }
+}

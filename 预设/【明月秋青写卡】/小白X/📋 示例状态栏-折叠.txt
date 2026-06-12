@@ -1,0 +1,301 @@
+iOS小组件风格状态栏示例（带折叠）
+
+适用场景：多角色场景，支持展开收起，iOS小组件风格设计
+注意：此状态栏使用 STscript 获取数据，无需使用宏语法，不会被剧情管理替换。
+
+```
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色状态栏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            color: #ffffff;
+            padding: 8px;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .widget {
+            background: linear-gradient(180deg, rgba(30, 30, 35, 0.95) 0%, rgba(15, 15, 20, 0.98) 100%);
+            border-radius: 16px;
+            max-width: 420px;
+            margin: 0 auto;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .widget-header {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 12px 16px;
+            text-align: center;
+        }
+
+        .widget-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .global-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .characters-body {
+            padding: 4px 0;
+        }
+
+        .character-section {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .character-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-toggle {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .section-toggle:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #e74c3c;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .character-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .arrow {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            transition: transform 0.3s;
+        }
+
+        .section-toggle.expanded .arrow {
+            transform: rotate(90deg);
+        }
+
+        .section-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .section-details.expanded {
+            max-height: 500px;
+        }
+
+        .details-content {
+            padding: 10px 16px 14px;
+        }
+
+        .attr-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 13px;
+        }
+
+        .attr-label {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .attr-value {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<div class="widget">
+    <div class="widget-header">
+        <div class="widget-title">角色状态栏</div>
+    </div>
+
+    <div class="global-bar">
+        <span id="global-date">--</span>
+        <span id="global-day">--</span>
+        <span id="global-time">--</span>
+        <span id="global-weather">--</span>
+    </div>
+
+    <div class="characters-body">
+        <div class="character-section">
+            <div class="section-toggle" onclick="toggleDetails(this)">
+                <div class="toggle-left">
+                    <div class="avatar">雪</div>
+                    <span class="character-name">白雪</span>
+                </div>
+                <span class="arrow">▶</span>
+            </div>
+            <div class="section-details">
+                <div class="details-content">
+                    <div class="attr-row"><span class="attr-label">好感度</span><span class="attr-value" id="baixue-favor">--</span></div>
+                    <div class="attr-row"><span class="attr-label">穿着</span><span class="attr-value" id="baixue-cloth">--</span></div>
+                    <div class="attr-row"><span class="attr-label">当前位置</span><span class="attr-value" id="baixue-location">--</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="character-section">
+            <div class="section-toggle" onclick="toggleDetails(this)">
+                <div class="toggle-left">
+                    <div class="avatar">远</div>
+                    <span class="character-name">沐远</span>
+                </div>
+                <span class="arrow">▶</span>
+            </div>
+            <div class="section-details">
+                <div class="details-content">
+                    <div class="attr-row"><span class="attr-label">好感度</span><span class="attr-value" id="muyuan-favor">--</span></div>
+                    <div class="attr-row"><span class="attr-label">穿着</span><span class="attr-value" id="muyuan-cloth">--</span></div>
+                    <div class="attr-row"><span class="attr-label">当前位置</span><span class="attr-value" id="muyuan-location">--</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="character-section">
+            <div class="section-toggle" onclick="toggleDetails(this)">
+                <div class="toggle-left">
+                    <div class="avatar">琳</div>
+                    <span class="character-name">苏琳</span>
+                </div>
+                <span class="arrow">▶</span>
+            </div>
+            <div class="section-details">
+                <div class="details-content">
+                    <div class="attr-row"><span class="attr-label">好感度</span><span class="attr-value" id="sulin-favor">--</span></div>
+                    <div class="attr-row"><span class="attr-label">穿着</span><span class="attr-value" id="sulin-cloth">--</span></div>
+                    <div class="attr-row"><span class="attr-label">当前位置</span><span class="attr-value" id="sulin-location">--</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDetails(element) {
+        element.classList.toggle('expanded');
+        element.nextElementSibling.classList.toggle('expanded');
+    }
+    
+    async function loadAndRender() {
+        try {
+            const raw = await STscript('/getvar 世界');
+            const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            
+            // 更新全局信息
+            const global = data['全局状态'] || {};
+            document.getElementById('global-date').textContent = global['日期'] || '--';
+            document.getElementById('global-day').textContent = global['星期几'] || '--';
+            document.getElementById('global-time').textContent = global['时间'] || '--';
+            document.getElementById('global-weather').textContent = global['天气图标'] || '--';
+            
+            // 更新角色状态
+            const characters = data['角色状态'] || {};
+            
+            // 白雪
+            const baixue = characters['白雪'] || {};
+            document.getElementById('baixue-favor').textContent = baixue['好感度'] || '--';
+            document.getElementById('baixue-cloth').textContent = baixue['穿着'] || '--';
+            document.getElementById('baixue-location').textContent = baixue['当前位置'] || '--';
+            
+            // 沐远
+            const muyuan = characters['沐远'] || {};
+            document.getElementById('muyuan-favor').textContent = muyuan['好感度'] || '--';
+            document.getElementById('muyuan-cloth').textContent = muyuan['穿着'] || '--';
+            document.getElementById('muyuan-location').textContent = muyuan['当前位置'] || '--';
+            
+            // 苏琳
+            const sulin = characters['苏琳'] || {};
+            document.getElementById('sulin-favor').textContent = sulin['好感度'] || '--';
+            document.getElementById('sulin-cloth').textContent = sulin['穿着'] || '--';
+            document.getElementById('sulin-location').textContent = sulin['当前位置'] || '--';
+        } catch(e) {
+            console.error('加载状态栏失败:', e);
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstToggle = document.querySelector('.section-toggle');
+        if(firstToggle) toggleDetails(firstToggle);
+        
+        loadAndRender();
+        setInterval(loadAndRender, 3000);
+    });
+</script>
+
+</body>
+</html>
+```
+
+/*
+数据结构示例：
+{
+  "全局状态": {
+    "日期": "12月15日",
+    "星期几": "周日",
+    "时间": "下午14:30",
+    "天气图标": "☀️"
+  },
+  "角色状态": {
+    "白雪": {
+      "好感度": 85,
+      "穿着": "白色连衣裙",
+      "当前位置": "客厅"
+    },
+    "沐远": {
+      "好感度": 75,
+      "穿着": "休闲装",
+      "当前位置": "书房"
+    },
+    "苏琳": {
+      "好感度": 90,
+      "穿着": "粉色睡衣",
+      "当前位置": "卧室"
+    }
+  }
+}
+*/

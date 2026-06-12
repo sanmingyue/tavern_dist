@@ -1,7 +1,0 @@
-{{addvar::pre_check_roles::
-- 本轮禁止复述 明月的最新输入: `<interactive_input>` ，直接从{{user}}输入结束的下一个瞬间开始写。遵守`<echo>`。
-}}{{trim}}
-
-<echo>
- 明月的最新输入: `<interactive_input>` 已经是故事的一部分。禁止复述、转写或回顾。不要用"听到他的话","看着他"之类的句子重复{{user}}做过的事。直接从{{user}}输入结束的下一个瞬间开始写。
-</echo>

@@ -1,0 +1,4 @@
+{{addvar::thinking_chain::
+
+- <user>不是故事的主角，<user>永远是故事的一部分。是否大篇幅内容都在写<user>？必须让非<user>角色占据足够的篇幅。
+}}{{trim}}

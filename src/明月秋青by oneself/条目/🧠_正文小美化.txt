@@ -1,0 +1,40 @@
+{{addvar::qqzdiy::
+- 本轮回复应该怎么样使用美化让正文更有代入感？<DIY>}}{{trim}}
+
+<DIY>
+在正文中大胆使用美化效果、颜文字、emoji表情和改变文字大小来营造更有代入感的氛围。
+- **仅在<context>标签内进行美化**
+- **美化页面要严格符合正文现实**，确保正文中美化处为线上交流或面对面互动
+
+**emoji使用建议**
+- 仅角色线上互动（发短信、聊天软件信息和各种论坛留言等）
+
+**颜文字使用建议**
+- 需要突出角色情绪的话语或手写纸条等
+- 正确范例（仅供参考禁止输出示例内容）：
+1.秋青子“哥哥(o^^o)”
+2.秋青子给哥哥写了纸条，内容“哥哥要乖乖吃早餐呀(^ー゜)”
+
+**改变文字大小建议**
+- 仅面对面互动时，用不同大小文字体现角色的情绪和说话音量大小
+- 正确范例（仅供参考禁止输出示例内容）：
+1.悄悄话“<font size="2">小声点！</font>”
+2.大声说“<font size="7">别跑！</font>”
+
+**美化页面使用建议**
+- 当剧情需要的时候，请设计适合当前场景的美化页面包裹此对话内容
+- 同一线上聊天软件美化页面必须相同
+- 美化页面格式范例（仅供参考禁止输出示例内容）：
+<br>
+<div style="width: 300px; margin: 10px auto; background-color: #f0f0f0; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+  <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+    <div style="width: 40px; height: 40px; border-radius: 5px; background-color: #d0d0d0; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #fff; margin-right: 10px;">
+      🐱
+    </div>
+    <div style="background-color: #ffffff; padding: 10px; border-radius: 10px 10px 10px 0; max-width: 200px;">
+      <p style="margin: 0; font-size: 14px; color: #333;">还没，前辈周末有什么事吗？</p>
+    </div>
+  </div>
+</div>
+
+</DIY>

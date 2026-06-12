@@ -6,6 +6,9 @@ import {
   type MyWork,
   type UserInfo,
   type DownloadResult,
+  type WorkComment,
+  type MyDownload,
+  type MyFavorite,
 } from './types';
 
 /** 发送 API 请求 */
@@ -110,11 +113,13 @@ export async function uploadWork(data: {
   type: string;
   content: string;
   tags: string[];
+  char_name?: string;
   cover?: File;
   card_link?: string;
   file_type?: string;
-  card_file?: File;
-  disclaimer_agreed?: boolean;
+  resource_file?: File;       // 资源文件（regex/worldbook/character/card_addon 文件上传）
+  addon_subtype?: string;     // card_addon 子类型
+  child_ids?: number[];       // 仅 collection 类型使用
 }): Promise<{ id: number; message: string }> {
   const formData = new FormData();
   formData.append('title', data.title);
@@ -122,6 +127,9 @@ export async function uploadWork(data: {
   formData.append('type', data.type);
   formData.append('content', data.content);
   formData.append('tags', JSON.stringify(data.tags));
+  if (data.char_name) {
+    formData.append('char_name', data.char_name);
+  }
   if (data.cover) {
     formData.append('cover', data.cover);
   }
@@ -131,11 +139,14 @@ export async function uploadWork(data: {
   if (data.file_type) {
     formData.append('file_type', data.file_type);
   }
-  if (data.card_file) {
-    formData.append('card_file', data.card_file);
+  if (data.resource_file) {
+    formData.append('card_file', data.resource_file);
   }
-  if (data.disclaimer_agreed) {
-    formData.append('disclaimer_agreed', 'true');
+  if (data.addon_subtype) {
+    formData.append('addon_subtype', data.addon_subtype);
+  }
+  if (data.child_ids && data.child_ids.length > 0) {
+    formData.append('child_ids', JSON.stringify(data.child_ids));
   }
 
   return request('/api/works', {
@@ -150,14 +161,24 @@ export async function updateWork(id: number, data: {
   description?: string;
   content?: string;
   tags?: string[];
+  char_name?: string;
+  card_link?: string;
+  file_type?: string;
   cover?: File;
+  resource_file?: File;
+  addon_subtype?: string;
 }): Promise<{ message: string }> {
   const formData = new FormData();
   if (data.title !== undefined) formData.append('title', data.title);
   if (data.description !== undefined) formData.append('description', data.description);
   if (data.content !== undefined) formData.append('content', data.content);
   if (data.tags !== undefined) formData.append('tags', JSON.stringify(data.tags));
+  if (data.char_name !== undefined) formData.append('char_name', data.char_name);
+  if (data.card_link !== undefined) formData.append('card_link', data.card_link);
+  if (data.file_type !== undefined) formData.append('file_type', data.file_type);
   if (data.cover) formData.append('cover', data.cover);
+  if (data.resource_file) formData.append('card_file', data.resource_file);
+  if (data.addon_subtype) formData.append('addon_subtype', data.addon_subtype);
 
   return request(`/api/works/${id}`, {
     method: 'PUT',
@@ -175,9 +196,61 @@ export async function toggleLikeApi(id: number): Promise<{ liked: boolean; like_
   return request(`/api/works/${id}/like`, { method: 'POST' });
 }
 
+/** 收藏/取消收藏 */
+export async function toggleFavoriteApi(id: number): Promise<{ favorited: boolean; favorite_count: number }> {
+  return request(`/api/works/${id}/favorite`, { method: 'POST' });
+}
+
+/** 获取作品评论 */
+export async function fetchComments(workId: number): Promise<{ comments: WorkComment[] }> {
+  return request(`/api/works/${workId}/comments`);
+}
+
+/** 发表评论 */
+export async function createCommentApi(workId: number, content: string): Promise<{ id: number; message: string }> {
+  return request(`/api/works/${workId}/comments`, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  });
+}
+
+/** 修改自己的评论 */
+export async function updateCommentApi(commentId: number, content: string): Promise<{ message: string }> {
+  return request(`/api/works/comments/${commentId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ content }),
+  });
+}
+
+/** 删除自己的评论，或作者隐藏自己作品下的评论 */
+export async function deleteCommentApi(commentId: number, reason?: string): Promise<{ message: string }> {
+  return request(`/api/works/comments/${commentId}`, {
+    method: 'DELETE',
+    body: JSON.stringify({ reason }),
+  });
+}
+
 // ─── 我的作品 ───
 
 /** 获取我的作品列表 */
 export async function fetchMyWorks(): Promise<{ works: MyWork[] }> {
   return request('/api/my/works');
+}
+
+/** 获取我的下载记录 */
+export async function fetchMyDownloads(): Promise<{ downloads: MyDownload[] }> {
+  return request('/api/my/downloads');
+}
+
+/** 获取我的收藏 */
+export async function fetchMyFavorites(): Promise<{ favorites: MyFavorite[] }> {
+  return request('/api/my/favorites');
+}
+
+/** 向合集追加子作品（作者专属） */
+export async function addWorksToCollection(collectionId: number, addIds: number[]): Promise<{ message: string; children_count: number }> {
+  return request(`/api/works/${collectionId}/children`, {
+    method: 'PUT',
+    body: JSON.stringify({ add_ids: addIds }),
+  });
 }

@@ -1,0 +1,223 @@
+每次回复都必须在正文合适的位置追加一个 <nai-image> 块。根据本次正文内容（角色特写、动作场面、情感高潮、环境变化、色色场景等），思考生成对应的 NAI 提示词。
+
+<nai-image> 内只写 YAML，不要写解释文字。脚本会自动把这个块从正文中移除，玩家和后续 AI 都看不到它。
+
+# 一、思维链引导
+
+在输出 <nai-image> 之前，在思维链中按以下顺序分析：
+
+1. 场景识别：本段正文描写了什么画面？是日常、战斗、情感、风景还是色色场景？
+2. 角色识别：画面中有几个角色？是否是热门角色（如原神、崩铁、蔚蓝档案、Fate、Vtuber 等知名 IP）？
+3. 服装判断：角色穿的是原装服饰还是换装？热门角色未换装时不堆外貌和服饰词条，加权角色名即可。非热门或换装角色需完整描述外貌和服装。
+4. 动作表情：角色在做什么？什么表情？使用准确的英文 NAI 提示词描述。
+5. 环境光影：在什么场所？什么时间？什么光线？
+6. 构图决策：单人还是多人？用什么视角？多人时如何分配位置？
+7. NSFW 判断：如果是色色场景，使用直接准确的提示词，不要委婉或模糊。
+8. 权重检查：只对核心词加权重，不要通篇都加。检查是否有冗余重复的词条。
+9. 组装输出：将以上分析结果组装成 <nai-image> YAML 块。
+
+# 二、NAI 提示词基础知识
+
+【词条分类顺序】
+按以下顺序排列提示词，保持结构清晰：
+1. 人数与性别：1girl, 2girls, 1boy 1girl
+2. 角色名（热门角色）：Castorice (honkai: star rail)
+3. 身体特征：long hair, blue eyes, medium breasts
+4. 服装配饰：school uniform, red ribbon, thigh highs
+5. 动作表情：sitting, smile, looking at viewer
+6. 环境背景：classroom, window, sunlight
+7. 光影视角：from above, soft lighting, depth of field
+8. 整体风格：illustration, highly detailed
+
+【角色名写法】
+- 标准格式：角色名 (作品名)
+  例：Castorice (honkai: star rail)
+  例：Hu Tao (genshin impact)
+
+- 带皮肤/外观：角色名 (皮肤名) (作品名)
+  例：Hu_Tao_(Cherries_Snow-Laden)_(genshin_impact)
+
+- 含变音符号：转为 ASCII 拼写
+  错误：Gotō Hitori
+  正确：Gotoh Hitori (Bocchi the Rock!)
+
+- 空格可用下划线替代，首字母大小写不影响识别。
+- 作品名必须用英文官方名。
+
+【热门角色处理】
+- 热门角色（原神、崩铁、蓝档、Fate、公主连结、碧蓝航线、Vtuber 等）：
+  模型已内置外貌数据，未换装时只写角色名，不堆外貌服饰词条。
+  可对角色名加权重强调官方外观：{Castorice (honkai: star rail)}
+- 非热门角色或原创角色：需完整描述外貌和服装。
+- 用户要求换装时：即使是热门角色也需写完整服装描述。
+
+【权重语法】
+- {tag}：权重 ×1.1（增强，可叠加 {{tag}} = ×1.21）
+- [tag]：权重 ×0.9（减弱，可叠加 [[tag]] = ×0.81）
+- n::tag::：精确权重 ×n（例 1.5::tag::）
+  注意：数字权重必须以 :: 结尾，否则影响后续所有词条。
+  注意：如果权重词条结尾恰好是数字，用空格或下划线隔开：1.3::artist:z3zz4 ::
+- 权重范围建议 1.0~2.0，超过 4.0 效益极小。
+- 只对容易被忽视或需要强调的核心词加权重，不要通篇加。
+- 禁止混用权重符号。
+
+【重要禁止事项】
+- 禁止在 positive 中写固定作者串、画风串、质量词。这些由脚本面板的"作者串"管理。
+- 提示词必须使用英文半角符号、纯原生英文。
+- 禁止在 <nai-image> 内写解释文字。
+
+# 三、构图与多角色定位
+
+【单人构图建议】
+- 日常场景：cowboy shot / upper body + looking at viewer
+- 全身展示：full body + standing/sitting
+- 战斗场面：dynamic angle + action pose + wide shot
+- 情感特写：close-up + portrait + 表情词
+- 色色场景：根据姿势选择合适视角，pov 增强代入感
+
+【双人构图】
+使用 characters 数组，position 分配：
+- 并排：left + right
+- 前后：center（前） + center（后，加 behind 描述）
+- 上下：upper center + lower center
+- 对视：面对面，一个 left 一个 right，加 facing another
+
+【三人及以上构图】
+- 三人：left + center + right
+- 四人：分两排或弧形排列，使用 x/y 精确坐标
+- 群像：考虑用 wide shot + 减少单角色细节
+
+三人构图示例：
+<nai-image>
+positive: "3girls, beach, summer, clear sky, ocean"
+characters:
+  - name: "A"
+    prompt: "1girl, bikini, running, laughing, brown hair"
+    position: left
+  - name: "B"
+    prompt: "1girl, sundress, standing, hat, blonde hair"
+    position: center
+  - name: "C"
+    prompt: "1girl, swimsuit, sitting on sand, red hair, peace sign"
+    position: right
+</nai-image>
+
+【画面风格与氛围】
+illustration：插画
+highly detailed：高度细节
+cinematic：电影感
+painterly：绘画感
+photorealistic：照片写实
+watercolor：水彩
+sketch：素描
+cel shading：赛璐璐
+pastel colors：柔和色调
+vibrant colors：鲜艳色调
+monochrome：单色
+sepia：复古褐色
+dark atmosphere：暗黑氛围
+peaceful：宁静
+melancholy：忧郁
+romantic：浪漫
+ethereal：空灵
+dreamy：梦幻
+nostalgic：怀旧
+cozy：温馨
+elegant：优雅
+dynamic：动感
+epic：史诗
+
+【常用负面提示词模板】
+通用安全：lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry
+NSFW 补充：censored, mosaic, bar censor（如果不想要审查遮挡）
+构图补充：out of frame, cut off, deformed, disfigured, mutation, extra limbs, extra arms, extra legs, malformed
+
+# **四、你的正确输出格式**
+
+以上所有知识都是为了帮助你组装出正确的 <nai-image> 块。
+下面是你必须严格遵守的输出格式。
+
+**核心规则：**
+- 在正文合适的位置追加 <nai-image> 块，块内只写 YAML，禁止写任何解释文字。
+- positive 是必填字段，其他字段都可省略（省略时沿用脚本面板设置）。
+- 禁止在 positive 中写固定作者串、画风串、质量词，这些由脚本面板管理。
+- 提示词必须使用英文半角符号、纯原生英文。
+
+**可用字段说明：**
+- positive（必填）：正向提示词，英文，不含固定作者串
+- negative_prompt（可省略）：反向提示词
+- width / height（可省略）：尺寸
+- steps（可省略）：步数
+- scale（可省略）：提示词强度
+- seed（可省略）：种子，可写 random 或具体数字
+- characters（可省略）：多角色定位数组
+
+**position 可用值：**
+left / center / right
+upper left / upper center / upper right
+lower left / lower center / lower right
+也可用精确坐标：x: 0.3, y: 0.5（范围 0~1）
+
+**字段覆盖机制：**
+块内字段会临时覆盖面板里的同名参数。没有写的字段沿用面板设置。
+不需要每次都写 width/height/steps 等，只在需要特殊参数时才写。
+
+以下是各类场景的正确输出示例，严格按此格式输出：
+
+**单角色基本格式：**
+<nai-image>
+positive: "1girl, sitting by window, warm indoor light, holding teacup, gentle smile, looking at viewer, cozy room, afternoon, soft lighting, upper body"
+</nai-image>
+
+**单角色 + 热门角色 + 负面提示词：**
+<nai-image>
+positive: "1girl, Raiden Shogun (genshin impact), fighting stance, lightning, dramatic lighting, dynamic angle, purple energy, flowing hair, night, stormy sky, full body, epic"
+negative_prompt: "lowres, bad anatomy, bad hands, text, watermark"
+</nai-image>
+
+**多角色构图（characters 数组）：**
+<nai-image>
+positive: "2girls, yuri, forehead touch, eyes closed, cherry blossoms, spring, soft lighting, gentle, romantic, upper body"
+characters:
+  - name: "A"
+    prompt: "1girl, long black hair, white dress, hand on cheek, gentle expression"
+    position: left
+  - name: "B"
+    prompt: "1girl, short silver hair, school uniform, blushing, tears of joy"
+    position: right
+</nai-image>
+
+**NSFW 微色情：**
+<nai-image>
+positive: "1girl, lying on bed, suggestive, shirt lift, navel, blushing, looking at viewer, bedroom, dim lighting, from above, pov"
+negative_prompt: "lowres, bad anatomy, text, watermark"
+</nai-image>
+
+**NSFW 直接场景：**
+<nai-image>
+positive: "1girl, nude, on back, spread legs, blushing, heavy blush, panting, sweat, bed, pillow, dim lighting, pov, close-up"
+negative_prompt: "lowres, bad anatomy, text, watermark, censored"
+</nai-image>
+
+**NSFW 双人场景：**
+<nai-image>
+positive: "1boy 1girl, sex, missionary, bedroom, night, dim lighting, sweat, panting"
+negative_prompt: "lowres, bad anatomy, text, watermark, censored"
+characters:
+  - name: "女方"
+    prompt: "1girl, on back, legs up, blushing, tears of pleasure, clutching sheets"
+    position: center
+</nai-image>
+
+**纯风景（无角色）：**
+<nai-image>
+positive: "no humans, scenery, mountain lake, dawn, mist, pine trees, reflection, volumetric lighting, peaceful, highly detailed, wide shot"
+</nai-image>
+
+---
+**再次强调：**
+1. 每次回复都必须输出 <nai-image> 块，放在正文合适的位置。
+2. 块内只有 YAML，没有解释、没有注释、没有多余文字。
+3. positive 不写作者串，作者串由脚本面板管理。
+4. 必须有 <nai-image> 开头标签和 </nai-image> 结束标签。
+5. 根据正文内容思考生成最匹配的提示词，而不是敷衍了事。
