@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.5</strong>
+            <strong>NAI 生图 v0.0.6</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>
@@ -775,7 +775,7 @@
               </div>
               <label class="switch-row compact">
                 <span>
-                  <strong>包含玩家楼层</strong>
+                  <strong>上下文包含玩家楼层</strong>
                   <small>把玩家输入放进漫画上下文</small>
                 </span>
                 <input
@@ -786,7 +786,7 @@
               </label>
               <label class="switch-row compact">
                 <span>
-                  <strong>包含 AI 楼层</strong>
+                  <strong>上下文包含 AI 楼层</strong>
                   <small>把 AI 正文放进漫画上下文</small>
                 </span>
                 <input
@@ -1215,9 +1215,20 @@ function stripImageBlock(text: string): string {
   return text.replace(IMAGE_BLOCK_PATTERN, '').trim();
 }
 
+function ensureComicTarget(message: ChatMessage, messageId: number): void {
+  if (message.role !== 'assistant') {
+    throw new Error(`第 ${messageId} 楼不是 AI 楼层。漫画生图只会挂到 AI 楼层，玩家楼层只作为上下文。`);
+  }
+}
+
+function getComicTargetMessages(start: number, end: number): ChatMessage[] {
+  return getChatMessages(`${start}-${end}`, { role: 'assistant', hide_state: 'unhidden' }) as ChatMessage[];
+}
+
 async function generateComicFloor(messageId: number): Promise<number> {
   const target = getAnyMessage(messageId);
   if (!target) throw new Error(`没有找到第 ${messageId} 楼。`);
+  ensureComicTarget(target, messageId);
   const context = buildComicContext(messageId);
   if (!context.trim()) throw new Error('漫画上下文为空，请检查起止楼层和角色筛选。');
   const result = await requestComicImageBlock(store.settings, context, target);
@@ -1248,26 +1259,24 @@ async function generateComicRange(): Promise<void> {
   try {
     const start = Math.min(store.settings.comicStartMessageId, store.settings.comicEndMessageId);
     const end = Math.max(store.settings.comicStartMessageId, store.settings.comicEndMessageId || getLastMessageId());
-    const targets = (getChatMessages(`${start}-${end}`, { role: 'all', hide_state: 'unhidden' }) as ChatMessage[]).filter(
-      message => (message.role === 'user' && store.settings.comicIncludeUser) || (message.role === 'assistant' && store.settings.comicIncludeAssistant),
-    );
-    if (targets.length === 0) throw new Error('范围内没有可处理楼层。');
+    const targets = getComicTargetMessages(start, end);
+    if (targets.length === 0) throw new Error('范围内没有可处理的 AI 楼层。');
 
     let totalImages = 0;
     const completed: Array<{ messageId: number; count: number }> = [];
     for (const [index, target] of targets.entries()) {
-      comicProgress.value = `正在处理 ${index + 1}/${targets.length}：第 ${target.message_id} 楼`;
+      comicProgress.value = `正在处理 ${index + 1}/${targets.length} 个 AI 楼层：第 ${target.message_id} 楼`;
       const count = await generateComicFloor(target.message_id);
       totalImages += count;
       completed.push({ messageId: target.message_id, count });
     }
 
-    comicProgress.value = `完成 ${targets.length} 个楼层，共 ${totalImages} 张图片`;
+    comicProgress.value = `完成 ${targets.length} 个 AI 楼层，共 ${totalImages} 张图片`;
     store.setLastLog({
       level: 'success',
       title: '漫画范围生图完成',
-      message: `已处理 ${targets.length} 个楼层，共生成 ${totalImages} 张图片。`,
-      solution: '每个楼层的图片已经挂回对应楼层；如果某楼层暂时没有显示，切换聊天或刷新后也会从楼层 data 恢复。',
+      message: `已处理 ${targets.length} 个 AI 楼层，共生成 ${totalImages} 张图片。`,
+      solution: '图片只会挂回 AI 楼层；玩家楼层只作为上下文参与提示词生成。',
       detail: JSON.stringify(completed, null, 2),
     });
     toastr.success(`漫画范围生图完成，共 ${totalImages} 张。`);
