@@ -25,7 +25,7 @@
 
         <header class="panel-header" @pointerdown="!isMobile && onPanelPointerDown($event)">
           <div class="title-block">
-            <strong>NAI 生图 v0.0.8</strong>
+            <strong>NAI 生图 v0.0.9</strong>
             <span>{{ statusLine }}</span>
           </div>
           <div class="header-actions" @pointerdown.stop>
@@ -735,7 +735,7 @@
                     />
                   </label>
                   <label class="field">
-                    <span>每楼张数</span>
+                    <span>每楼分镜数</span>
                     <input
                       type="number"
                       min="1"
@@ -831,7 +831,7 @@ import {
   fetchComicModels,
   getDefaultComicBaseUrl,
   getDefaultComicModel,
-  requestComicImageBlock,
+  requestComicImageBlocks,
 } from './comic';
 import {
   IMAGE_BLOCK_PATTERN,
@@ -883,6 +883,8 @@ type NaiMessageImageState = {
   fingerprint: string;
   raw: string;
   config: Partial<NaiBlockConfig>;
+  raws?: string[];
+  configs?: Array<Partial<NaiBlockConfig>>;
   status: 'captured' | 'generating' | 'ready' | 'blocked_anlas' | 'error';
   model?: string;
   seed?: number;
@@ -893,6 +895,11 @@ type NaiMessageImageState = {
   caches?: Awaited<ReturnType<typeof putCachedImage>>[];
   last_error?: string;
   anlas_warnings?: string[];
+};
+
+type NaiPromptEntry = {
+  raw: string;
+  config: NaiBlockConfig;
 };
 
 defineExpose({
@@ -1075,6 +1082,23 @@ function makeFingerprint(raw: string, model: string, source: string): string {
   return JSON.stringify({ raw, model, source });
 }
 
+function makePromptEntriesFingerprint(entries: NaiPromptEntry[], model: string, source: string): string {
+  return JSON.stringify({
+    raws: entries.map(entry => entry.raw),
+    model,
+    source,
+  });
+}
+
+function formatStateRaw(entries: NaiPromptEntry[]): string {
+  if (entries.length === 1) return entries[0].raw;
+  return entries.map(entry => `<nai-image>\n${entry.raw}\n</nai-image>`).join('\n\n');
+}
+
+function uniqueWarnings(warnings: string[]): string[] {
+  return Array.from(new Set(warnings));
+}
+
 async function setFloorImageState(message: ChatMessage, state: NaiMessageImageState): Promise<void> {
   const data = _.isPlainObject(message.data) ? { ...(message.data as Record<string, unknown>) } : {};
   data[SCRIPT_STATE_KEY] = state;
@@ -1227,6 +1251,151 @@ async function generateFloorFromRaw(
   }
 }
 
+async function generateFloorFromPromptEntries(
+  messageId: number,
+  entries: NaiPromptEntry[],
+  source: string,
+): Promise<number> {
+  const message = getAnyMessage(messageId);
+  if (!message) throw new Error(`没有找到第 ${messageId} 楼。`);
+  if (entries.length === 0) throw new Error('漫画模型没有返回可用的分镜提示词。');
+
+  const promptEntries = entries.map(entry => ({
+    raw: normalizeRawImageInput(entry.raw),
+    config: {
+      ...entry.config,
+      n_samples: 1,
+    },
+  }));
+  const warnings = uniqueWarnings(promptEntries.flatMap(entry => getCostWarnings(store.settings, entry.config)));
+  const baseState: NaiMessageImageState = {
+    version: 3,
+    fingerprint: makePromptEntriesFingerprint(promptEntries, promptEntries[0].config.model ?? store.settings.model, source),
+    raw: formatStateRaw(promptEntries),
+    config: promptEntries[0].config,
+    raws: promptEntries.map(entry => entry.raw),
+    configs: promptEntries.map(entry => entry.config),
+    status: 'captured',
+  };
+
+  if (warnings.length > 0 && store.settings.paidMode === 'block') {
+    await setFloorImageState(message, {
+      ...baseState,
+      status: 'blocked_anlas',
+      anlas_warnings: warnings,
+    });
+    store.setLastLog({
+      level: 'warning',
+      title: '已阻止可能消耗 Anlas 的请求',
+      message: warnings.join('\n'),
+      solution: '把参数改回会员免费范围，或在面板中把策略改为“提醒后允许”或“直接允许”。',
+      detail: baseState.raw,
+    });
+    return 0;
+  }
+
+  await setFloorImageState(message, {
+    ...baseState,
+    status: 'generating',
+    anlas_warnings: warnings,
+  });
+
+  const caches: Awaited<ReturnType<typeof putCachedImage>>[] = [];
+  let lastPayload: ReturnType<typeof buildSingleNaiPayload> | null = null;
+
+  try {
+    for (const [frameIndex, entry] of promptEntries.entries()) {
+      const payload = buildSingleNaiPayload(store.settings, entry.config, 0);
+      lastPayload = payload;
+      const images = await requestNaiImages(store.settings, payload);
+
+      for (const image of images) {
+        const cacheIndex = caches.length;
+        const ext = image.mimeType.includes('webp') ? 'webp' : 'png';
+        const downloadName = renderIndexedDownloadName(store.settings.downloadNameTemplate, {
+          messageId,
+          seed: image.seed,
+          ext,
+          index: cacheIndex,
+          total: promptEntries.length,
+        });
+        const cache = await putCachedImage(image, downloadName, store.settings.imageTtlDays);
+        caches.push(cache);
+
+        if (store.settings.autoDownload || store.settings.storageMode === 'download') {
+          downloadImage(image, downloadName);
+        }
+
+        await setFloorImageState(message, {
+          ...baseState,
+          status: 'generating',
+          model: payload.model,
+          seed: caches[0]?.seed,
+          width: Number(payload.parameters.width),
+          height: Number(payload.parameters.height),
+          generated_at: new Date().toISOString(),
+          cache: caches[0],
+          caches: [...caches],
+          anlas_warnings: warnings,
+        });
+      }
+
+      comicProgress.value = `第 ${messageId} 楼分镜 ${frameIndex + 1}/${promptEntries.length} 已完成`;
+    }
+
+    await setFloorImageState(message, {
+      ...baseState,
+      status: 'ready',
+      model: lastPayload?.model,
+      seed: caches[0]?.seed,
+      width: Number(lastPayload?.parameters.width),
+      height: Number(lastPayload?.parameters.height),
+      generated_at: new Date().toISOString(),
+      cache: caches[0],
+      caches: [...caches],
+      anlas_warnings: warnings,
+    });
+
+    store.setLastLog({
+      level: 'success',
+      title: `${source}分镜生图成功`,
+      message: `第 ${messageId} 楼已生成 ${caches.length} 张分镜图片。`,
+      solution:
+        warnings.length > 0 ? `本次参数可能消耗 Anlas：\n${warnings.join('\n')}` : '当前参数处于会员免费生图范围内。',
+      detail: JSON.stringify(
+        {
+          source,
+          frameCount: promptEntries.length,
+          model: lastPayload?.model,
+          width: lastPayload?.parameters.width,
+          height: lastPayload?.parameters.height,
+          steps: lastPayload?.parameters.steps,
+          cacheIds: caches.map(cache => cache.id),
+        },
+        null,
+        2,
+      ),
+    });
+    return caches.length;
+  } catch (error) {
+    const translated = translateUnknownError(error);
+    await setFloorImageState(message, {
+      ...baseState,
+      status: 'error',
+      model: lastPayload?.model,
+      seed: caches[0]?.seed,
+      width: Number(lastPayload?.parameters.width),
+      height: Number(lastPayload?.parameters.height),
+      generated_at: new Date().toISOString(),
+      cache: caches[0],
+      caches: [...caches],
+      anlas_warnings: warnings,
+      last_error: translated.message,
+    });
+    throw error;
+  }
+}
+
 async function generateManualFloor(): Promise<void> {
   if (manualGenerating.value) return;
   manualGenerating.value = true;
@@ -1315,8 +1484,12 @@ async function generateComicFloor(messageId: number): Promise<number> {
   ensureComicTarget(target, messageId);
   const context = buildComicContext(messageId);
   if (!context.trim()) throw new Error('漫画上下文为空，请检查起止楼层和角色筛选。');
-  const result = await requestComicImageBlock(store.settings, context, target);
-  return generateFloorFromRaw(messageId, result.raw, '漫画', store.settings.comicImagesPerFloor);
+  const results = await requestComicImageBlocks(store.settings, context, target, store.settings.comicImagesPerFloor);
+  return generateFloorFromPromptEntries(
+    messageId,
+    results.map(result => ({ raw: result.raw, config: result.config })),
+    '漫画',
+  );
 }
 
 async function generateComicCurrentFloor(): Promise<void> {
