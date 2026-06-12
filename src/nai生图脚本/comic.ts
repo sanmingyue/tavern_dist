@@ -5,6 +5,12 @@ export type ComicModel = {
   id: string;
 };
 
+export type ComicImageBlockResult = {
+  raw: string;
+  config: NaiBlockConfig;
+  modelText: string;
+};
+
 type CompletionResponse = {
   choices?: Array<{
     finish_reason?: string | null;
@@ -21,11 +27,13 @@ const COMIC_SYSTEM_PROMPT = `你是 NovelAI 漫画分镜提示词生成器。
 规则：
 - 只根据用户提供的“剧情上下文”和“当前目标楼层”生成当前楼层画面。
 - 1 楼只看 1 楼，2 楼看 1-2 楼，后续同理；越靠后的楼层要保持角色、地点和情绪连续。
+- 用户会给出“需要分镜数”。如果分镜数大于 1，必须把当前目标楼层正文按时间顺序拆成对应数量的连续片段，每个片段生成一个不同画面。
+- 每个 <nai-image> 块只能对应一个片段，不要把同一段剧情、同一姿势、同一镜头重复写成多张。
 - positive 只写当前画面的英文提示词，不包含固定作者串、画师串、质量词或后置作者串。
 - negative_prompt 只写当前画面的英文反向提示词。
 - 如果有多角色，使用 characters，每个角色单独写 prompt 和 position。
 - 不要输出中文解释，不要输出 Markdown。
-- 必须输出完整 <nai-image> YAML 块，最后单独输出 <<<NAI_COMIC_DONE>>>。
+- 必须输出与分镜数完全一致的完整 <nai-image> YAML 块，最后单独输出 <<<NAI_COMIC_DONE>>>。
 
 输出格式：
 <nai-image>
@@ -69,8 +77,19 @@ export async function requestComicImageBlock(
   settings: NaiSettings,
   context: string,
   targetMessage: ChatMessage,
-): Promise<{ raw: string; config: NaiBlockConfig; modelText: string }> {
+): Promise<ComicImageBlockResult> {
+  const [result] = await requestComicImageBlocks(settings, context, targetMessage, 1);
+  return result;
+}
+
+export async function requestComicImageBlocks(
+  settings: NaiSettings,
+  context: string,
+  targetMessage: ChatMessage,
+  frameCount: number,
+): Promise<ComicImageBlockResult[]> {
   if (!settings.comicModel.trim()) throw new Error('请先选择漫画转提示词模型。');
+  const requestedFrameCount = Math.min(10, Math.max(1, Math.floor(frameCount)));
 
   const response = await fetch(`${normalizeBaseUrl(settings.comicBaseUrl)}/chat/completions`, {
     method: 'POST',
@@ -87,7 +106,7 @@ export async function requestComicImageBlock(
         { role: 'system', content: COMIC_SYSTEM_PROMPT },
         {
           role: 'user',
-          content: buildComicUserPrompt(context, targetMessage),
+          content: buildComicUserPrompt(context, targetMessage, requestedFrameCount),
         },
       ],
     }),
@@ -99,29 +118,50 @@ export async function requestComicImageBlock(
   const modelText = stripCompletionMarker(readCompletionContent(data));
   if (!modelText.trim()) throw new Error('模型返回为空。');
 
-  const raw = extractRawImageBlock(modelText);
-  return {
+  const raws = extractRawImageBlocks(modelText, requestedFrameCount);
+  if (raws.length < requestedFrameCount) {
+    throw new Error(
+      `漫画模型只返回了 ${raws.length} 个分镜提示词块，但当前设置需要 ${requestedFrameCount} 个。请提高“最大输出”或重试；不要用同一个 tag 块重复生成多张。`,
+    );
+  }
+
+  return raws.slice(0, requestedFrameCount).map(raw => ({
     raw,
     config: parseImageBlockRaw(raw),
     modelText,
-  };
+  }));
 }
 
-function buildComicUserPrompt(context: string, targetMessage: ChatMessage): string {
+function buildComicUserPrompt(context: string, targetMessage: ChatMessage, frameCount: number): string {
   return `剧情上下文：
 ${context}
 
+需要分镜数：
+${frameCount}
+
 当前目标楼层：
 #${targetMessage.message_id} ${targetMessage.role}
-${targetMessage.message}
+${targetMessage.message.replace(IMAGE_BLOCK_PATTERN, '').trim()}
 
-请只输出当前目标楼层的一张画面提示词块。`;
+请输出当前目标楼层的 ${frameCount} 个连续分镜提示词块。
+如果正文较长，把当前目标楼层按开头、中段、后段等剧情进度拆分；如果正文较短，也要用不同镜头和动作表达不同瞬间。
+只使用剧情上下文维持角色、地点和情绪连续，不要把旧楼层当作当前画面主体。`;
 }
 
 function extractRawImageBlock(text: string): string {
   const match = text.match(IMAGE_BLOCK_PATTERN);
   if (match) return match[1].trim();
   return text.trim();
+}
+
+function extractRawImageBlocks(text: string, expectedCount: number): string[] {
+  const matches = Array.from(text.matchAll(/<\s*nai[\s_-]*image\b[^>]*>([\s\S]*?)<\s*\/\s*nai[\s_-]*image\s*>/gi))
+    .map(match => match[1]?.trim() ?? '')
+    .filter(Boolean);
+
+  if (matches.length > 0) return matches;
+  if (expectedCount === 1) return [extractRawImageBlock(text)];
+  return [];
 }
 
 function normalizeBaseUrl(baseUrl: string): string {

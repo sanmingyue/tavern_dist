@@ -45,6 +45,8 @@ type NaiMessageImageState = {
   fingerprint: string;
   raw: string;
   config: Partial<NaiBlockConfig>;
+  raws?: string[];
+  configs?: Array<Partial<NaiBlockConfig>>;
   status: 'captured' | 'generating' | 'ready' | 'blocked_anlas' | 'error';
   model?: string;
   seed?: number;
@@ -55,6 +57,11 @@ type NaiMessageImageState = {
   caches?: NaiCachedImageMeta[];
   last_error?: string;
   anlas_warnings?: string[];
+};
+
+type NaiPromptEntry = {
+  raw: string;
+  config: Partial<NaiBlockConfig>;
 };
 
 function buildFingerprint(raw: string, model: string): string {
@@ -80,6 +87,51 @@ function createParseErrorState(raw: string, model: string, errorMessage: string)
     status: 'error',
     last_error: errorMessage,
   };
+}
+
+function createCapturedStateFromEntries(entries: NaiPromptEntry[], model: string): NaiMessageImageState {
+  const firstEntry = entries[0];
+  if (!firstEntry) throw new Error('没有可用的生图提示词。');
+
+  if (entries.length === 1) {
+    return createCapturedState(firstEntry.raw, firstEntry.config as NaiBlockConfig, model);
+  }
+
+  return {
+    version: 3,
+    fingerprint: JSON.stringify({ raws: entries.map(entry => entry.raw), model }),
+    raw: formatStateRaw(entries),
+    config: firstEntry.config,
+    raws: entries.map(entry => entry.raw),
+    configs: entries.map(entry => entry.config),
+    status: 'captured',
+  };
+}
+
+function getPromptEntries(state: NaiMessageImageState): NaiPromptEntry[] {
+  const rawList = Array.isArray(state.raws) ? state.raws.filter((raw): raw is string => _.isString(raw) && raw.trim().length > 0) : [];
+  const configList = Array.isArray(state.configs)
+    ? state.configs.filter((config): config is Partial<NaiBlockConfig> => _.isPlainObject(config))
+    : [];
+
+  if (rawList.length > 0 && configList.length === rawList.length) {
+    return rawList.map((raw, index) => ({ raw, config: configList[index] }));
+  }
+
+  return [{ raw: state.raw, config: state.config }];
+}
+
+function formatStateRaw(entries: NaiPromptEntry[]): string {
+  if (entries.length === 1) return entries[0].raw;
+  return entries.map(entry => `<nai-image>\n${entry.raw}\n</nai-image>`).join('\n\n');
+}
+
+function getEditorRaw(state: NaiMessageImageState): string {
+  return formatStateRaw(getPromptEntries(state));
+}
+
+function uniqueWarnings(warnings: string[]): string[] {
+  return Array.from(new Set(warnings));
 }
 
 function getImageState(message: ChatMessage): NaiMessageImageState | null {
@@ -139,7 +191,13 @@ async function generateForMessage(
 
   const store = useNaiStore(pinia);
   const settings = store.settings;
-  const warnings = getCostWarnings(settings, state.config);
+  const promptEntries = getPromptEntries(state);
+  const isSegmentedPrompt = promptEntries.length > 1;
+  const warnings = uniqueWarnings(
+    promptEntries.flatMap(entry =>
+      getCostWarnings(settings, isSegmentedPrompt ? { ...entry.config, n_samples: 1 } : entry.config),
+    ),
+  );
   showAnlasWarningOnce(warnings);
 
   if (shouldBlockForAnlas(warnings, settings.paidMode)) {
@@ -154,7 +212,7 @@ async function generateForMessage(
       title: '已阻止可能消耗 Anlas 的请求',
       message: warnings.join('\n'),
       solution: '把参数改回会员免费范围，或在面板中把策略改为“提醒后允许”或“直接允许”。',
-      detail: state.raw,
+      detail: getEditorRaw(state),
     });
     toastr.warning('当前参数已超出会员免费生图范围，已按“免费优先”策略阻止。');
     return;
@@ -173,16 +231,19 @@ async function generateForMessage(
     title: '正在生图',
     message: `正在处理第 ${message.message_id} 楼。`,
     solution: '请等待 NovelAI 返回图片，期间不要重复点击重新生成。',
-    detail: state.raw,
+    detail: getEditorRaw(state),
   });
 
-  const requestedCount = getRequestedImageCount(settings, state.config);
+  const requestedCount = isSegmentedPrompt ? promptEntries.length : getRequestedImageCount(settings, state.config);
   const caches: NaiCachedImageMeta[] = [];
   let lastPayload: NaiImageRequest | null = null;
 
   try {
     for (let requestIndex = 0; requestIndex < requestedCount; requestIndex += 1) {
-      const payload = buildSingleNaiPayload(settings, state.config, requestIndex);
+      const currentConfig = isSegmentedPrompt
+        ? { ...promptEntries[requestIndex].config, n_samples: 1 }
+        : state.config;
+      const payload = buildSingleNaiPayload(settings, currentConfig, isSegmentedPrompt ? 0 : requestIndex);
       lastPayload = payload;
       const images = await requestNaiImages(settings, payload);
 
@@ -370,6 +431,18 @@ function normalizeEditorRawInput(input: string): string {
   return (extractImageBlockCandidate(input)?.raw ?? input).trim();
 }
 
+function normalizeEditorPromptEntries(input: string): NaiPromptEntry[] {
+  const taggedBlocks = Array.from(input.matchAll(/<\s*nai[\s_-]*image\b[^>]*>([\s\S]*?)<\s*\/\s*nai[\s_-]*image\s*>/gi))
+    .map(match => match[1]?.trim() ?? '')
+    .filter(Boolean);
+  const raws = taggedBlocks.length > 0 ? taggedBlocks : [normalizeEditorRawInput(input)].filter(Boolean);
+
+  return raws.map(raw => ({
+    raw,
+    config: parseImageBlockRaw(raw),
+  }));
+}
+
 async function saveParseErrorForMessage(
   message: ChatMessage,
   candidate: { raw: string; cleanedMessage: string },
@@ -531,7 +604,7 @@ async function renderMessageImage(messageId: number): Promise<void> {
   }
 
   const $actions = $('<div></div>').addClass('nai-image-actions').appendTo($box);
-  const canRegenerate = hasPromptConfig(state.config);
+  const canRegenerate = hasPromptState(state);
   $('<button type="button"></button>')
     .addClass(REGENERATE_CLASS)
     .attr('data-message-id', String(messageId))
@@ -576,7 +649,7 @@ async function handleRegenerateClick(event: JQuery.ClickEvent, pinia: ReturnType
   if (!message) return;
   const state = getImageState(message);
   if (!state) return;
-  if (!hasPromptConfig(state.config)) {
+  if (!hasPromptState(state)) {
     toastr.warning('请先修复提示词格式。');
     return;
   }
@@ -599,7 +672,7 @@ function handleEditClick(event: JQuery.ClickEvent, pinia: ReturnType<typeof crea
 
   $box.find(`.${EDITOR_CLASS}`).remove();
   const $editor = $('<div></div>').addClass(EDITOR_CLASS).appendTo($box);
-  const $textarea = $('<textarea></textarea>').val(state.raw).appendTo($editor);
+  const $textarea = $('<textarea></textarea>').val(getEditorRaw(state)).appendTo($editor);
   const $actions = $('<div></div>').addClass('nai-image-editor-actions').appendTo($editor);
 
   $('<button type="button"></button>')
@@ -626,8 +699,8 @@ async function saveEditedPrompt(
 
   const raw = normalizeEditorRawInput(rawInput);
   try {
-    const config = parseImageBlockRaw(raw);
-    const state = createCapturedState(raw, config, store.settings.model);
+    const entries = normalizeEditorPromptEntries(rawInput);
+    const state = createCapturedStateFromEntries(entries, store.settings.model);
     await setMessageState(message, state);
     const updatedMessage = getAnyMessage(messageId) ?? {
       ...message,
@@ -678,6 +751,11 @@ function getStateCaches(state: NaiMessageImageState): NaiCachedImageMeta[] {
 
 function hasPromptConfig(config: Partial<NaiBlockConfig>): boolean {
   return Boolean((config.prompt ?? config.positive ?? config.input)?.trim());
+}
+
+function hasPromptState(state: NaiMessageImageState): boolean {
+  const entries = getPromptEntries(state);
+  return entries.length > 0 && entries.every(entry => hasPromptConfig(entry.config));
 }
 
 function formatCacheStatus(records: Array<{ record: { seed: number; expiresAt: string } }>): string {
