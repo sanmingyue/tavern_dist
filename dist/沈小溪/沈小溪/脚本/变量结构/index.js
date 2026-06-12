@@ -1,2 +1,0 @@
-import{registerMvuSchema as e}from'https://testingcf.jsdelivr.net/gh/StageDog/tavern_resource/dist/util/mvu_zod.js';const t=z,r=t.z.object({世界:t.z.object({当前场景:t.z.enum(['日常','回忆中']).prefault('日常'),当前回忆片段ID:t.z.string().prefault('')}).prefault({}),回忆片段:t.z.record(t.z.string().describe('片段ID，如 001, 002...'),t.z.object({状态:t.z.enum(['未触发','进行中','已完成']).prefault('未触发'),触发物:t.z.array(t.z.string()).prefault([])})).prefault({})});$(()=>{e(r)});export{r as Schema};
-//# sourceMappingURL=index.js.map
