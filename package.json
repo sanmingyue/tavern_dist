@@ -7,8 +7,12 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "dump": "node dump_schema.ts",
+<<<<<<< HEAD
     "sync": "node tavern_sync.mjs",
     "bundle:8bit-worldbook": "node scripts/bundle_8bit_worldbook.mjs"
+=======
+    "sync": "node tavern_sync.mjs"
+>>>>>>> 4f0b745981550e95a66a32adf5b43f01a2cde104
   },
   "browserslist": [
     "defaults and partially supports es6-module"
@@ -84,6 +88,10 @@
     "@vueuse/integrations": "^13.9.0",
     "@vueuse/shared": "^13.9.0",
     "async-wait-until": "^2.0.31",
+<<<<<<< HEAD
+=======
+    "axios": "1.14.0",
+>>>>>>> 4f0b745981550e95a66a32adf5b43f01a2cde104
     "compare-versions": "^6.1.1",
     "dedent": "^1.7.2",
     "gsap": "^3.15.0",
