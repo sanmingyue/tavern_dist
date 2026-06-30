@@ -368,10 +368,10 @@ import ModalDialog from './ModalDialog.vue';
 import { useModal } from './useModal';
 
 // 彩蛋：预设识别
-const SANMINGYUE_BANNER = 'https://i.postimg.cc/XJWHH9Qk/F18E432B-B2EC-4F82-9B6F-5E152A8D3293.png';
+const SANMINGYUE_BANNER = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.0.9/dist/潮汐预设脚本/assets/ig_0bb09a32e9873f06016a43e41ce3708191bcf8e98620765ea5.png';
 const IZUMI_AVATAR = 'https://i.postimg.cc/4yWJP6R6/f762f573-f542-4f2f-8303-770f83e248f9.png';
 const NEMO_BANNER = 'https://i.postimg.cc/rFSPWVc9/u31sdg.png';
-const SANMINGYUE_KEYWORDS = ['潮汐', '明月秋青', '氤', '傻子', '浮生'];
+const SANMINGYUE_KEYWORDS = ['潮汐', '明月秋青', '氤', '傻子', '浮生', '观星'];
 
 function isSanmingyuePreset(name: string): boolean {
   const lower = name.toLowerCase();
@@ -399,7 +399,7 @@ function getPresetBannerStyle(name: string): Record<string, string> {
     return {
       backgroundImage: `linear-gradient(to right, rgba(5,8,16,0.9) 0%, rgba(5,8,16,0.5) 50%, rgba(5,8,16,0.15) 100%), url(${SANMINGYUE_BANNER})`,
       backgroundSize: 'cover',
-      backgroundPosition: 'right center',
+      backgroundPosition: 'right top',
       backgroundRepeat: 'no-repeat',
     };
   }
