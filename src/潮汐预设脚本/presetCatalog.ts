@@ -1,5 +1,5 @@
 // CDN 基础路径：预设文件使用独立版本号，避免 CDN 缓存导致玩家下到旧预设
-export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.7/dist/presets';
+export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.8/dist/presets';
 
 export interface PresetCatalogItem {
   /** 显示名称 */
