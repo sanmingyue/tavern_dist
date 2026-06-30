@@ -369,7 +369,7 @@ import ModalDialog from './ModalDialog.vue';
 import { useModal } from './useModal';
 
 // 彩蛋：预设识别
-const SANMINGYUE_BANNER = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.0.9/dist/潮汐预设脚本/assets/ig_0bb09a32e9873f06016a43e41ce3708191bcf8e98620765ea5.png';
+const SANMINGYUE_BANNER = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.1.0/dist/潮汐预设脚本/assets/ig_0bb09a32e9873f06016a43e41ce3708191bcf8e98620765ea5.png';
 const IZUMI_AVATAR = 'https://i.postimg.cc/4yWJP6R6/f762f573-f542-4f2f-8303-770f83e248f9.png';
 const NEMO_BANNER = 'https://i.postimg.cc/rFSPWVc9/u31sdg.png';
 const SANMINGYUE_KEYWORDS = ['潮汐', '明月秋青', '氤', '傻子', '浮生', '观星'];
