@@ -1,3 +1,4 @@
+呃
 <template>
   <div class="chaoxi-manager-view" :class="{ mobile: isMobile }">
     <!-- 工具栏 -->

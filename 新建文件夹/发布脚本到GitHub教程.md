@@ -431,19 +431,20 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\修仙世�
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.0.8/dist/潮汐预设脚本/index.js';
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@cp-v2.1.0/dist/潮汐预设脚本/index.js';
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\潮汐预设脚本\presetCatalog.ts" "dist\潮汐预设脚本\index.js" "dist\潮汐预设脚本\index.js.map" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "潮汐预设脚本 v2.0.8" && git tag cp-v2.0.8 && git push && git push origin cp-v2.0.8
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\潮汐预设脚本" "dist\潮汐预设脚本" "dist\presets" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "潮汐预设脚本 v2.1.0" && git tag cp-v2.1.0 && git tag preset-v2.0.8 && git push && git push origin cp-v2.1.0 preset-v2.0.8
 ```
 
 **版本历史**
 
 | 版本号    | 日期       | 更新内容                                                                                                                                                                               |
 | --------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| cp-v2.1.0 | 2026-07-01 | 新增"明月秋青 Heart Sound"和"分成两半的灰魂 · v2.3"预设，更新彩蛋图+观星关键词；预设资源版本号升至 `preset-v2.0.8`                                                                     |
 | cp-v2.0.8 | 2026-06-09 | 预设仓库排序调整：将“明月秋青 Maya”移动到最上方；预设资源版本号仍为 `preset-v2.0.6`                                                                                                    |
 | cp-v2.0.7 | 2026-06-09 | 预设仓库新增“明月秋青 Maya”，标签 Gemini，展示更新日期 2026.6.9，介绍“最强的Gemini预设”；预设资源版本号升至 `preset-v2.0.6`                                                            |
 | cp-v2.0.6 | 2026-06-05 | 预设仓库资源版本号升至 `preset-v2.0.5`，修复“明月秋青 by oneself”变量初始化对齐问题                                                                                                    |
@@ -580,10 +581,10 @@ git tag -l "wsy-v*" --sort=-creatordate      # 卫疏影
 | 创意工坊脚本 CDN            | `@ws-v2.1.1/dist/创意工坊/index.js`                            |
 | 修仙世界状态栏 CDN          | `@xw-v1.1.3/dist/修仙世界状态栏/index.js`                      |
 | 修仙世界CE脚本 CDN          | `@xw-v1.1.3/dist/修仙世界重置版/脚本/CE脚本/index.js`          |
-| 潮汐预设脚本 CDN            | `@cp-v2.0.8/dist/潮汐预设脚本/index.js`                        |
+| 潮汐预设脚本 CDN            | `@cp-v2.1.0/dist/潮汐预设脚本/index.js`                        |
 | 小手机脚本 CDN              | `@phone-v0.2.2/dist/小手机/index.js`                           |
 | 点赞致谢数据 CDN            | `@reactions-v1.0.0/dist/reactions/reactions.json`              |
-| 预设JSON CDN 目录           | `@preset-v2.0.6/dist/presets/`                                 |
+| 预设JSON CDN 目录           | `@preset-v2.0.8/dist/presets/`                                 |
 | **酒馆联机脚本 CDN**        | `@online-v0.2.2/dist/酒馆联机脚本/index.js`                    |
 | **卫疏影开局脚本 CDN**      | `@wsy-v0.0.1/dist/卫疏影/index.js`                             |
 | **明月秋青智脑脚本 CDN**    | `@zhino-v4.0.0/dist/明月秋青脚本/index.js`                     |
