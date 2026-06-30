@@ -1,5 +1,5 @@
 // CDN 基础路径：预设文件使用独立版本号，避免 CDN 缓存导致玩家下到旧预设
-export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.6/dist/presets';
+export const CDN_BASE = 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@preset-v2.0.7/dist/presets';
 
 export interface PresetCatalogItem {
   /** 显示名称 */
@@ -18,12 +18,28 @@ export interface PresetCatalogItem {
 
 export const PRESET_CATALOG: PresetCatalogItem[] = [
   {
+    name: '明月秋青 Heart Sound',
+    filename: '明月秋青Heart Sound.json',
+    description: '专注心声与情感共鸣的预设',
+    tags: ['Gemini'],
+    author: '三明月',
+    updateDate: '2026.7.1',
+  },
+  {
+    name: '分成两半的灰魂 · v2.3',
+    filename: '分成两半的灰魂 · v2.3.json',
+    description: 'DSV4 专属预设，灰魂人格创意写作预设。多文风可选，支持长考/普通思维链切换。',
+    tags: ['DSV4专属预设', '非本人预设'],
+    author: '濯清江',
+    updateDate: '2026.7.1',
+  },
+  {
     name: '明月秋青 Maya',
     filename: '明月秋青Maya.json',
     description: '最强的Gemini预设',
     tags: ['Gemini'],
     author: '三明月',
-    updateDate: '2026.6.9',
+    updateDate: '2026.9',
   },
   {
     name: '明月秋青 by oneself',
@@ -39,13 +55,6 @@ export const PRESET_CATALOG: PresetCatalogItem[] = [
     description: '最懂你的预设。活人感与人设挖掘深度极强，适合追求极致角色表现的用户。',
     tags: ['5.19更新', 'Claude', 'Gemini', '最懂你的预设'],
     author: '三明月',
-  },
-  {
-    name: '分成两半的灰魂 · v2.0',
-    filename: '分成两半的灰魂 · v2.0.json',
-    description: 'DSV4 专属预设，灰魂人格创意写作预设。多文风可选，支持长考/普通思维链切换。',
-    tags: ['DSV4专属预设', '非本人预设'],
-    author: '濯清江',
   },
   {
     name: '浮生 Vane',
@@ -78,7 +87,7 @@ export const PRESET_CATALOG: PresetCatalogItem[] = [
   {
     name: '明月秋青 NAI 提示词版',
     filename: '明月秋青nai提示词版.json',
-    description: '专门用于给 AI 写 TAG 英文提示词的工具预设。只有这一个功能，无法进行 AIRP 游玩。',
+    description: '专门用于给 AI 写TAG 英文提示词的工具预设。只有这一个功能，无法进行 AIRP 游玩。',
     tags: ['工具', 'TAG提示词', 'NAI'],
     author: '三明月',
   },
