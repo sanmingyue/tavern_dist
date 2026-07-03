@@ -5,6 +5,7 @@
       "args": [
         "chrome-devtools-mcp@latest",
         "--autoConnect"
+<<<<<<< HEAD
       ],
       "alwaysAllow": [
         "list_pages",
@@ -15,6 +16,8 @@
         "get_network_request",
         "list_network_requests",
         "take_screenshot"
+=======
+>>>>>>> 75341c6e42a9de4002601a50d28fd5c0a0bfa070
       ]
     }
   }
