@@ -54,7 +54,7 @@
 | **青春的果实状态栏** | **`fruit-v`**  | **`fruit-v5.0.0`**  | **青春的果实角色卡 MVU 状态栏悬浮窗**                                 |
 | **onion状态栏**      | **`onion-v`**  | **`onion-v0.0.1`**  | **一脸嫌弃给你看胖次的onion IF线状态栏**                              |
 | **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.9`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
-| **未开之花汤泉脚本** | **`tq-v`**     | **`tq-v0.0.1`**     | **未开之花汤泉零层美化与玩法前端脚本**                                |
+| **未开之花汤泉脚本** | **`tq-v`**     | **`tq-v0.0.2`**     | **未开之花汤泉零层美化与玩法前端脚本**                                |
 
 > 每个项目的版本号独立递增，互不影响。
 
@@ -203,7 +203,7 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\nai生图�
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@tq-v0.0.1/dist/汤泉/脚本/零层美化/index.js';
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@tq-v0.0.2/dist/汤泉/脚本/零层美化/index.js';
 ```
 
 **一键更新**
@@ -216,6 +216,7 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "dist\汤泉\�
 
 | 版本号    | 日期       | 更新内容 |
 | --------- | ---------- | -------- |
+| tq-v0.0.2 | 2026-07-09 | 修复测试反馈：正式 UI 改回 0 层楼层内挂载，不再全屏覆盖酒馆；身份选择流程改为选择身份后继续进入存档；MVU 初始化和写入增加超时保护，避免卡在 42% |
 | tq-v0.0.1 | 2026-07-09 | 初始测试发布：未开之花汤泉零层美化与正式玩法前端脚本，含标题页、存档系统、老板玩法前端、MVU 注册与世界书条目开关运行接口 |
 
 ---
@@ -615,5 +616,5 @@ git tag -l "tq-v*" --sort=-creatordate       # 未开之花汤泉
 | **明月秋青智脑脚本 CDN**    | `@zhino-v4.0.0/dist/明月秋青脚本/index.js`                     |
 | **onion状态栏 CDN**         | `@onion-v0.0.6/dist/一脸嫌弃给你看胖次的onion/状态栏/index.js` |
 | **NAI 生图脚本 CDN**        | `@nai-v0.0.9/dist/nai生图脚本/index.js`                        |
-| **未开之花汤泉脚本 CDN**    | `@tq-v0.0.1/dist/汤泉/脚本/零层美化/index.js`                   |
+| **未开之花汤泉脚本 CDN**    | `@tq-v0.0.2/dist/汤泉/脚本/零层美化/index.js`                   |
 | 角色卡PNG CDN 目录          | `@char-v1.0.0/dist/characters/`                                |
