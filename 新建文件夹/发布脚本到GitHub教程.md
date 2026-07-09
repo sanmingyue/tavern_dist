@@ -24,6 +24,7 @@
   - [酒馆联机脚本](#酒馆联机脚本online-v)
   - [8bit的幻想控制台](#8bit的幻想控制台8bit-v)
   - [NAI 生图脚本](#nai-生图脚本nai-v)
+  - [未开之花汤泉脚本](#未开之花汤泉脚本tq-v)
 - **CDN 资源**
   - [预设JSON文件](#预设json文件preset-v)
   - [角色卡PNG文件](#角色卡png文件char-v)
@@ -53,6 +54,7 @@
 | **青春的果实状态栏** | **`fruit-v`**  | **`fruit-v5.0.0`**  | **青春的果实角色卡 MVU 状态栏悬浮窗**                                 |
 | **onion状态栏**      | **`onion-v`**  | **`onion-v0.0.1`**  | **一脸嫌弃给你看胖次的onion IF线状态栏**                              |
 | **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.9`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
+| **未开之花汤泉脚本** | **`tq-v`**     | **`tq-v0.0.1`**     | **未开之花汤泉零层美化与玩法前端脚本**                                |
 
 > 每个项目的版本号独立递增，互不影响。
 
@@ -193,6 +195,28 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\nai生图�
 | nai-v0.0.3 | 2026-06-10 | 修复生成完成后酒馆连续触发楼层更新事件时，同一楼层的 NAI 图片块会在当前页面重复插入多份的问题；现在同楼层渲染会合并，并只允许最后一次异步渲染结果落地 |
 | nai-v0.0.2 | 2026-06-10 | 移除前端订阅接口“测试账号”入口，避免订阅接口在酒馆浏览器环境中因代理、跨域或扩展拦截造成误报；接口页保留真实生图测试，并确认新 AI 楼层自动捕获、按楼层渲染图片与重新生成按钮 |
 | nai-v0.0.1 | 2026-06-10 | 正式发布：NovelAI API 生图面板、AI 楼层 `<nai-image>` 自动捕获与首次自动生成、浏览器 7 天图片缓存、重新生成/保存图片、会员免费范围提醒、作者串与 NAI 参数设置、独立 OpenAI 兼容提示词助手 |
+
+---
+
+### 未开之花汤泉脚本（tq-v）
+
+**CDN 链接**
+
+```javascript
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@tq-v0.0.1/dist/汤泉/脚本/零层美化/index.js';
+```
+
+**一键更新**
+
+```bash
+cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "dist\汤泉\脚本\零层美化\index.js" "dist\汤泉\脚本\零层美化\index.js.map" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "未开之花汤泉脚本 v0.0.X" && git tag tq-v0.0.X && git push && git push origin tq-v0.0.X
+```
+
+**版本历史**
+
+| 版本号    | 日期       | 更新内容 |
+| --------- | ---------- | -------- |
+| tq-v0.0.1 | 2026-07-09 | 初始测试发布：未开之花汤泉零层美化与正式玩法前端脚本，含标题页、存档系统、老板玩法前端、MVU 注册与世界书条目开关运行接口 |
 
 ---
 
@@ -562,6 +586,7 @@ git tag -l "reactions-v*" --sort=-creatordate # 点赞致谢
 git tag -l "online-v*" --sort=-creatordate   # 酒馆联机
 git tag -l "8bit-v*" --sort=-creatordate     # 8bit的幻想
 git tag -l "wsy-v*" --sort=-creatordate      # 卫疏影
+git tag -l "tq-v*" --sort=-creatordate       # 未开之花汤泉
 ```
 
 ---
@@ -590,4 +615,5 @@ git tag -l "wsy-v*" --sort=-creatordate      # 卫疏影
 | **明月秋青智脑脚本 CDN**    | `@zhino-v4.0.0/dist/明月秋青脚本/index.js`                     |
 | **onion状态栏 CDN**         | `@onion-v0.0.6/dist/一脸嫌弃给你看胖次的onion/状态栏/index.js` |
 | **NAI 生图脚本 CDN**        | `@nai-v0.0.9/dist/nai生图脚本/index.js`                        |
+| **未开之花汤泉脚本 CDN**    | `@tq-v0.0.1/dist/汤泉/脚本/零层美化/index.js`                   |
 | 角色卡PNG CDN 目录          | `@char-v1.0.0/dist/characters/`                                |
