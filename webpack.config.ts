@@ -128,6 +128,7 @@ function schema_dump(compiler: webpack.Compiler) {
   }
 }
 
+<<<<<<< HEAD
 // ─── 复制角色卡资源到 dist ───
 function copy_characters(compiler: webpack.Compiler) {
   const srcDir = path.join(import.meta.dirname, '我的角色卡');
@@ -164,6 +165,12 @@ let child_process: ChildProcess;
 const bundle = () => {
   exec('pnpm sync bundle 角色卡示例', { cwd: import.meta.dirname });
   console.info('\x1b[36m[tavern_sync]\x1b[0m 已打包默认预设；8bit 世界书需手动运行 npm run bundle:8bit-worldbook');
+=======
+let child_process: ChildProcess;
+const bundle = () => {
+  exec('pnpm sync bundle all', { cwd: import.meta.dirname });
+  console.info('\x1b[36m[tavern_sync]\x1b[0m 已打包所有配置了的角色卡/世界书/预设');
+>>>>>>> b6c722413d8cfdaf014bbb3f87518fd8c19754be
 };
 const bundle_debounced = _.debounce(bundle, 500, { leading: true, trailing: false });
 function tavern_sync(compiler: webpack.Compiler) {
@@ -368,11 +375,14 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
               ],
             },
             {
+<<<<<<< HEAD
               test: /\.txt$/,
               type: 'asset/source',
               exclude: /node_modules/,
             },
             {
+=======
+>>>>>>> b6c722413d8cfdaf014bbb3f87518fd8c19754be
               test: /\.ya?ml$/,
               loader: 'yaml-loader',
               options: { asStream: true },
@@ -477,7 +487,10 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
         { apply: watch_tavern_helper },
         { apply: schema_dump },
         { apply: tavern_sync },
+<<<<<<< HEAD
         { apply: copy_characters },
+=======
+>>>>>>> b6c722413d8cfdaf014bbb3f87518fd8c19754be
         new VueLoaderPlugin(),
         unpluginAutoImport({
           dts: true,
@@ -490,6 +503,10 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
             { from: 'klona', imports: ['klona'] },
             { from: 'vue-final-modal', imports: ['useModal'] },
             { from: 'zod', imports: ['z'] },
+<<<<<<< HEAD
+=======
+            { from: 'type-fest', imports: [['*', 'TypeFest']], type: true },
+>>>>>>> b6c722413d8cfdaf014bbb3f87518fd8c19754be
           ],
         }),
         unpluginVueComponents({
@@ -598,9 +615,23 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
       const cdn = {
         sass: 'https://jspm.dev/sass',
       };
+<<<<<<< HEAD
       return callback(
         null,
         'module-import ' + (cdn[request as keyof typeof cdn] ?? `https://testingcf.jsdelivr.net/npm/${request}/+esm`),
+=======
+      const package_json = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'package.json'), 'utf-8')) as {
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+      };
+      const package_versions = { ...package_json.devDependencies, ...package_json.dependencies };
+      const version = package_versions[request]?.replace(/^[~^]/, '');
+      const versioned_request = /^[.\d]+$/.test(version) ? `${request}@${version}` : request;
+      return callback(
+        null,
+        'module-import ' +
+          (cdn[request as keyof typeof cdn] ?? `https://testingcf.jsdelivr.net/npm/${versioned_request}/+esm`),
+>>>>>>> b6c722413d8cfdaf014bbb3f87518fd8c19754be
       );
     },
   });
