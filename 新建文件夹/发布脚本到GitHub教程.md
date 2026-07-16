@@ -54,7 +54,7 @@
 | **青春的果实状态栏** | **`fruit-v`**  | **`fruit-v5.0.0`**  | **青春的果实角色卡 MVU 状态栏悬浮窗**                                 |
 | **onion状态栏**      | **`onion-v`**  | **`onion-v0.0.1`**  | **一脸嫌弃给你看胖次的onion IF线状态栏**                              |
 | **NAI 生图脚本**     | **`nai-v`**    | **`nai-v0.0.9`**    | **NovelAI 生图面板 + 楼层自动生图 + 提示词助手**                      |
-| **未开之花汤泉脚本** | **`tq-v`**     | **`tq-v1.0.2`**     | **未开之花汤泉零层美化与玩法前端脚本**                                |
+| **未开之花汤泉脚本** | **`tq-v`**     | **`tq-v1.0.3`**     | **未开之花汤泉零层美化与玩法前端脚本**                                |
 
 > 每个项目的版本号独立递增，互不影响。
 
@@ -203,19 +203,20 @@ cd C:\Users\三明月\Desktop\三明月 && pnpm build && git add "src\nai生图�
 **CDN 链接**
 
 ```javascript
-import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@tq-v1.0.2/dist/汤泉/脚本/零层美化/index.js';
+import 'https://testingcf.jsdelivr.net/gh/sanmingyue/tavern_dist@tq-v1.0.3/dist/汤泉/脚本/零层美化/index.js';
 ```
 
 **一键更新**
 
 ```bash
-cd C:\Users\三明月\Desktop\三明月 && pnpm build:dev && git add "dist\汤泉\脚本\零层美化\index.js" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "未开之花汤泉脚本 v1.0.2" && git tag tq-v1.0.2 && git push origin main && git push origin tq-v1.0.2
+cd C:\Users\三明月\Desktop\三明月 && pnpm build:dev && git add "dist\汤泉\脚本\零层美化\index.js" "新建文件夹\发布脚本到GitHub教程.md" && git commit -m "未开之花汤泉脚本 v1.0.3" && git tag tq-v1.0.3 && git push origin main && git push origin tq-v1.0.3
 ```
 
 **版本历史**
 
 | 版本号    | 日期       | 更新内容 |
 | --------- | ---------- | -------- |
+| tq-v1.0.3 | 2026-07-16 | 二期体验升级：修复确认排班错误推进时间、AIRP 现场与立绘恢复等问题；新增三玩法手动跳时、自由看板娘、普通招募付费刷新、独立 AI 人才市场、AI 角色完整人设与事务世界书；完善双招募池、存档迁移、失败回滚、联系人线上正文约束及全流程自动化与实机回归 |
 | tq-v1.0.2 | 2026-07-15 | 修复 Galgame 对话模式打开现场输入后当前台词不可见的问题；输入区现在固定显示当前说话人与分页台词，旧对话框同步隐藏，上一句、下一句、输入和发送不再互相遮挡 |
 | tq-v1.0.1 | 2026-07-15 | 素材补充修正版：新增城市街道、私人套房、河畔公园三处店外地点的昼夜背景；老板、游客、服务员界面的旧“汤”字徽记统一替换为正式 LOGO；`打开未开之花` 在界面收起后提供重开入口，并在脚本卸载时自动清理，避免本地测试残留 |
 | tq-v1.0.0 | 2026-07-15 | 正式发布：三套玩法与新手教程完整落地；完成模块化 MVU、动态世界书、每日串行安排、角色素材和专属预设联动；完善 12 槽存档、AIRP 正文与 Galgame 台词显示、跨楼层恢复、回退与重 Roll；加入最多保留 5 次操作的问题记录导出，并通过长周目、存档、内存与实机界面验收 |
@@ -621,5 +622,5 @@ git tag -l "tq-v*" --sort=-creatordate       # 未开之花汤泉
 | **明月秋青智脑脚本 CDN**    | `@zhino-v4.0.0/dist/明月秋青脚本/index.js`                     |
 | **onion状态栏 CDN**         | `@onion-v0.0.6/dist/一脸嫌弃给你看胖次的onion/状态栏/index.js` |
 | **NAI 生图脚本 CDN**        | `@nai-v0.0.9/dist/nai生图脚本/index.js`                        |
-| **未开之花汤泉脚本 CDN**    | `@tq-v1.0.2/dist/汤泉/脚本/零层美化/index.js`                   |
+| **未开之花汤泉脚本 CDN**    | `@tq-v1.0.3/dist/汤泉/脚本/零层美化/index.js`                   |
 | 角色卡PNG CDN 目录          | `@char-v1.0.0/dist/characters/`                                |
