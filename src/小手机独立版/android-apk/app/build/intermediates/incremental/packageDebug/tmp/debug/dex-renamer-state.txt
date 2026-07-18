@@ -1,7 +1,0 @@
-#Mon Jun 01 18:54:43 CST 2026
-base.1=C\:\\Users\\三明月\\Desktop\\三明月\\src\\小手机独立版\\android-apk\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\9\\classes.dex
-path.1=9/classes.dex
-base.0=C\:\\Users\\三明月\\Desktop\\三明月\\src\\小手机独立版\\android-apk\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-renamed.1=classes2.dex
-renamed.0=classes.dex
-path.0=0/classes.dex

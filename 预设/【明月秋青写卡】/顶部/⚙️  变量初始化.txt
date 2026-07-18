@@ -1,1 +1,0 @@
-{{setvar::template_knowledge:: }}{{setvar::self_check_instruction:: }}{{trim}}
