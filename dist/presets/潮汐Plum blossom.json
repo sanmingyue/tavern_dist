@@ -936,7 +936,7 @@
             "injection_depth": 4,
             "injection_order": 100,
             "role": "system",
-            "content": "{{setvar::output_language::}}{{setvar::word_min::}}{{setvar::word_max::}}{{setvar::POV_rules::}}{{setvar::pre_check_roles::}}{{setvar::extra_cot_roles::}}{{setvar::recap_format::}}{{setvar::choice_format::}}{{setvar::timeline::}}{{setvar::recap_reminder::}}{{setvar::extra_format_adapt::}}{{setvar::diy::}}{{setvar::timeline::}}{{setvar::theater_format::}}{{setvar::parallel_world_timeline::}}{{setvar::pacing_format::}}{{setvar::pacing_reminder::}}{{setvar::battle_rules::}}{{setvar::battle_format::}}{{setvar::battle_reminder::}}{{setvar::revision_rules::}}",
+            "content": "{{setvar::output_language::}}{{setvar::word_min::}}{{setvar::word_max::}}{{setvar::POV_rules::}}{{setvar::pre_check_roles::}}{{setvar::extra_cot_roles::}}{{setvar::recap_format::}}{{setvar::choice_format::}}{{setvar::timeline::}}{{setvar::recap_reminder::}}{{setvar::extra_format_adapt::}}{{setvar::diy::}}{{setvar::theater_format::}}{{setvar::parallel_world_timeline::}}{{setvar::pacing_format::}}{{setvar::pacing_reminder::}}{{setvar::battle_rules::}}{{setvar::battle_format::}}{{setvar::battle_reminder::}}{{setvar::revision_rules::}}",
             "system_prompt": false,
             "marker": false,
             "forbid_overrides": false

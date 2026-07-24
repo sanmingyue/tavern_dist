@@ -72,7 +72,7 @@
             "injection_depth": 4,
             "injection_order": 100,
             "role": "system",
-            "content": "{{setvar::output_language:: }}{{setvar::word_min:: }}{{setvar::word_max:: }}{{setvar::POV_rules:: }}{{setvar::anti_rules:: }}{{setvar::thinking_chain:: }}{{setvar::nsfw_thinking_chain:: }}{{setvar::recap_format:: }}{{setvar::theater_format:: }}{{setvar::choice_format:: }}{{setvar::update_reminder:: }}{{setvar::final_reminder:: }}\n{{setvar::timeline:: }}\n{{setvar::recap_reminder:: }}{{setvar::highschool_mindset:: }}{{setvar::highschool_reaction_check:: }}{{setvar::parallel_world_timeline:: }}{{setvar::personality:: }}{{trim}}",
+            "content": "{{setvar::output_language::}}{{setvar::word_min::}}{{setvar::word_max::}}{{setvar::POV_rules::}}{{setvar::anti_rules::}}{{setvar::thinking_chain::}}{{setvar::nsfw_thinking_chain::}}{{setvar::recap_format::}}{{setvar::theater_format::}}{{setvar::choice_format::}}{{setvar::final_reminder::}}\n{{setvar::timeline::}}\n{{setvar::recap_reminder::}}{{setvar::highschool_mindset::}}{{setvar::highschool_reaction_check::}}{{setvar::parallel_world_timeline::}}{{trim}}",
             "system_prompt": false,
             "marker": false,
             "forbid_overrides": false,
