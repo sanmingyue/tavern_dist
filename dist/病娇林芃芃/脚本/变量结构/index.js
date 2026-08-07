@@ -1,0 +1,2 @@
+import{registerMvuSchema as t}from'https://testingcf.jsdelivr.net/gh/StageDog/tavern_resource/dist/util/mvu_zod.js';const e=z,r=e.z.object({场景:e.z.object({当前时间:e.z.string().prefault('2025年10月13日 星期一 16:30'),当前地点:e.z.string().prefault('浙江大学校园')}).prefault({}),林芃芃:e.z.object({$状态:e.z.enum(['普通','病娇']).prefault('普通')}).prefault({})});$(()=>{t(r)});
+//# sourceMappingURL=index.js.map
